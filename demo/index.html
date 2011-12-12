@@ -12,7 +12,12 @@
     <h1>notebook.js demo</h1>
     <div id='notebook'>
       <div id='title'></div>
-      <div id='cells'></div>
+      <ul id='cells'></ul>
     </div>
+    <script id='cell-template' type='text/template'>
+      <div class='cell' id='[[= id ]]'>
+        <textarea class='cell-input' cols='80' rows='10'>[[= input ]]</textarea>
+      </div>
+    </script>
   </body>
 </html>

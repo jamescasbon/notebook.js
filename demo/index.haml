@@ -13,4 +13,12 @@
 
     #notebook
       #title
-      #cells
+      %ul{:id => "cells"}
+
+
+    %script{:type => "text/template", "id"=>"cell-template"}
+      %div{:class => "cell", :id => "[[= id ]]"}
+        %textarea{:class=>"cell-input", :rows => "10", :cols => 80}
+          [[= input ]]
+
+
