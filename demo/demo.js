@@ -1,5 +1,5 @@
 (function() {
-  var Cell, CellView, Cells, Notebook, NotebookView, Notebooks;
+  var Cell, CellView, Cells, JavascriptEval, Notebook, NotebookView, Notebooks;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
@@ -87,10 +87,24 @@
     Cell.prototype.tagName = 'li';
     Cell.prototype.defaults = function() {
       return {
-        input: "something"
+        input: "something",
+        type: "javascript",
+        output: null
       };
     };
     return Cell;
+  })();
+  JavascriptEval = (function() {
+    function JavascriptEval() {}
+    JavascriptEval.prototype.evaluate = function(cell) {
+      var output;
+      output = eval(cell.get('input'));
+      console.log('eval produced', output);
+      return cell.set({
+        output: output
+      });
+    };
+    return JavascriptEval;
   })();
   CellView = (function() {
     __extends(CellView, Backbone.View);
@@ -100,7 +114,8 @@
       CellView.__super__.constructor.apply(this, arguments);
     }
     CellView.prototype.initialize = function() {
-      return this.template = _.template($('#cell-template').html());
+      this.template = _.template($('#cell-template').html());
+      return this.model.bind('all', this.render);
     };
     CellView.prototype.render = function() {
       console.log('render cell', this.model.toJSON());
@@ -126,6 +141,7 @@
     app = new NotebookView({
       model: notebook
     });
+    window.ev = new JavascriptEval();
     window.n = notebook;
     window.C = Cell;
     return window.N = Notebook;

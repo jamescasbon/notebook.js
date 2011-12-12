@@ -44,12 +44,21 @@ class NotebookView extends Backbone.View
 
 class Cell extends Backbone.Model
     tagName: 'li'
-    defaults: => (input: "something")
+    defaults: => (input: "something", type: "javascript", output: null)
+
+
+class JavascriptEval
+    evaluate: (cell) -> 
+        output = eval(cell.get('input'))
+        console.log 'eval produced', output
+        cell.set(output: output)
+    
 
 
 class CellView extends Backbone.View
     initialize: => 
         @template =  _.template($('#cell-template').html())
+        @model.bind 'all', @render
 
     render: =>
         console.log('render cell', @model.toJSON())
@@ -67,7 +76,7 @@ $(document).ready ->
     notebooks = new Notebooks()
     notebook = notebooks.create()
     app = new NotebookView(model: notebook)
-
+    window.ev = new JavascriptEval()
 
     window.n = notebook
     window.C = Cell
