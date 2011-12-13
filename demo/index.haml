@@ -17,10 +17,13 @@
 
 
     %script{:type => "text/template", "id"=>"cell-template"}
-      %div{:class => "cell", :id => "[[= id ]]"}
-        %textarea{:class=>"cell-input", :rows => "10", :cols => 80}
+      #cell{:id => "[[= id ]]"}
+        #controls
+          #evaluate evaluate
+          #delete delete
+        %textarea{:class=>"cell-input", :rows => "5", :cols => 80}
           [[= input ]]
-        %div{:class => "cell-output"}
+        #cell-output
           [[= output ]]
 
 

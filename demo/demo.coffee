@@ -46,26 +46,51 @@ class Cell extends Backbone.Model
     tagName: 'li'
     defaults: => (input: "something", type: "javascript", output: null)
 
+    evaluate: => 
+        # how to look up handler
+        handler = new JavascriptEval()
+        handler.evaluate @get('input'), @evaluateSuccess
+
+    evaluateSuccess: (output) => 
+        @set(output: output)
+        @save()
 
 class JavascriptEval
-    evaluate: (cell) -> 
-        output = eval(cell.get('input'))
+    evaluate: (input, onSuccess) -> 
+        output = eval(output)
         console.log 'eval produced', output
-        cell.set(output: output)
+        onSuccess output
     
 
 
 class CellView extends Backbone.View
+
+    events: => (
+        "click #evaluate":  "evaluate",
+        "click #delete": "destroy"
+    )
+       
+
     initialize: => 
         @template =  _.template($('#cell-template').html())
         @model.bind 'all', @render
-
+        @model.bind 'destroy', @remove
     render: =>
         console.log('render cell', @model.toJSON())
         $(@el).html(@template(@model.toJSON()))
         @input = @$('.todo-input') 
         @el
 
+    evaluate: =>
+        console.log 'in cellview evaluate handler'
+        @model.evaluate()
+
+    destroy: =>
+        console.log 'in cellview destroy handler'
+        @model.destroy()
+
+    remove: => 
+        $(@el).fadeOut('fast', $(@el).remove)
 
 class Cells extends Backbone.Collection
     model: Cell

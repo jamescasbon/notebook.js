@@ -81,6 +81,8 @@
   Cell = (function() {
     __extends(Cell, Backbone.Model);
     function Cell() {
+      this.evaluateSuccess = __bind(this.evaluateSuccess, this);
+      this.evaluate = __bind(this.evaluate, this);
       this.defaults = __bind(this.defaults, this);
       Cell.__super__.constructor.apply(this, arguments);
     }
@@ -92,36 +94,67 @@
         output: null
       };
     };
+    Cell.prototype.evaluate = function() {
+      var handler;
+      handler = new JavascriptEval();
+      return handler.evaluate(this.get('input'), this.evaluateSuccess);
+    };
+    Cell.prototype.evaluateSuccess = function(output) {
+      this.set({
+        output: output
+      });
+      return this.save();
+    };
     return Cell;
   })();
   JavascriptEval = (function() {
     function JavascriptEval() {}
-    JavascriptEval.prototype.evaluate = function(cell) {
+    JavascriptEval.prototype.evaluate = function(input, onSuccess) {
       var output;
-      output = eval(cell.get('input'));
+      output = eval(output);
       console.log('eval produced', output);
-      return cell.set({
-        output: output
-      });
+      return onSuccess(output);
     };
     return JavascriptEval;
   })();
   CellView = (function() {
     __extends(CellView, Backbone.View);
     function CellView() {
+      this.remove = __bind(this.remove, this);
+      this.destroy = __bind(this.destroy, this);
+      this.evaluate = __bind(this.evaluate, this);
       this.render = __bind(this.render, this);
       this.initialize = __bind(this.initialize, this);
+      this.events = __bind(this.events, this);
       CellView.__super__.constructor.apply(this, arguments);
     }
+    CellView.prototype.events = function() {
+      return {
+        "click #evaluate": "evaluate",
+        "click #delete": "destroy"
+      };
+    };
     CellView.prototype.initialize = function() {
       this.template = _.template($('#cell-template').html());
-      return this.model.bind('all', this.render);
+      this.model.bind('all', this.render);
+      return this.model.bind('destroy', this.remove);
     };
     CellView.prototype.render = function() {
       console.log('render cell', this.model.toJSON());
       $(this.el).html(this.template(this.model.toJSON()));
       this.input = this.$('.todo-input');
       return this.el;
+    };
+    CellView.prototype.evaluate = function() {
+      console.log('in cellview evaluate handler');
+      return this.model.evaluate();
+    };
+    CellView.prototype.destroy = function() {
+      console.log('in cellview destroy handler');
+      return this.model.destroy();
+    };
+    CellView.prototype.remove = function() {
+      return $(this.el).fadeOut('fast', $(this.el).remove);
     };
     return CellView;
   })();

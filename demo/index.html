@@ -15,9 +15,13 @@
       <ul id='cells'></ul>
     </div>
     <script id='cell-template' type='text/template'>
-      <div class='cell' id='[[= id ]]'>
-        <textarea class='cell-input' cols='80' rows='10'>[[= input ]]</textarea>
-        <div class='cell-output'>
+      <div id='cell_[[= id ]]'>
+        <div id='controls'>
+          <div id='evaluate'>evaluate</div>
+          <div id='delete'>delete</div>
+        </div>
+        <textarea class='cell-input' cols='80' rows='5'>[[= input ]]</textarea>
+        <div id='cell-output'>
           [[= output ]]
         </div>
       </div>
