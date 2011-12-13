@@ -42,13 +42,20 @@
   NotebookView = (function() {
     __extends(NotebookView, Backbone.View);
     function NotebookView() {
+      this.spawnCell = __bind(this.spawnCell, this);
       this.addAll = __bind(this.addAll, this);
       this.addOne = __bind(this.addOne, this);
       this.render = __bind(this.render, this);
       this.initialize = __bind(this.initialize, this);
+      this.events = __bind(this.events, this);
       NotebookView.__super__.constructor.apply(this, arguments);
     }
     NotebookView.prototype.el = "#notebook";
+    NotebookView.prototype.events = function() {
+      return {
+        "click #spawner": 'spawnCell'
+      };
+    };
     NotebookView.prototype.initialize = function() {
       this.title = this.$('#title');
       this.cells = this.$('#cells');
@@ -60,7 +67,7 @@
       });
     };
     NotebookView.prototype.render = function() {
-      console.log('rendering' + this.model.get('title'));
+      console.log('rendering notebook' + this.model.get('title'));
       return this.title.html(this.model.get("title"));
     };
     NotebookView.prototype.addOne = function(cell) {
@@ -70,11 +77,14 @@
         model: cell
       });
       newEl = view.render();
-      console.log('cell view', newEl, this.cells);
       return $(newEl).appendTo(this.cells);
     };
     NotebookView.prototype.addAll = function(cells) {
       return cells.each(this.addOne);
+    };
+    NotebookView.prototype.spawnCell = function() {
+      console.log('spawning cell');
+      return this.model.cells.create();
     };
     return NotebookView;
   })();
@@ -111,8 +121,8 @@
     function JavascriptEval() {}
     JavascriptEval.prototype.evaluate = function(input, onSuccess) {
       var output;
-      output = eval(output);
-      console.log('eval produced', output);
+      output = eval(input);
+      console.log('eval produced', input, output);
       return onSuccess(output);
     };
     return JavascriptEval;
@@ -142,11 +152,14 @@
     CellView.prototype.render = function() {
       console.log('render cell', this.model.toJSON());
       $(this.el).html(this.template(this.model.toJSON()));
-      this.input = this.$('.todo-input');
+      this.input = this.$('.cell-input');
       return this.el;
     };
     CellView.prototype.evaluate = function() {
       console.log('in cellview evaluate handler');
+      this.model.set({
+        input: this.input.val()
+      });
       return this.model.evaluate();
     };
     CellView.prototype.destroy = function() {

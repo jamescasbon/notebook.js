@@ -17,7 +17,11 @@ class Notebooks extends Backbone.Collection
 
 class NotebookView extends Backbone.View
     el: "#notebook"
-   
+  
+    events: => ( 
+        "click #spawner": 'spawnCell'
+    )
+
     initialize: =>
         @title = @$('#title')
         @cells = @$('#cells')
@@ -29,25 +33,30 @@ class NotebookView extends Backbone.View
         @model.cells.fetch(success: @addAll)
 
     render: =>
-        console.log 'rendering' + @model.get('title')
+        console.log 'rendering notebook' + @model.get('title')
         @title.html(@model.get("title"))
         
     addOne: (cell) =>
         console.log('adding cell', cell)
         view = new CellView(model: cell)
         newEl = view.render()
-        console.log('cell view', newEl, @cells)
         $(newEl).appendTo(@cells)
 
     addAll: (cells) => 
         cells.each @addOne
 
+    spawnCell: => 
+        console.log 'spawning cell'
+        @model.cells.create()
+
+
 class Cell extends Backbone.Model
     tagName: 'li'
     defaults: => (input: "something", type: "javascript", output: null)
 
-    evaluate: => 
-        # how to look up handler
+    evaluate: =>
+        # should we save the model at this point?
+        # how to look up handler?
         handler = new JavascriptEval()
         handler.evaluate @get('input'), @evaluateSuccess
 
@@ -57,8 +66,8 @@ class Cell extends Backbone.Model
 
 class JavascriptEval
     evaluate: (input, onSuccess) -> 
-        output = eval(output)
-        console.log 'eval produced', output
+        output = eval(input)
+        console.log 'eval produced', input,  output
         onSuccess output
     
 
@@ -69,20 +78,21 @@ class CellView extends Backbone.View
         "click #evaluate":  "evaluate",
         "click #delete": "destroy"
     )
-       
 
     initialize: => 
         @template =  _.template($('#cell-template').html())
         @model.bind 'all', @render
         @model.bind 'destroy', @remove
+
     render: =>
         console.log('render cell', @model.toJSON())
         $(@el).html(@template(@model.toJSON()))
-        @input = @$('.todo-input') 
+        @input = @$('.cell-input') 
         @el
 
     evaluate: =>
         console.log 'in cellview evaluate handler'
+        @model.set(input: @input.val()) 
         @model.evaluate()
 
     destroy: =>
