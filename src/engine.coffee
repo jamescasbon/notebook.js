@@ -9,10 +9,11 @@ class JavascriptEval
 
 
 class MarkdownEval
-    evalaute: (input, onSuccess) -> 
-        markdownConvertor = new Showdown.convertor()
-
-        html = markdownConvertor.convert(input)
+    evaluate: (input, onSuccess) -> 
+        console.log 'markdown eval', Showdown
+        markdownConvertor = new Showdown.converter()
+        console.log 'markdown cv'
+        html = markdownConvertor.makeHtml(input)
         onSuccess html
     
 

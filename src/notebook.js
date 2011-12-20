@@ -54,6 +54,7 @@
     function Cell() {
       this.evaluateSuccess = __bind(this.evaluateSuccess, this);
       this.evaluate = __bind(this.evaluate, this);
+      this.toggleType = __bind(this.toggleType, this);
       this.defaults = __bind(this.defaults, this);
       Cell.__super__.constructor.apply(this, arguments);
     }
@@ -67,6 +68,18 @@
         output: null,
         position: null
       };
+    };
+
+    Cell.prototype.toggleType = function() {
+      if (this.get('type') === 'javascript') {
+        return this.set({
+          type: 'markdown'
+        });
+      } else {
+        return this.set({
+          type: 'javascript'
+        });
+      }
     };
 
     Cell.prototype.evaluate = function() {

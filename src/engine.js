@@ -22,10 +22,12 @@
 
     function MarkdownEval() {}
 
-    MarkdownEval.prototype.evalaute = function(input, onSuccess) {
+    MarkdownEval.prototype.evaluate = function(input, onSuccess) {
       var html, markdownConvertor;
-      markdownConvertor = new Showdown.convertor();
-      html = markdownConvertor.convert(input);
+      console.log('markdown eval', Showdown);
+      markdownConvertor = new Showdown.converter();
+      console.log('markdown cv');
+      html = markdownConvertor.makeHtml(input);
       return onSuccess(html);
     };
 

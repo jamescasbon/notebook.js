@@ -51,6 +51,7 @@ class CellView extends Backbone.View
         "click .spawn-above": 'spawnAbove',
         "click .evaluate":  "evaluate",
         "click .delete": "destroy"
+        "click .toggle": 'toggle'
     )
 
     initialize: => 
@@ -78,6 +79,9 @@ class CellView extends Backbone.View
 
     spawnAbove: =>
         @model.collection.createBefore @model
+    
+    toggle: => 
+        @model.toggleType()
 
 
 $(document).ready ->

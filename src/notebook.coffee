@@ -17,6 +17,12 @@ class Notebooks extends Backbone.Collection
 class Cell extends Backbone.Model
     tagName: 'li'
     defaults: => (input: "something", type: "javascript", output: null, position: null)
+    
+    toggleType: =>
+        if @get('type') == 'javascript'
+            @set type: 'markdown'
+        else
+            @set type: 'javascript'
 
     evaluate: =>
         # should we save the model at this point?

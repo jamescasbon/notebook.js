@@ -78,6 +78,7 @@
     __extends(CellView, _super);
 
     function CellView() {
+      this.toggle = __bind(this.toggle, this);
       this.spawnAbove = __bind(this.spawnAbove, this);
       this.remove = __bind(this.remove, this);
       this.destroy = __bind(this.destroy, this);
@@ -92,7 +93,8 @@
       return {
         "click .spawn-above": 'spawnAbove',
         "click .evaluate": "evaluate",
-        "click .delete": "destroy"
+        "click .delete": "destroy",
+        "click .toggle": 'toggle'
       };
     };
 
@@ -128,6 +130,10 @@
 
     CellView.prototype.spawnAbove = function() {
       return this.model.collection.createBefore(this.model);
+    };
+
+    CellView.prototype.toggle = function() {
+      return this.model.toggleType();
     };
 
     return CellView;

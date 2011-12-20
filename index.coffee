@@ -27,6 +27,7 @@ html ->
         div '.controls', ->
           div '.evaluate', -> 'evaluate'
           div '.delete', -> 'delete'
+          div '.toggle', -> 'toggle'
         textarea class: "cell-input", rows: 5, cols: 80, ->
           '[[= input ]]'
         div '.cell-output', ->
