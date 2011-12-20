@@ -1,8 +1,6 @@
 
 class Notebook extends Backbone.Model
     defaults: => (title: "untitled")
-    
-    localStorage: = new Store('Notebooks') 
 
     initialize: =>
         @cells = new Cells()
@@ -16,6 +14,7 @@ class Notebook extends Backbone.Model
 
 class Notebooks extends Backbone.Collection
     model: Notebook
+    localStorage:  new Store('Notebooks') 
 
 
 class Cell extends Backbone.Model

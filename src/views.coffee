@@ -3,9 +3,6 @@ _.templateSettings = {interpolate : /\[\[=(.+?)\]\]/g, evaluate: /\[\[(.+?)\]\]/
 
 root = exports ? this
 
-root.Notebooks.prototype.localStorage = new Store('Notebooks')
-root.Notebooks.prototype.setupCellStorage = () -> 
-    console.log('subc')
    
 
 class NotebookView extends Backbone.View
@@ -51,8 +48,8 @@ class NotebookView extends Backbone.View
 class CellView extends Backbone.View
 
     events: => (
-        "click #evaluate":  "evaluate",
-        "click #delete": "destroy"
+        "click .evaluate":  "evaluate",
+        "click .delete": "destroy"
     )
 
     initialize: => 
