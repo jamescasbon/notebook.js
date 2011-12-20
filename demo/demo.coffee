@@ -1,19 +1,12 @@
 # use [[]] for underscore templates (i.e. client side templating)
 _.templateSettings = {interpolate : /\[\[=(.+?)\]\]/g, evaluate: /\[\[(.+?)\]\]/g}
 
+root = exports ? this
 
-class Notebook extends Backbone.Model
-    defaults: => (title: "untitled")
-    
-    initialize: =>
-        @cells = new Cells()
-        @cells.localStorage = new Store('Cells')
-
-
-class Notebooks extends Backbone.Collection
-    localStorage: new Store("Notebooks") 
-    model: Notebook
-
+root.Notebooks.prototype.localStorage = new Store('Notebooks')
+root.Notebooks.prototype.setupCellStorage = () -> 
+    console.log('subc')
+   
 
 class NotebookView extends Backbone.View
     el: "#notebook"
@@ -42,7 +35,8 @@ class NotebookView extends Backbone.View
         newEl = view.render()
         $(newEl).appendTo(@cells)
 
-    addAll: (cells) => 
+    addAll: (cells) =>
+        console.log(cells)
         cells.each @addOne
 
     spawnCell: => 
@@ -50,25 +44,7 @@ class NotebookView extends Backbone.View
         @model.cells.create()
 
 
-class Cell extends Backbone.Model
-    tagName: 'li'
-    defaults: => (input: "something", type: "javascript", output: null)
 
-    evaluate: =>
-        # should we save the model at this point?
-        # how to look up handler?
-        handler = new JavascriptEval()
-        handler.evaluate @get('input'), @evaluateSuccess
-
-    evaluateSuccess: (output) => 
-        @set(output: output)
-        @save()
-
-class JavascriptEval
-    evaluate: (input, onSuccess) -> 
-        output = eval(input)
-        console.log 'eval produced', input,  output
-        onSuccess output
     
 
 
@@ -102,8 +78,6 @@ class CellView extends Backbone.View
     remove: => 
         $(@el).fadeOut('fast', $(@el).remove)
 
-class Cells extends Backbone.Collection
-    model: Cell
 
 
 $(document).ready ->

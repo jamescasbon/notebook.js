@@ -1,5 +1,5 @@
 (function() {
-  var Cell, CellView, Cells, JavascriptEval, Notebook, NotebookView, Notebooks;
+  var CellView, NotebookView, root;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
@@ -12,33 +12,11 @@
     interpolate: /\[\[=(.+?)\]\]/g,
     evaluate: /\[\[(.+?)\]\]/g
   };
-  Notebook = (function() {
-    __extends(Notebook, Backbone.Model);
-    function Notebook() {
-      this.initialize = __bind(this.initialize, this);
-      this.defaults = __bind(this.defaults, this);
-      Notebook.__super__.constructor.apply(this, arguments);
-    }
-    Notebook.prototype.defaults = function() {
-      return {
-        title: "untitled"
-      };
-    };
-    Notebook.prototype.initialize = function() {
-      this.cells = new Cells();
-      return this.cells.localStorage = new Store('Cells');
-    };
-    return Notebook;
-  })();
-  Notebooks = (function() {
-    __extends(Notebooks, Backbone.Collection);
-    function Notebooks() {
-      Notebooks.__super__.constructor.apply(this, arguments);
-    }
-    Notebooks.prototype.localStorage = new Store("Notebooks");
-    Notebooks.prototype.model = Notebook;
-    return Notebooks;
-  })();
+  root = typeof exports !== "undefined" && exports !== null ? exports : this;
+  root.Notebooks.prototype.localStorage = new Store('Notebooks');
+  root.Notebooks.prototype.setupCellStorage = function() {
+    return console.log('subc');
+  };
   NotebookView = (function() {
     __extends(NotebookView, Backbone.View);
     function NotebookView() {
@@ -80,6 +58,7 @@
       return $(newEl).appendTo(this.cells);
     };
     NotebookView.prototype.addAll = function(cells) {
+      console.log(cells);
       return cells.each(this.addOne);
     };
     NotebookView.prototype.spawnCell = function() {
@@ -87,45 +66,6 @@
       return this.model.cells.create();
     };
     return NotebookView;
-  })();
-  Cell = (function() {
-    __extends(Cell, Backbone.Model);
-    function Cell() {
-      this.evaluateSuccess = __bind(this.evaluateSuccess, this);
-      this.evaluate = __bind(this.evaluate, this);
-      this.defaults = __bind(this.defaults, this);
-      Cell.__super__.constructor.apply(this, arguments);
-    }
-    Cell.prototype.tagName = 'li';
-    Cell.prototype.defaults = function() {
-      return {
-        input: "something",
-        type: "javascript",
-        output: null
-      };
-    };
-    Cell.prototype.evaluate = function() {
-      var handler;
-      handler = new JavascriptEval();
-      return handler.evaluate(this.get('input'), this.evaluateSuccess);
-    };
-    Cell.prototype.evaluateSuccess = function(output) {
-      this.set({
-        output: output
-      });
-      return this.save();
-    };
-    return Cell;
-  })();
-  JavascriptEval = (function() {
-    function JavascriptEval() {}
-    JavascriptEval.prototype.evaluate = function(input, onSuccess) {
-      var output;
-      output = eval(input);
-      console.log('eval produced', input, output);
-      return onSuccess(output);
-    };
-    return JavascriptEval;
   })();
   CellView = (function() {
     __extends(CellView, Backbone.View);
@@ -170,14 +110,6 @@
       return $(this.el).fadeOut('fast', $(this.el).remove);
     };
     return CellView;
-  })();
-  Cells = (function() {
-    __extends(Cells, Backbone.Collection);
-    function Cells() {
-      Cells.__super__.constructor.apply(this, arguments);
-    }
-    Cells.prototype.model = Cell;
-    return Cells;
   })();
   $(document).ready(function() {
     var app, notebook, notebooks;
