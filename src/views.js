@@ -66,7 +66,7 @@
 
     NotebookView.prototype.spawnCell = function() {
       console.log('spawning cell');
-      return this.model.cells.create();
+      return this.model.cells.createAtEnd();
     };
 
     return NotebookView;
@@ -78,6 +78,7 @@
     __extends(CellView, _super);
 
     function CellView() {
+      this.spawnAbove = __bind(this.spawnAbove, this);
       this.remove = __bind(this.remove, this);
       this.destroy = __bind(this.destroy, this);
       this.evaluate = __bind(this.evaluate, this);
@@ -89,6 +90,7 @@
 
     CellView.prototype.events = function() {
       return {
+        "click .spawn-above": 'spawnAbove',
         "click .evaluate": "evaluate",
         "click .delete": "destroy"
       };
@@ -124,22 +126,23 @@
       return $(this.el).fadeOut('fast', $(this.el).remove);
     };
 
+    CellView.prototype.spawnAbove = function() {
+      return app.model.cells.createBefore(this.model);
+    };
+
     return CellView;
 
   })(Backbone.View);
 
   $(document).ready(function() {
-    var app, notebook, notebooks;
+    var notebook, notebooks;
     console.log('creating app');
     notebooks = new Notebooks();
     notebook = notebooks.create();
-    app = new NotebookView({
+    root.app = new NotebookView({
       model: notebook
     });
-    window.ev = new JavascriptEval();
-    window.n = notebook;
-    window.C = Cell;
-    return window.N = Notebook;
+    return root.n = notebook;
   });
 
 }).call(this);

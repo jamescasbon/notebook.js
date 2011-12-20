@@ -5,11 +5,6 @@ class Notebook extends Backbone.Model
     initialize: =>
         @cells = new Cells()
         @cells.localStorage = new Store('Cells')
-        @setupCellStorage()
-
-    setupCellStorage: =>
-        console.log 'base cell storage hook'
-        
 
 
 class Notebooks extends Backbone.Collection
@@ -19,7 +14,7 @@ class Notebooks extends Backbone.Collection
 
 class Cell extends Backbone.Model
     tagName: 'li'
-    defaults: => (input: "something", type: "javascript", output: null)
+    defaults: => (input: "something", type: "javascript", output: null, position: null)
 
     evaluate: =>
         # should we save the model at this point?
@@ -34,6 +29,30 @@ class Cell extends Backbone.Model
 
 class Cells extends Backbone.Collection
     model: Cell
+   
+    # sort by position and put large jumps in the position to allow insertion
+    posJump: Math.pow(2, 16)
+    comparator: (cell) => cell.get('position') 
+
+    
+    # creation methods that preserve the ordering of the notebook
+    createAtEnd: ->
+        if @length 
+            pos = @at(@length - 1).get('position') + @posJump
+        else
+            pos = @posJump
+        @create position: pos
+
+    createBefore: (cell) -> 
+        cellIndex = @indexOf(cell)
+        cellPos = cell.get('position')
+        if cellIndex == 0
+            prevPos = 0
+        else
+            prevPos = @at(cellIndex - 1).get('position')
+        @create position: (cellPos + prevPos)/2
+        
+
 
 class JavascriptEval
     evaluate: (input, onSuccess) -> 

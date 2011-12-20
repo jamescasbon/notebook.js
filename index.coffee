@@ -13,7 +13,7 @@ html ->
     h1 'notebook.js demo'
 
     div '#notebook', ->
-      div '#title'
+      div '#title', -> ''
       ul id: "cells" 
       div '#spawner', ->
           'Spawn a new cell'
@@ -21,11 +21,10 @@ html ->
 
     script type: "text/template", id: "cell-template", ->
       div '.cell', id: "[[= id ]]", ->
+        div '.spawn-above', -> 'Spawn cell above'
         div '.controls', ->
-          div '.evaluate', -> 
-              'evaluate'
-          div '.delete', ->
-              'delete'
+          div '.evaluate', -> 'evaluate'
+          div '.delete', -> 'delete'
         textarea class: "cell-input", rows: 5, cols: 80, ->
           '[[= input ]]'
         div '.cell-output', ->

@@ -9,7 +9,6 @@
     __extends(Notebook, _super);
 
     function Notebook() {
-      this.setupCellStorage = __bind(this.setupCellStorage, this);
       this.initialize = __bind(this.initialize, this);
       this.defaults = __bind(this.defaults, this);
       Notebook.__super__.constructor.apply(this, arguments);
@@ -23,12 +22,7 @@
 
     Notebook.prototype.initialize = function() {
       this.cells = new Cells();
-      this.cells.localStorage = new Store('Cells');
-      return this.setupCellStorage();
-    };
-
-    Notebook.prototype.setupCellStorage = function() {
-      return console.log('base cell storage hook');
+      return this.cells.localStorage = new Store('Cells');
     };
 
     return Notebook;
@@ -68,7 +62,8 @@
       return {
         input: "something",
         type: "javascript",
-        output: null
+        output: null,
+        position: null
       };
     };
 
@@ -94,10 +89,43 @@
     __extends(Cells, _super);
 
     function Cells() {
+      this.comparator = __bind(this.comparator, this);
       Cells.__super__.constructor.apply(this, arguments);
     }
 
     Cells.prototype.model = Cell;
+
+    Cells.prototype.posJump = Math.pow(2, 16);
+
+    Cells.prototype.comparator = function(cell) {
+      return cell.get('position');
+    };
+
+    Cells.prototype.createAtEnd = function() {
+      var pos;
+      if (this.length) {
+        pos = this.at(this.length - 1).get('position') + this.posJump;
+      } else {
+        pos = this.posJump;
+      }
+      return this.create({
+        position: pos
+      });
+    };
+
+    Cells.prototype.createBefore = function(cell) {
+      var cellIndex, cellPos, prevPos;
+      cellIndex = this.indexOf(cell);
+      cellPos = cell.get('position');
+      if (cellIndex === 0) {
+        prevPos = 0;
+      } else {
+        prevPos = this.at(cellIndex - 1).get('position');
+      }
+      return this.create({
+        position: (cellPos + prevPos) / 2
+      });
+    };
 
     return Cells;
 

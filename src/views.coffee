@@ -38,7 +38,7 @@ class NotebookView extends Backbone.View
 
     spawnCell: => 
         console.log 'spawning cell'
-        @model.cells.create()
+        @model.cells.createAtEnd()
 
 
 
@@ -48,6 +48,7 @@ class NotebookView extends Backbone.View
 class CellView extends Backbone.View
 
     events: => (
+        "click .spawn-above": 'spawnAbove',
         "click .evaluate":  "evaluate",
         "click .delete": "destroy"
     )
@@ -75,15 +76,14 @@ class CellView extends Backbone.View
     remove: => 
         $(@el).fadeOut('fast', $(@el).remove)
 
+    spawnAbove: =>
+        app.model.cells.createBefore @model
 
 
 $(document).ready ->
     console.log 'creating app'
     notebooks = new Notebooks()
     notebook = notebooks.create()
-    app = new NotebookView(model: notebook)
-    window.ev = new JavascriptEval()
+    root.app = new NotebookView(model: notebook)
 
-    window.n = notebook
-    window.C = Cell
-    window.N = Notebook
+    root.n = notebook
