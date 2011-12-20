@@ -106,7 +106,8 @@
         "click .spawn-above": 'spawnAbove',
         "click .evaluate": "evaluate",
         "click .delete": "destroy",
-        "click .toggle": 'toggle'
+        "click .toggle": 'toggle',
+        "evaluate": "evaluate"
       };
     };
 

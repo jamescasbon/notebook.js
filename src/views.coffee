@@ -56,8 +56,9 @@ class CellView extends Backbone.View
     events: => (
         "click .spawn-above": 'spawnAbove',
         "click .evaluate":  "evaluate",
-        "click .delete": "destroy"
-        "click .toggle": 'toggle'
+        "click .delete": "destroy",
+        "click .toggle": 'toggle',
+        "evaluate": "evaluate",
     )
 
     initialize: => 

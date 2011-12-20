@@ -12,6 +12,7 @@ html ->
     script src: "/src/engine.js" 
     script src: "/src/notebook.js" 
     script src: "/src/views.js" 
+    script src: "/src/ace-events.js"
 
     link rel: 'stylesheet', href: '/css/notebook.css'
 
