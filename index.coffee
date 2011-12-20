@@ -5,7 +5,9 @@ html ->
     script src: "http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js" 
     script src: "/lib/underscore.js" 
     script src: "/lib/backbone.js" 
-    script src: "/lib/backbone.localStorage.js" 
+    script src: "/lib/backbone.localStorage.js"
+    script src: "/lib/showdown.js"
+    script src: "/src/engine.js" 
     script src: "/src/notebook.js" 
     script src: "/src/views.js" 
 

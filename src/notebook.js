@@ -1,8 +1,10 @@
 (function() {
-  var Cell, Cells, JavascriptEval, Notebook, Notebooks, root,
+  var Cell, Cells, Notebook, Notebooks, root,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  root = typeof exports !== "undefined" && exports !== null ? exports : this;
 
   Notebook = (function(_super) {
 
@@ -69,7 +71,7 @@
 
     Cell.prototype.evaluate = function() {
       var handler;
-      handler = new JavascriptEval();
+      handler = root.engines[this.get('type')];
       return handler.evaluate(this.get('input'), this.evaluateSuccess);
     };
 
@@ -131,23 +133,6 @@
 
   })(Backbone.Collection);
 
-  JavascriptEval = (function() {
-
-    function JavascriptEval() {}
-
-    JavascriptEval.prototype.evaluate = function(input, onSuccess) {
-      var output;
-      output = eval(input);
-      console.log('eval produced', input, output);
-      return onSuccess(output);
-    };
-
-    return JavascriptEval;
-
-  })();
-
-  root = typeof exports !== "undefined" && exports !== null ? exports : this;
-
   root.Notebook = Notebook;
 
   root.Cell = Cell;
@@ -155,7 +140,5 @@
   root.Notebooks = Notebooks;
 
   root.Cells = Cells;
-
-  root.JavascriptEval = JavascriptEval;
 
 }).call(this);

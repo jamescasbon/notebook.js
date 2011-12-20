@@ -1,3 +1,5 @@
+root = exports ? this
+
 
 class Notebook extends Backbone.Model
     defaults: => (title: "untitled")
@@ -19,7 +21,7 @@ class Cell extends Backbone.Model
     evaluate: =>
         # should we save the model at this point?
         # how to look up handler?
-        handler = new JavascriptEval()
+        handler = root.engines[@get('type')]
         handler.evaluate @get('input'), @evaluateSuccess
 
     evaluateSuccess: (output) => 
@@ -33,7 +35,6 @@ class Cells extends Backbone.Collection
     # sort by position and put large jumps in the position to allow insertion
     posJump: Math.pow(2, 16)
     comparator: (cell) => cell.get('position') 
-
     
     # creation methods that preserve the ordering of the notebook
     createAtEnd: ->
@@ -54,17 +55,9 @@ class Cells extends Backbone.Collection
         
 
 
-class JavascriptEval
-    evaluate: (input, onSuccess) -> 
-        output = eval(input)
-        console.log 'eval produced', input,  output
-        onSuccess output
 
-
-root = exports ? this
 root.Notebook = Notebook
 root.Cell = Cell
 root.Notebooks = Notebooks
 root.Cells = Cells
-root.JavascriptEval = JavascriptEval
 
