@@ -29,7 +29,15 @@ class NotebookView extends Backbone.View
         console.log('adding cell', cell)
         view = new CellView(model: cell)
         newEl = view.render()
-        $(newEl).appendTo(@cells)
+        
+        index = @model.cells.indexOf(cell)
+        if index == 0
+            @cells.prepend(newEl)
+        else 
+            previous = @model.cells.at(index - 1)
+            previousView = previous.view
+            $(previousView.el).after(newEl)
+
         view.afterDomInsert()
 
     addAll: (cells) =>
@@ -56,6 +64,7 @@ class CellView extends Backbone.View
         @template =  _.template($('#cell-template').html())
         @model.bind 'all', @render
         @model.bind 'destroy', @remove
+        @model.view = @
         @editor = null
 
     render: =>

@@ -50,13 +50,20 @@
     };
 
     NotebookView.prototype.addOne = function(cell) {
-      var newEl, view;
+      var index, newEl, previous, previousView, view;
       console.log('adding cell', cell);
       view = new CellView({
         model: cell
       });
       newEl = view.render();
-      $(newEl).appendTo(this.cells);
+      index = this.model.cells.indexOf(cell);
+      if (index === 0) {
+        this.cells.prepend(newEl);
+      } else {
+        previous = this.model.cells.at(index - 1);
+        previousView = previous.view;
+        $(previousView.el).after(newEl);
+      }
       return view.afterDomInsert();
     };
 
@@ -107,6 +114,7 @@
       this.template = _.template($('#cell-template').html());
       this.model.bind('all', this.render);
       this.model.bind('destroy', this.remove);
+      this.model.view = this;
       return this.editor = null;
     };
 
