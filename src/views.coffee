@@ -77,7 +77,7 @@ class CellView extends Backbone.View
         $(@el).fadeOut('fast', $(@el).remove)
 
     spawnAbove: =>
-        app.model.cells.createBefore @model
+        @model.collection.createBefore @model
 
 
 $(document).ready ->

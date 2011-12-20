@@ -127,7 +127,7 @@
     };
 
     CellView.prototype.spawnAbove = function() {
-      return app.model.cells.createBefore(this.model);
+      return this.model.collection.createBefore(this.model);
     };
 
     return CellView;
