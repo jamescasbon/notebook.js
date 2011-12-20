@@ -30,9 +30,9 @@ html ->
         div '.type', -> '[[= type ]]'
         div '.spawn-above', tabindex: '[[= position ]]a', -> 'Insert cell'
         div '.controls', ->
-          div '.evaluate', -> 'evaluate'
-          div '.delete', -> 'delete'
-          div '.toggle', -> 'toggle'
+          span '.evaluate', -> 'evaluate'
+          span '.delete', -> 'delete'
+          span '.toggle', -> 'toggle'
         # we can control the container size, but not the editor
         div '.ace-container', ->
           div class: "cell-input", style: "top:0;bottom:0;left:0;right:0;", id: "input-[[= id ]]", ->
