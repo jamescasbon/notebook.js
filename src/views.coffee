@@ -82,16 +82,17 @@ class CellView extends Backbone.View
             else 
                 console.log 'error', @model.get('error')
                 @output.html @model.get('error')
+            @setEditorHighlightMode()
         @el
     
     afterDomInsert: =>
         @editor = ace.edit('input-' + @model.id)
         @editor.resize()
-        @editor.getSession().setUseWrapMode(true)
-        @editor.renderer.setShowGutter(false)
-        @editor.renderer.setHScrollBarAlwaysVisible(false)
-        @editor.renderer.setShowPrintMargin(false)
-        @editor.setHighlightActiveLine(false)
+        @editor.getSession().setUseWrapMode true
+        @editor.renderer.setShowGutter false
+        @editor.renderer.setHScrollBarAlwaysVisible false
+        @editor.renderer.setShowPrintMargin false
+        @editor.setHighlightActiveLine true
         
         # TODO: hide scrollbar when sizing elements correctly 
         #this.$('.ace_sb').css({overflow: 'hidden'});
@@ -100,14 +101,18 @@ class CellView extends Backbone.View
         #// trigger initial sizing of element.  TODO: correctly size when creating template
         #this.inputChange();
         
-        #@setEditorHighlightMode()
+        @setEditorHighlightMode()
     
     setEditorHighlightMode: => 
+        # TODO: text mode not found, better lookup of modes
+        
         if @model.get('type') == 'javascript'
             mode = require("ace/mode/javascript").Mode
         else if @model.get('mode') == 'markdown'
             mode = require("ace/mode/text").Mode
-        @editor.getSession().setMode(new mode())
+        console.log 'mode', mode
+        if mode?
+            @editor.getSession().setMode(new mode())
 
     evaluate: =>
         console.log 'in cellview evaluate handler'

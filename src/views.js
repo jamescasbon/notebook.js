@@ -134,6 +134,7 @@
           console.log('error', this.model.get('error'));
           this.output.html(this.model.get('error'));
         }
+        this.setEditorHighlightMode();
       }
       return this.el;
     };
@@ -145,7 +146,8 @@
       this.editor.renderer.setShowGutter(false);
       this.editor.renderer.setHScrollBarAlwaysVisible(false);
       this.editor.renderer.setShowPrintMargin(false);
-      return this.editor.setHighlightActiveLine(false);
+      this.editor.setHighlightActiveLine(true);
+      return this.setEditorHighlightMode();
     };
 
     CellView.prototype.setEditorHighlightMode = function() {
@@ -155,7 +157,8 @@
       } else if (this.model.get('mode') === 'markdown') {
         mode = require("ace/mode/text").Mode;
       }
-      return this.editor.getSession().setMode(new mode());
+      console.log('mode', mode);
+      if (mode != null) return this.editor.getSession().setMode(new mode());
     };
 
     CellView.prototype.evaluate = function() {
