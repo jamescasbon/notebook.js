@@ -28,7 +28,7 @@ html ->
     script type: "text/template", id: "cell-template", ->
       div '.cell', id: "[[= id ]]", ->
         div '.type', -> '[[= type ]]'
-        div '.spawn-above', -> 'Insert cell'
+        div '.spawn-above', tabindex: '[[= position ]]a', -> 'Insert cell'
         div '.controls', ->
           div '.evaluate', -> 'evaluate'
           div '.delete', -> 'delete'
@@ -37,7 +37,7 @@ html ->
         div '.ace-container', ->
           div class: "cell-input", style: "top:0;bottom:0;left:0;right:0;", id: "input-[[= id ]]", ->
             '[[= input ]]'
-        div '.cell-output', ->
+        div '.cell-output', tabindex: "[[= position ]]c", ->
           '[[= output ]]'
 
 
