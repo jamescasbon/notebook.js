@@ -16,7 +16,12 @@ class Notebooks extends Backbone.Collection
 
 class Cell extends Backbone.Model
     tagName: 'li'
-    defaults: => (input: "something", type: "javascript", output: null, position: null)
+    defaults: => 
+        input: "something", 
+        type: "javascript", 
+        output: null, 
+        position: null,
+        error: null
     
     toggleType: =>
         if @get('type') == 'javascript'
@@ -28,11 +33,15 @@ class Cell extends Backbone.Model
         # should we save the model at this point?
         # how to look up handler?
         handler = root.engines[@get('type')]
-        handler.evaluate @get('input'), @evaluateSuccess
+        handler.evaluate @get('input'), @evaluateSuccess, @evaluateError
 
     evaluateSuccess: (output) => 
-        @set(output: output)
+        @set output: output, error: null
         @save()
+
+    evaluateError: (error) => 
+        @set output: null, error: error
+        @save
 
 
 class Cells extends Backbone.Collection

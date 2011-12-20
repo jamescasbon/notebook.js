@@ -31,6 +31,7 @@ class NotebookView extends Backbone.View
         view = new CellView(model: cell)
         newEl = view.render()
         $(newEl).appendTo(@cells)
+        view.afterDomInsert()
 
     addAll: (cells) =>
         console.log(cells)
@@ -58,12 +59,17 @@ class CellView extends Backbone.View
         @template =  _.template($('#cell-template').html())
         @model.bind 'all', @render
         @model.bind 'destroy', @remove
+        @editor = null
 
     render: =>
         console.log('render cell', @model.toJSON())
         $(@el).html(@template(@model.toJSON()))
         @input = @$('.cell-input') 
         @el
+    
+    afterDomInsert: =>
+        @editor = ace.edit('input-' + @model.id)
+        @editor.resize()
 
     evaluate: =>
         console.log 'in cellview evaluate handler'

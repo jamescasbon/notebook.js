@@ -7,9 +7,12 @@ html ->
     script src: "/lib/backbone.js" 
     script src: "/lib/backbone.localStorage.js"
     script src: "/lib/showdown.js"
+    script src: "/lib/ace/ace.js"
     script src: "/src/engine.js" 
     script src: "/src/notebook.js" 
     script src: "/src/views.js" 
+
+    link rel: 'stylesheet', href: '/css/notebook.css'
 
   body ->
     h1 'notebook.js demo'
@@ -28,8 +31,10 @@ html ->
           div '.evaluate', -> 'evaluate'
           div '.delete', -> 'delete'
           div '.toggle', -> 'toggle'
-        textarea class: "cell-input", rows: 5, cols: 80, ->
-          '[[= input ]]'
+        # we can control the container size, but not the editor
+        div '.ace-container', ->
+          div class: "cell-input", style: "top:0;bottom:0;left:0;right:0;", id: "input-[[= id ]]", ->
+            '[[= input ]]'
         div '.cell-output', ->
           '[[= output ]]'
 

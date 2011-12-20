@@ -56,7 +56,8 @@
         model: cell
       });
       newEl = view.render();
-      return $(newEl).appendTo(this.cells);
+      $(newEl).appendTo(this.cells);
+      return view.afterDomInsert();
     };
 
     NotebookView.prototype.addAll = function(cells) {
@@ -83,6 +84,7 @@
       this.remove = __bind(this.remove, this);
       this.destroy = __bind(this.destroy, this);
       this.evaluate = __bind(this.evaluate, this);
+      this.afterDomInsert = __bind(this.afterDomInsert, this);
       this.render = __bind(this.render, this);
       this.initialize = __bind(this.initialize, this);
       this.events = __bind(this.events, this);
@@ -101,7 +103,8 @@
     CellView.prototype.initialize = function() {
       this.template = _.template($('#cell-template').html());
       this.model.bind('all', this.render);
-      return this.model.bind('destroy', this.remove);
+      this.model.bind('destroy', this.remove);
+      return this.editor = null;
     };
 
     CellView.prototype.render = function() {
@@ -109,6 +112,11 @@
       $(this.el).html(this.template(this.model.toJSON()));
       this.input = this.$('.cell-input');
       return this.el;
+    };
+
+    CellView.prototype.afterDomInsert = function() {
+      this.editor = ace.edit('input-' + this.model.id);
+      return this.editor.resize();
     };
 
     CellView.prototype.evaluate = function() {

@@ -52,6 +52,7 @@
     __extends(Cell, _super);
 
     function Cell() {
+      this.evaluateError = __bind(this.evaluateError, this);
       this.evaluateSuccess = __bind(this.evaluateSuccess, this);
       this.evaluate = __bind(this.evaluate, this);
       this.toggleType = __bind(this.toggleType, this);
@@ -66,7 +67,8 @@
         input: "something",
         type: "javascript",
         output: null,
-        position: null
+        position: null,
+        error: null
       };
     };
 
@@ -85,14 +87,23 @@
     Cell.prototype.evaluate = function() {
       var handler;
       handler = root.engines[this.get('type')];
-      return handler.evaluate(this.get('input'), this.evaluateSuccess);
+      return handler.evaluate(this.get('input'), this.evaluateSuccess, this.evaluateError);
     };
 
     Cell.prototype.evaluateSuccess = function(output) {
       this.set({
-        output: output
+        output: output,
+        error: null
       });
       return this.save();
+    };
+
+    Cell.prototype.evaluateError = function(error) {
+      this.set({
+        output: null,
+        error: error
+      });
+      return this.save;
     };
 
     return Cell;

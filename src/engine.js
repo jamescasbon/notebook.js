@@ -7,11 +7,15 @@
 
     function JavascriptEval() {}
 
-    JavascriptEval.prototype.evaluate = function(input, onSuccess) {
+    JavascriptEval.prototype.evaluate = function(input, onSuccess, onErr) {
       var output;
-      output = eval(input);
-      console.log('eval produced', input, output);
-      return onSuccess(output);
+      try {
+        output = eval(input);
+        console.log('eval produced', input, output);
+        return onSuccess(output);
+      } catch (error) {
+        return onErr(error.message);
+      }
     };
 
     return JavascriptEval;
@@ -22,13 +26,15 @@
 
     function MarkdownEval() {}
 
-    MarkdownEval.prototype.evaluate = function(input, onSuccess) {
+    MarkdownEval.prototype.evaluate = function(input, onSuccess, onErr) {
       var html, markdownConvertor;
-      console.log('markdown eval', Showdown);
-      markdownConvertor = new Showdown.converter();
-      console.log('markdown cv');
-      html = markdownConvertor.makeHtml(input);
-      return onSuccess(html);
+      try {
+        markdownConvertor = new Showdown.converter();
+        html = markdownConvertor.makeHtml(input);
+        return onSuccess(html);
+      } catch (error) {
+        return onError(error.message);
+      }
     };
 
     return MarkdownEval;
