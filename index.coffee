@@ -2,12 +2,13 @@ doctype 5
 html ->
   head ->
     title 'notebook.js demo'
-    script src: "http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js" 
+    script src: "/lib/jquery-1.7.1.js" 
     script src: "/lib/underscore.js" 
     script src: "/lib/backbone.js" 
     script src: "/lib/backbone.localStorage.js"
     script src: "/lib/showdown.js"
     script src: "/lib/ace/ace.js"
+    script src: "/lib/ace/mode-javascript.js"
     script src: "/src/engine.js" 
     script src: "/src/notebook.js" 
     script src: "/src/views.js" 
@@ -15,10 +16,11 @@ html ->
     link rel: 'stylesheet', href: '/css/notebook.css'
 
   body ->
-    h1 'notebook.js demo'
 
     div '#notebook', ->
-      div '#title', -> ''
+      div '#navbar', ->
+        div '#logo', -> 'notebook.js'
+        div '#title', -> ''
       ul id: "cells" 
       div '#spawner', ->
           'Spawn a new cell'

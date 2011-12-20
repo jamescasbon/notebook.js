@@ -84,12 +84,15 @@
       this.remove = __bind(this.remove, this);
       this.destroy = __bind(this.destroy, this);
       this.evaluate = __bind(this.evaluate, this);
+      this.setEditorHighlightMode = __bind(this.setEditorHighlightMode, this);
       this.afterDomInsert = __bind(this.afterDomInsert, this);
       this.render = __bind(this.render, this);
       this.initialize = __bind(this.initialize, this);
       this.events = __bind(this.events, this);
       CellView.__super__.constructor.apply(this, arguments);
     }
+
+    CellView.prototype.tagName = 'li';
 
     CellView.prototype.events = function() {
       return {
@@ -108,21 +111,47 @@
     };
 
     CellView.prototype.render = function() {
-      console.log('render cell', this.model.toJSON());
-      $(this.el).html(this.template(this.model.toJSON()));
-      this.input = this.$('.cell-input');
+      if (!(this.editor != null)) {
+        console.log('render cell', this.model.toJSON());
+        $(this.el).html(this.template(this.model.toJSON()));
+        this.input = this.$('.cell-input');
+        this.output = this.$('.cell-output');
+      } else {
+        console.log('rerender');
+        if (!(this.model.get('error') != null)) {
+          this.output.html(this.model.get('output'));
+        } else {
+          console.log('error', this.model.get('error'));
+          this.output.html(this.model.get('error'));
+        }
+      }
       return this.el;
     };
 
     CellView.prototype.afterDomInsert = function() {
       this.editor = ace.edit('input-' + this.model.id);
-      return this.editor.resize();
+      this.editor.resize();
+      this.editor.getSession().setUseWrapMode(true);
+      this.editor.renderer.setShowGutter(false);
+      this.editor.renderer.setHScrollBarAlwaysVisible(false);
+      this.editor.renderer.setShowPrintMargin(false);
+      return this.editor.setHighlightActiveLine(false);
+    };
+
+    CellView.prototype.setEditorHighlightMode = function() {
+      var mode;
+      if (this.model.get('type') === 'javascript') {
+        mode = require("ace/mode/javascript").Mode;
+      } else if (this.model.get('mode') === 'markdown') {
+        mode = require("ace/mode/text").Mode;
+      }
+      return this.editor.getSession().setMode(new mode());
     };
 
     CellView.prototype.evaluate = function() {
       console.log('in cellview evaluate handler');
       this.model.set({
-        input: this.input.val()
+        input: this.editor.getSession().getValue()
       });
       return this.model.evaluate();
     };

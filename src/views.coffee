@@ -2,7 +2,6 @@
 _.templateSettings = {interpolate : /\[\[=(.+?)\]\]/g, evaluate: /\[\[(.+?)\]\]/g}
 
 root = exports ? this
-
    
 
 class NotebookView extends Backbone.View
@@ -43,10 +42,8 @@ class NotebookView extends Backbone.View
 
 
 
-    
-
-
 class CellView extends Backbone.View
+    tagName: 'li'
 
     events: => (
         "click .spawn-above": 'spawnAbove',
@@ -62,18 +59,48 @@ class CellView extends Backbone.View
         @editor = null
 
     render: =>
-        console.log('render cell', @model.toJSON())
-        $(@el).html(@template(@model.toJSON()))
-        @input = @$('.cell-input') 
+        if not @editor?
+            console.log 'render cell', @model.toJSON()
+            $(@el).html(@template(@model.toJSON()))
+            @input = @$('.cell-input') 
+            @output = @$('.cell-output')
+        else
+            console.log 'rerender'
+            if not @model.get('error')?
+                @output.html @model.get('output') 
+            else 
+                console.log 'error', @model.get('error')
+                @output.html @model.get('error')
         @el
     
     afterDomInsert: =>
         @editor = ace.edit('input-' + @model.id)
         @editor.resize()
+        @editor.getSession().setUseWrapMode(true)
+        @editor.renderer.setShowGutter(false)
+        @editor.renderer.setHScrollBarAlwaysVisible(false)
+        @editor.renderer.setShowPrintMargin(false)
+        @editor.setHighlightActiveLine(false)
+        
+        # TODO: hide scrollbar when sizing elements correctly 
+        #this.$('.ace_sb').css({overflow: 'hidden'});
+        
+        #@editor.getSession().on('change', this.inputChange);
+        #// trigger initial sizing of element.  TODO: correctly size when creating template
+        #this.inputChange();
+        
+        #@setEditorHighlightMode()
+    
+    setEditorHighlightMode: => 
+        if @model.get('type') == 'javascript'
+            mode = require("ace/mode/javascript").Mode
+        else if @model.get('mode') == 'markdown'
+            mode = require("ace/mode/text").Mode
+        @editor.getSession().setMode(new mode())
 
     evaluate: =>
         console.log 'in cellview evaluate handler'
-        @model.set(input: @input.val()) 
+        @model.set(input: @editor.getSession().getValue()) 
         @model.evaluate()
 
     destroy: =>
