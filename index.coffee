@@ -22,13 +22,13 @@ html ->
         div '#logo', -> 'notebook.js'
         div '#title', -> ''
       ul id: "cells" 
-      div '#spawner', ->
-          'Spawn a new cell'
+      div '#spawner', -> 'Insert cell'
 
 
     script type: "text/template", id: "cell-template", ->
       div '.cell', id: "[[= id ]]", ->
-        div '.spawn-above', -> 'Spawn cell above'
+        div '.type', -> '[[= type ]]'
+        div '.spawn-above', -> 'Insert cell'
         div '.controls', ->
           div '.evaluate', -> 'evaluate'
           div '.delete', -> 'delete'

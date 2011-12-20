@@ -64,8 +64,10 @@ class CellView extends Backbone.View
             $(@el).html(@template(@model.toJSON()))
             @input = @$('.cell-input') 
             @output = @$('.cell-output')
+            @type = @$('.type')
         else
             console.log 'rerender'
+            @type.html @model.get('type')
             if not @model.get('error')?
                 @output.html @model.get('output') 
             else 

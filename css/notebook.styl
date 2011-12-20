@@ -3,24 +3,6 @@ body
     background-color: #B0A08F
     margin: 0
 
-#notebook
-    width: 760px
-    padding-top: 40px;
-    margin-left: auto
-    margin-right: auto    
-    background-color: #FFFFFF
-    -webkit-box-shadow: rgba(0, 0, 0, 0.496094) 0 0 8px
-    -moz-box-shadow: rgba(0, 0, 0, 0.496094) 0 0 8px
-
-#spawner
-    // clear the floats sizes the notebook div correctly
-    clear: both
-
-.ace-container
-    position: relative 
-    height: 100px
-
-
 #navbar
     height: 34px
     background-color: #3D5963 
@@ -33,5 +15,72 @@ body
     vertical-align: center
     -webkit-box-shadow: rgba(0, 0, 0, 0.496094) 0 0 8px
     -moz-box-shadow: rgba(0, 0, 0, 0.496094) 0 0 8px
+
+#notebook
+    width: 760px
+    padding-top: 40px
+    margin-left: auto
+    margin-right: auto    
+    background-color: #FFFFFF
+    -webkit-box-shadow: rgba(0, 0, 0, 0.496094) 0 0 8px
+    -moz-box-shadow: rgba(0, 0, 0, 0.496094) 0 0 8px
+
+#spawner
+    // clear the floats sizes the notebook div correctly
+    clear: both
+
+
+#cells 
+    list-style-type: none
+    padding: 0     
+
+.cell
+    padding: 0
+
+.ace-container, .cell-output
+    margin-left: 20px
+    margin-right: 20px
+
+.ace-container
+    position: relative 
+    height: 100px
+    padding: 5px
+    -webkit-box-shadow: rgba(0, 0, 0, 0.496094) 0 0 6px
+
+.cell-output 
+    margin-top: 10px
     
+    &:focus
+         background-color: rgb(232, 242, 254)
+
+.type 
+    // The mode is absolute position wrt to the cell's relative position */
+    //    border: 1px solid red*/
+    position: absolute
+    -webkit-transform-origin: top left   
+    -webkit-transform: rotate(90deg) 
+    -moz-transform-origin: top left  
+    -moz-transform: rotate(90deg)
+    background-color: #8FA7B0
+    color: white
+    padding: 5px
+    font-weight: bold
+    font-family: sans-serif
+    -webkit-box-shadow: rgba(0, 0, 0, 0.496094) 0 0 8px
+    -moz-box-shadow: rgba(0, 0, 0, 0.496094) 0 0 8px
+    z-index: -10
+
+
+
+.spawn-above, #spawner
+    align: right
+    margin-top: 5px
+    margin-bottom: 5px
+    margin-left: 20px
+    margin-right: 20px
+    font-family: sans-serif
+    font-size: 10px
+    text-align: center
+    background-color: #EEEEEE 
+    font-family: "Gill Sans", "Gill Sans MT", Helvetica 
 

@@ -116,8 +116,10 @@
         $(this.el).html(this.template(this.model.toJSON()));
         this.input = this.$('.cell-input');
         this.output = this.$('.cell-output');
+        this.type = this.$('.type');
       } else {
         console.log('rerender');
+        this.type.html(this.model.get('type'));
         if (!(this.model.get('error') != null)) {
           this.output.html(this.model.get('output'));
         } else {
