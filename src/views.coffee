@@ -59,6 +59,7 @@ class CellView extends Backbone.View
         "click .delete": "destroy",
         "click .toggle": 'toggle',
         "evaluate": "evaluate",
+        "toggle": "toggle"
     )
 
     initialize: => 

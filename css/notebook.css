@@ -24,7 +24,6 @@ body {
   float: right;
   font-family: "Courier New", "monospace";
   font-weight: bold;
-  text-shadow: 0px 2px 3px #bbb;
 }
 #notebook {
   width: 760px;

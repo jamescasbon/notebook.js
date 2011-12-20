@@ -107,7 +107,8 @@
         "click .evaluate": "evaluate",
         "click .delete": "destroy",
         "click .toggle": 'toggle',
-        "evaluate": "evaluate"
+        "evaluate": "evaluate",
+        "toggle": "toggle"
       };
     };
 
