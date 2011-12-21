@@ -52,6 +52,7 @@
     __extends(Cell, _super);
 
     function Cell() {
+      this.handleMessage = __bind(this.handleMessage, this);
       this.evaluateError = __bind(this.evaluateError, this);
       this.evaluateSuccess = __bind(this.evaluateSuccess, this);
       this.evaluate = __bind(this.evaluate, this);
@@ -68,7 +69,8 @@
         type: "javascript",
         output: null,
         position: null,
-        error: null
+        error: null,
+        state: null
       };
     };
 
@@ -86,8 +88,12 @@
 
     Cell.prototype.evaluate = function() {
       var handler;
+      this.set({
+        output: null,
+        state: 'evaluating'
+      });
       handler = root.engines[this.get('type')];
-      return handler.evaluate(this.get('input'), this.evaluateSuccess, this.evaluateError);
+      return handler.evaluate(this.get('input'), this);
     };
 
     Cell.prototype.evaluateSuccess = function(output) {
@@ -104,6 +110,38 @@
         error: error
       });
       return this.save;
+    };
+
+    Cell.prototype.handleMessage = function(data) {
+      switch (data.msg) {
+        case 'evalEnd':
+          return this.set({
+            state: null
+          });
+        case 'error':
+          return this.onError(data.data);
+        case 'print':
+          return this.onPrint(data.data);
+        case 'result':
+          return this.onPrint(data.data);
+      }
+    };
+
+    Cell.prototype.onError = function(error) {
+      return this.set({
+        error: error
+      });
+    };
+
+    Cell.prototype.onPrint = function(data) {
+      var current, el;
+      el = document.createElement('div');
+      el.className = 'print';
+      el.innerHTML = data;
+      current = this.get('output') || "";
+      return this.set({
+        output: current.concat(el.outerHTML)
+      });
     };
 
     return Cell;

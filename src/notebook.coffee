@@ -21,7 +21,8 @@ class Cell extends Backbone.Model
         type: "javascript", 
         output: null, 
         position: null,
-        error: null
+        error: null,
+        state: null
     
     toggleType: =>
         if @get('type') == 'javascript'
@@ -30,10 +31,12 @@ class Cell extends Backbone.Model
             @set type: 'javascript'
 
     evaluate: =>
+        @save()
+        @set(output: null, state: 'evaluating')
         # should we save the model at this point?
         # how to look up handler?
         handler = root.engines[@get('type')]
-        handler.evaluate @get('input'), @evaluateSuccess, @evaluateError
+        handler.evaluate @get('input'), @
 
     evaluateSuccess: (output) => 
         @set output: output, error: null
@@ -42,6 +45,27 @@ class Cell extends Backbone.Model
     evaluateError: (error) => 
         @set output: null, error: error
         @save
+
+    handleMessage: (data) => 
+        switch data.msg
+            when 'evalEnd' then 
+                @set(state: null)
+                @save()
+            when 'error' then @onError(data.data)
+            when 'print' then @onPrint(data.data)
+            when 'result' then @onPrint(data.data)
+
+    onError: (error) -> 
+        @set(error: error)
+
+    onPrint: (data) ->
+        el = document.createElement('div')
+        el.className = 'print'
+        el.innerHTML = data 
+        current = @get('output') or ""
+        @set(output: current.concat(el.outerHTML))
+        
+        
 
 
 class Cells extends Backbone.Collection

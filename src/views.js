@@ -94,6 +94,7 @@
       this.setEditorHighlightMode = __bind(this.setEditorHighlightMode, this);
       this.afterDomInsert = __bind(this.afterDomInsert, this);
       this.render = __bind(this.render, this);
+      this.logev = __bind(this.logev, this);
       this.initialize = __bind(this.initialize, this);
       this.events = __bind(this.events, this);
       CellView.__super__.constructor.apply(this, arguments);
@@ -114,10 +115,15 @@
 
     CellView.prototype.initialize = function() {
       this.template = _.template($('#cell-template').html());
-      this.model.bind('all', this.render);
+      this.model.bind('change', this.render);
       this.model.bind('destroy', this.remove);
       this.model.view = this;
-      return this.editor = null;
+      this.editor = null;
+      return this.model.bind('all', this.logev);
+    };
+
+    CellView.prototype.logev = function(ev) {
+      return console.log('in ev', ev);
     };
 
     CellView.prototype.render = function() {
@@ -159,7 +165,6 @@
       } else if (this.model.get('mode') === 'markdown') {
         mode = require("ace/mode/text").Mode;
       }
-      console.log('mode', mode);
       if (mode != null) return this.editor.getSession().setMode(new mode());
     };
 

@@ -64,10 +64,14 @@ class CellView extends Backbone.View
 
     initialize: => 
         @template =  _.template($('#cell-template').html())
-        @model.bind 'all', @render
+        @model.bind 'change', @render
         @model.bind 'destroy', @remove
         @model.view = @
         @editor = null
+        @model.bind 'all', @logev
+
+    logev: (ev) =>
+        console.log('in ev', ev)
 
     render: =>
         if not @editor?
@@ -112,7 +116,6 @@ class CellView extends Backbone.View
             mode = require("ace/mode/javascript").Mode
         else if @model.get('mode') == 'markdown'
             mode = require("ace/mode/text").Mode
-        console.log 'mode', mode
         if mode?
             @editor.getSession().setMode(new mode())
 
