@@ -88,8 +88,10 @@
 
     Cell.prototype.evaluate = function() {
       var handler;
+      this.save();
       this.set({
         output: null,
+        error: null,
         state: 'evaluating'
       });
       handler = root.engines[this.get('type')];
@@ -113,11 +115,13 @@
     };
 
     Cell.prototype.handleMessage = function(data) {
+      console.log('cell message', data);
       switch (data.msg) {
         case 'evalEnd':
-          return this.set({
+          this.set({
             state: null
           });
+          return this.save();
         case 'error':
           return this.onError(data.data);
         case 'print':

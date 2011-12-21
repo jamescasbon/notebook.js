@@ -1,17 +1,25 @@
 root = exports ? this
 
-class JavascriptContext 
-    foo: 42
-
 
 class JavascriptEval
-    evaluate: (input, onSuccess, onErr) => 
+    evaluate: (input, handler) => 
         try
-            output = eval(input)
+            print = (d) -> 
+                handler.handleMessage(msg: 'print', data: d.toString())
+            foo = ->
+                eval(input)
+            
+            result = setTimeout(foo, 0)
             #console.log 'eval produced', input,  output
-            onSuccess output.toString()
+            if result?
+                console.log('result', result)
+                handler.handleMessage(msg: 'result', data: result.toString())
+
         catch error
-            onErr error.toString()
+            console.log(error.message, error.stack)
+            handler.handleMessage(msg: 'error', data: error.toString())
+        finally 
+            handler.handleMessage(msg: 'evalEnd') 
 
 
 class MarkdownEval
@@ -37,7 +45,7 @@ class WorkerEval
         @worker.postMessage(src: input, id: @inputId)
 
     handleMessage: (ev) =>
-        console.log('got msg from worker', ev.data)
+        console.log('got msg from worker', ev.msg)
         inputId = ev.data.inputId
         handler = @handlers[inputId]
         handler.handleMessage(ev.data)
@@ -46,7 +54,7 @@ class WorkerEval
 
 
 engines = {}
-engines.javascript = new WorkerEval()
+engines.javascript = new JavascriptEval()
 engines.markdown = new MarkdownEval()
 
 root.engines = engines

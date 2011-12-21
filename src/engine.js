@@ -1,18 +1,8 @@
 (function() {
-  var JavascriptContext, JavascriptEval, MarkdownEval, WorkerEval, engines, root,
+  var JavascriptEval, MarkdownEval, WorkerEval, engines, root,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   root = typeof exports !== "undefined" && exports !== null ? exports : this;
-
-  JavascriptContext = (function() {
-
-    function JavascriptContext() {}
-
-    JavascriptContext.prototype.foo = 42;
-
-    return JavascriptContext;
-
-  })();
 
   JavascriptEval = (function() {
 
@@ -20,13 +10,36 @@
       this.evaluate = __bind(this.evaluate, this);
     }
 
-    JavascriptEval.prototype.evaluate = function(input, onSuccess, onErr) {
-      var output;
+    JavascriptEval.prototype.evaluate = function(input, handler) {
+      var foo, print, result;
       try {
-        output = eval(input);
-        return onSuccess(output.toString());
+        print = function(d) {
+          return handler.handleMessage({
+            msg: 'print',
+            data: d.toString()
+          });
+        };
+        foo = function() {
+          return eval(input);
+        };
+        result = setTimeout(foo, 0);
+        if (result != null) {
+          console.log('result', result);
+          return handler.handleMessage({
+            msg: 'result',
+            data: result.toString()
+          });
+        }
       } catch (error) {
-        return onErr(error.toString());
+        console.log(error.message, error.stack);
+        return handler.handleMessage({
+          msg: 'error',
+          data: error.toString()
+        });
+      } finally {
+        handler.handleMessage({
+          msg: 'evalEnd'
+        });
       }
     };
 
@@ -76,7 +89,7 @@
 
     WorkerEval.prototype.handleMessage = function(ev) {
       var handler, inputId;
-      console.log('got msg from worker', ev.data);
+      console.log('got msg from worker', ev.msg);
       inputId = ev.data.inputId;
       handler = this.handlers[inputId];
       return handler.handleMessage(ev.data);
@@ -88,7 +101,7 @@
 
   engines = {};
 
-  engines.javascript = new WorkerEval();
+  engines.javascript = new JavascriptEval();
 
   engines.markdown = new MarkdownEval();
 
