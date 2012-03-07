@@ -11,7 +11,7 @@
     }
 
     JavascriptEval.prototype.evaluate = function(input, handler) {
-      var foo, print, result;
+      var print, result;
       try {
         print = function(d) {
           return handler.handleMessage({
@@ -19,10 +19,7 @@
             data: d.toString()
           });
         };
-        foo = function() {
-          return eval(input);
-        };
-        result = setTimeout(foo, 0);
+        result = eval(input);
         if (result != null) {
           console.log('result', result);
           return handler.handleMessage({
@@ -53,14 +50,18 @@
       this.evaluate = __bind(this.evaluate, this);
     }
 
-    MarkdownEval.prototype.evaluate = function(input, onSuccess, onErr) {
+    MarkdownEval.prototype.evaluate = function(input, handler) {
       var html, markdownConvertor;
       try {
         markdownConvertor = new Showdown.converter();
         html = markdownConvertor.makeHtml(input);
-        return onSuccess(html);
+        return handler.handleMessage({
+          msg: 'result',
+          data: html
+        });
       } catch (error) {
-        return onError(error.message);
+        console.log(error.message);
+        return onErr(error.message);
       }
     };
 
@@ -101,7 +102,7 @@
 
   engines = {};
 
-  engines.javascript = new JavascriptEval();
+  engines.javascript = new WorkerEval();
 
   engines.markdown = new MarkdownEval();
 

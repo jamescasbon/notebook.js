@@ -6,10 +6,8 @@ class JavascriptEval
         try
             print = (d) -> 
                 handler.handleMessage(msg: 'print', data: d.toString())
-            foo = ->
-                eval(input)
+            result = eval(input)
             
-            result = setTimeout(foo, 0)
             #console.log 'eval produced', input,  output
             if result?
                 console.log('result', result)
@@ -23,13 +21,14 @@ class JavascriptEval
 
 
 class MarkdownEval
-    evaluate: (input, onSuccess, onErr) =>
+    evaluate: (input, handler) =>
         try
             markdownConvertor = new Showdown.converter()
             html = markdownConvertor.makeHtml(input)
-            onSuccess html
+            handler.handleMessage(msg: 'result', data: html)
         catch error
-            onError error.message
+            console.log error.message
+            onErr error.message
         
 
 class WorkerEval
@@ -54,7 +53,7 @@ class WorkerEval
 
 
 engines = {}
-engines.javascript = new JavascriptEval()
+engines.javascript = new WorkerEval()
 engines.markdown = new MarkdownEval()
 
 root.engines = engines
