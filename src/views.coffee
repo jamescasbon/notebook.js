@@ -103,7 +103,7 @@ class CellView extends Backbone.View
         # TODO: hide scrollbar when sizing elements correctly 
         #this.$('.ace_sb').css({overflow: 'hidden'});
         
-        #@editor.getSession().on('change', this.inputChange);
+        @editor.getSession().on('change', this.inputChange)
         #// trigger initial sizing of element.  TODO: correctly size when creating template
         #this.inputChange();
         
@@ -111,7 +111,7 @@ class CellView extends Backbone.View
     
     setEditorHighlightMode: => 
         # TODO: text mode not found, better lookup of modes
-        
+        # TODO: ace markdown support
         if @model.get('type') == 'javascript'
             mode = require("ace/mode/javascript").Mode
         else if @model.get('mode') == 'markdown'
@@ -136,6 +136,14 @@ class CellView extends Backbone.View
     
     toggle: => 
         @model.toggleType()
+    
+    inputChange: => 
+        # resize the editor container
+        # TODO: implement real renderer for ace
+        line_height = @editor.renderer.$textLayer.getLineHeight()
+        lines = @editor.getSession().getDocument().getLength()
+        @$('.ace-container').height(line_height * lines)
+        @editor.resize()
 
 
 $(document).ready ->

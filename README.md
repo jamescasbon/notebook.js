@@ -32,6 +32,7 @@ Now:
 * backspace supress
 * evaluate focus element
 * html stripped from javascript input 
+* monkeypatch ace renderer to override scroll?
 
 Someday: 
 * latex mode
@@ -41,4 +42,8 @@ Someday:
 * Mouse scroll in ace 
 * Insert cell scroll
 * Focus ace line where clicked
+
+ace/virtual_renderer.js without scrollbar layers
+
+CSS stuff http://css-tricks.com/different-transitions-for-hover-on-hover-off/
 

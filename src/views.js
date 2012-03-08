@@ -86,6 +86,7 @@
     __extends(CellView, _super);
 
     function CellView() {
+      this.inputChange = __bind(this.inputChange, this);
       this.toggle = __bind(this.toggle, this);
       this.spawnAbove = __bind(this.spawnAbove, this);
       this.remove = __bind(this.remove, this);
@@ -155,6 +156,7 @@
       this.editor.renderer.setHScrollBarAlwaysVisible(false);
       this.editor.renderer.setShowPrintMargin(false);
       this.editor.setHighlightActiveLine(true);
+      this.editor.getSession().on('change', this.inputChange);
       return this.setEditorHighlightMode();
     };
 
@@ -191,6 +193,14 @@
 
     CellView.prototype.toggle = function() {
       return this.model.toggleType();
+    };
+
+    CellView.prototype.inputChange = function() {
+      var line_height, lines;
+      line_height = this.editor.renderer.$textLayer.getLineHeight();
+      lines = this.editor.getSession().getDocument().getLength();
+      this.$('.ace-container').height(line_height * lines);
+      return this.editor.resize();
     };
 
     return CellView;
