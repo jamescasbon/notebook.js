@@ -9,6 +9,7 @@ html ->
     script src: "/lib/showdown.js"
     script src: "/lib/ace/ace.js"
     script src: "/lib/ace/mode-javascript.js"
+    script src: "/lib/ace/mode-markdown.js"
     script src: "/src/engine.js" 
     script src: "/src/notebook.js" 
     script src: "/src/views.js" 

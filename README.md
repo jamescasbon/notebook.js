@@ -31,6 +31,8 @@ Now:
 * backspace supress
 * evaluate focus element
 * html stripped from javascript input 
+* click out markdown eval
+* keyup in ace out of screen detection
 
 Someday: 
 * latex mode

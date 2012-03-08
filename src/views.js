@@ -94,6 +94,7 @@
       this.destroy = __bind(this.destroy, this);
       this.evaluate = __bind(this.evaluate, this);
       this.setEditorHighlightMode = __bind(this.setEditorHighlightMode, this);
+      this.scroll = __bind(this.scroll, this);
       this.afterDomInsert = __bind(this.afterDomInsert, this);
       this.render = __bind(this.render, this);
       this.logev = __bind(this.logev, this);
@@ -152,6 +153,7 @@
     };
 
     CellView.prototype.afterDomInsert = function() {
+      var _this = this;
       this.editor = ace.edit('input-' + this.model.id);
       this.editor.resize();
       this.editor.getSession().setUseWrapMode(false);
@@ -160,16 +162,41 @@
       this.editor.renderer.setShowPrintMargin(false);
       this.editor.setHighlightActiveLine(true);
       this.$('.ace_sb').css({
-        display: 'none',
-        clear: 'both'
+        display: 'none'
       });
       this.editor.getSession().on('change', this.inputChange);
       this.setEditorHighlightMode();
       this.inputChange();
-      if (this.model.get('type') === 'markdown') {
-        console.log(this.model.get('type'), this.inputContainer);
-        return this.switchIoViews();
-      }
+      console.log('scroller', this.$('.ace_scroller'));
+      if (this.model.get('type') === 'markdown') this.switchIoViews();
+      this.editor.commands.addCommand({
+        name: 'evaluate',
+        bindKey: {
+          win: 'Ctrl-E',
+          mac: 'Command-E',
+          sender: 'editor'
+        },
+        exec: function(env, args, request) {
+          return console.log('canon eval handler', _this.evaluate());
+        }
+      });
+      return this.editor.commands.addCommand({
+        name: 'toggleMode',
+        bindKey: {
+          win: 'Ctrl-M',
+          mac: 'Command-M',
+          sender: 'editor'
+        },
+        exec: function(env, args, request) {
+          console.log('canon eval handler');
+          return _this.toggle();
+        }
+      });
+    };
+
+    CellView.prototype.scroll = function() {
+      console.log('scroll');
+      return false;
     };
 
     CellView.prototype.setEditorHighlightMode = function() {
@@ -177,7 +204,7 @@
       if (this.model.get('type') === 'javascript') {
         mode = require("ace/mode/javascript").Mode;
       } else if (this.model.get('mode') === 'markdown') {
-        mode = require("ace/mode/text").Mode;
+        mode = require("ace/mode/markdown").Mode;
       }
       if (mode != null) return this.editor.getSession().setMode(new mode());
     };
@@ -205,6 +232,11 @@
     };
 
     CellView.prototype.toggle = function() {
+      if (this.model.get('type') === 'markdown') {
+        this.inputContainer.show();
+        this.output.show();
+        this.editor.resize();
+      }
       return this.model.toggleType();
     };
 
@@ -212,9 +244,9 @@
       var line_height, lines;
       line_height = this.editor.renderer.$textLayer.getLineHeight();
       lines = this.editor.getSession().getDocument().getLength();
-      this.$('.ace-container').height(20 + (line_height * lines));
+      this.$('.ace-container').height(20 + (18 * lines));
       this.editor.resize();
-      return console.log('resized editor on', line_height, lines);
+      return console.log('resized editor on', 18, lines);
     };
 
     CellView.prototype.switchIoViews = function() {

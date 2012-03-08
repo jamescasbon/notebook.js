@@ -76,6 +76,7 @@ class CellView extends Backbone.View
 
     render: =>
         if not @editor?
+            # initialize
             console.log 'render cell', @model.toJSON()
             $(@el).html(@template(@model.toJSON()))
             @input = @$('.cell-input') 
@@ -83,6 +84,7 @@ class CellView extends Backbone.View
             @inputContainer = @$('.ace-container')
             @type = @$('.type')
         else
+            # update
             console.log 'rerender'
             @type.html @model.get('type')
             if not @model.get('error')?
@@ -105,26 +107,47 @@ class CellView extends Backbone.View
         @editor.setHighlightActiveLine true
         
         # TODO: size of line highlight not correct
-        @$('.ace_sb').css({display: 'none', clear: 'both'});
+        @$('.ace_sb').css({display: 'none'})
         
         @editor.getSession().on('change', this.inputChange)
         @setEditorHighlightMode()
         # there is a race condition here looking up the line height
         @inputChange()
-  
+        
+        console.log('scroller', @$('.ace_scroller'))
+
+        #$(window).scroll @scroll
         # hide markdown editors 
         if @model.get('type') == 'markdown'
-            console.log(@model.get('type'),@inputContainer )
-            #@inputContainer.hide()
             @switchIoViews()
-    
+        
+        @editor.commands.addCommand
+            name: 'evaluate', 
+            bindKey: { win: 'Ctrl-E', mac: 'Command-E', sender: 'editor' },
+            exec: (env, args, request) =>
+                console.log 'canon eval handler', 
+                @evaluate()
+        
+        @editor.commands.addCommand
+            name: 'toggleMode', 
+            bindKey: { win: 'Ctrl-M', mac: 'Command-M', sender: 'editor' },
+            exec: (env, args, request) =>
+                console.log 'canon eval handler'
+                @toggle()
+
+
+
+    scroll: => 
+        console.log 'scroll'
+        return false
+
     setEditorHighlightMode: => 
         # TODO: text mode not found, better lookup of modes
         # TODO: ace markdown support
         if @model.get('type') == 'javascript'
             mode = require("ace/mode/javascript").Mode
         else if @model.get('mode') == 'markdown'
-            mode = require("ace/mode/text").Mode
+            mode = require("ace/mode/markdown").Mode
         if mode?
             @editor.getSession().setMode(new mode())
 
@@ -144,7 +167,11 @@ class CellView extends Backbone.View
     spawnAbove: =>
         @model.collection.createBefore @model
     
-    toggle: => 
+    toggle: =>
+        if @model.get('type') == 'markdown'
+            @inputContainer.show()
+            @output.show()
+            @editor.resize()
         @model.toggleType()
     
     inputChange: => 
@@ -153,9 +180,10 @@ class CellView extends Backbone.View
         line_height = @editor.renderer.$textLayer.getLineHeight()
         lines = @editor.getSession().getDocument().getLength()
         # Add 20 here to allow scroll while wrap is broken
-        @$('.ace-container').height(20 + (line_height * lines))
+        @$('.ace-container').height(20 + (18 * lines))
         @editor.resize()
-        console.log('resized editor on', line_height, lines)
+        # TODO get real line height 
+        console.log('resized editor on', 18, lines)
     
     switchIoViews: => 
         if @model.get('type') == 'markdown'
