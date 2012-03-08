@@ -25,7 +25,7 @@ class MarkdownEval
         try
             markdownConvertor = new Showdown.converter()
             html = markdownConvertor.makeHtml(input)
-            handler.handleMessage(msg: 'result', data: html)
+            handler.handleMessage(msg: 'raw', data: html)
 
         catch error
             console.log error.message

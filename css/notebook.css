@@ -65,10 +65,12 @@ body {
   position: relative;
   height: 100px;
   padding: 5px;
-  -webkit-box-shadow: rgba(0,0,0,0.50) 0 0 6px;
 }
 .cell-output {
   margin-top: 10px;
+}
+.cell-output .print {
+  font-family: "Courier New", "monospace";
 }
 .cell-output ul {
   list-style-type: disc;
@@ -95,6 +97,7 @@ body {
 }
 .spawn-above,
 #spawner {
+  font-family: "Courier New", "monospace";
   margin-top: 5px;
   margin-bottom: 5px;
   margin-left: 5%;

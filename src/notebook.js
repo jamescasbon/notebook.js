@@ -126,9 +126,11 @@
         case 'error':
           return this.onError(data.data);
         case 'print':
-          return this.onPrint(data.data);
+          return this.onPrint(data.data, 'print');
         case 'result':
-          return this.onPrint(data.data);
+          return this.onPrint(data.data, 'print');
+        case 'raw':
+          return this.onPrint(data.data, 'raw');
       }
     };
 
@@ -138,10 +140,10 @@
       });
     };
 
-    Cell.prototype.onPrint = function(data) {
+    Cell.prototype.onPrint = function(data, elName) {
       var current, el;
       el = document.createElement('div');
-      el.className = 'print';
+      el.className = elName;
       el.innerHTML = data;
       current = this.get('output') || "";
       return this.set({

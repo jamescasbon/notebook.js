@@ -56,7 +56,7 @@
         markdownConvertor = new Showdown.converter();
         html = markdownConvertor.makeHtml(input);
         return handler.handleMessage({
-          msg: 'result',
+          msg: 'raw',
           data: html
         });
       } catch (error) {

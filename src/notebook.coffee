@@ -54,15 +54,16 @@ class Cell extends Backbone.Model
                 @set(state: null)
                 @save()
             when 'error' then @onError(data.data)
-            when 'print' then @onPrint(data.data)
-            when 'result' then @onPrint(data.data)
+            when 'print' then @onPrint(data.data, 'print')
+            when 'result' then @onPrint(data.data, 'print')
+            when 'raw' then @onPrint(data.data, 'raw')
 
     onError: (error) -> 
         @set(error: error)
 
-    onPrint: (data) ->
+    onPrint: (data, elName) ->
         el = document.createElement('div')
-        el.className = 'print'
+        el.className = elName
         el.innerHTML = data 
         current = @get('output') or ""
         @set(output: current.concat(el.outerHTML))
