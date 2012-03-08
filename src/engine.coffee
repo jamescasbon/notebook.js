@@ -17,7 +17,7 @@ class JavascriptEval
             console.log(error.message, error.stack)
             handler.handleMessage(msg: 'error', data: error.toString())
         finally 
-            handler.handleMessage(msg: 'evalEnd') 
+            handler.handleMessage(msg: 'evalEnd')
 
 
 class MarkdownEval
@@ -26,9 +26,12 @@ class MarkdownEval
             markdownConvertor = new Showdown.converter()
             html = markdownConvertor.makeHtml(input)
             handler.handleMessage(msg: 'result', data: html)
+
         catch error
             console.log error.message
             onErr error.message
+        finally 
+            handler.handleMessage(msg: 'evalEnd')
         
 
 class WorkerEval

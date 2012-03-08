@@ -62,6 +62,10 @@
       } catch (error) {
         console.log(error.message);
         return onErr(error.message);
+      } finally {
+        handler.handleMessage({
+          msg: 'evalEnd'
+        });
       }
     };
 
