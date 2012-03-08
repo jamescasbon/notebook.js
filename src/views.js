@@ -86,6 +86,7 @@
     __extends(CellView, _super);
 
     function CellView() {
+      this.switchIoViews = __bind(this.switchIoViews, this);
       this.inputChange = __bind(this.inputChange, this);
       this.toggle = __bind(this.toggle, this);
       this.spawnAbove = __bind(this.spawnAbove, this);
@@ -109,6 +110,7 @@
         "click .evaluate": "evaluate",
         "click .delete": "destroy",
         "click .toggle": 'toggle',
+        "click .cell-output": 'switchIoViews',
         "evaluate": "evaluate",
         "toggle": "toggle"
       };
@@ -133,6 +135,7 @@
         $(this.el).html(this.template(this.model.toJSON()));
         this.input = this.$('.cell-input');
         this.output = this.$('.cell-output');
+        this.inputContainer = this.$('.ace-container');
         this.type = this.$('.type');
       } else {
         console.log('rerender');
@@ -162,7 +165,11 @@
       });
       this.editor.getSession().on('change', this.inputChange);
       this.setEditorHighlightMode();
-      return this.inputChange();
+      this.inputChange();
+      if (this.model.get('type') === 'markdown') {
+        console.log(this.model.get('type'), this.inputContainer);
+        return this.switchIoViews();
+      }
     };
 
     CellView.prototype.setEditorHighlightMode = function() {
@@ -180,7 +187,8 @@
       this.model.set({
         input: this.editor.getSession().getValue()
       });
-      return this.model.evaluate();
+      this.model.evaluate();
+      return this.switchIoViews();
     };
 
     CellView.prototype.destroy = function() {
@@ -207,6 +215,19 @@
       this.$('.ace-container').height(20 + (line_height * lines));
       this.editor.resize();
       return console.log('resized editor on', line_height, lines);
+    };
+
+    CellView.prototype.switchIoViews = function() {
+      if (this.model.get('type') === 'markdown') {
+        if (this.$('.ace-container').is(":hidden")) {
+          this.inputContainer.show();
+          this.output.hide();
+          return this.editor.resize();
+        } else {
+          this.output.show();
+          return this.inputContainer.hide();
+        }
+      }
     };
 
     return CellView;

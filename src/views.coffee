@@ -58,6 +58,7 @@ class CellView extends Backbone.View
         "click .evaluate":  "evaluate",
         "click .delete": "destroy",
         "click .toggle": 'toggle',
+        "click .cell-output":   'switchIoViews',
         "evaluate": "evaluate",
         "toggle": "toggle"
     )
@@ -79,6 +80,7 @@ class CellView extends Backbone.View
             $(@el).html(@template(@model.toJSON()))
             @input = @$('.cell-input') 
             @output = @$('.cell-output')
+            @inputContainer = @$('.ace-container')
             @type = @$('.type')
         else
             console.log 'rerender'
@@ -109,6 +111,12 @@ class CellView extends Backbone.View
         @setEditorHighlightMode()
         # there is a race condition here looking up the line height
         @inputChange()
+  
+        # hide markdown editors 
+        if @model.get('type') == 'markdown'
+            console.log(@model.get('type'),@inputContainer )
+            #@inputContainer.hide()
+            @switchIoViews()
     
     setEditorHighlightMode: => 
         # TODO: text mode not found, better lookup of modes
@@ -124,6 +132,7 @@ class CellView extends Backbone.View
         console.log 'in cellview evaluate handler'
         @model.set(input: @editor.getSession().getValue()) 
         @model.evaluate()
+        @switchIoViews()
 
     destroy: =>
         console.log 'in cellview destroy handler'
@@ -147,6 +156,20 @@ class CellView extends Backbone.View
         @$('.ace-container').height(20 + (line_height * lines))
         @editor.resize()
         console.log('resized editor on', line_height, lines)
+    
+    switchIoViews: => 
+        if @model.get('type') == 'markdown'
+    
+            if @$('.ace-container').is(":hidden")
+                @inputContainer.show()
+                @output.hide()
+                @editor.resize()
+            else
+                @output.show()
+                @inputContainer.hide()
+
+
+
 
 
 $(document).ready ->
