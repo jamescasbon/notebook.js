@@ -29,6 +29,7 @@ class Cell extends Backbone.Model
             @set type: 'markdown'
         else
             @set type: 'javascript'
+        @evaluate()
 
     evaluate: =>
         @save()

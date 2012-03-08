@@ -13,7 +13,6 @@ html ->
     script src: "/src/engine.js" 
     script src: "/src/notebook.js" 
     script src: "/src/views.js" 
-    script src: "/src/ace-events.js"
 
     link rel: 'stylesheet', href: '/css/base.css'
     link rel: 'stylesheet', href: '/css/skeleton.css'
@@ -34,7 +33,7 @@ html ->
     script type: "text/template", id: "cell-template", ->
       div '.cell', id: "[[= id ]]", ->
         div '.type', -> '[[= type ]]'
-        button '.full-width .spawn-above', tabindex: '[[= position ]]a', -> 'Insert cell'
+        div '.spawn-above', tabindex: '[[= position ]]a', -> 'Insert cell'
         div '.controls', ->
           button '.full-width .evaluate', -> 'evaluate'
           button '.full-width .delete', -> 'delete'
