@@ -93,21 +93,22 @@ class CellView extends Backbone.View
     
     afterDomInsert: =>
         @editor = ace.edit('input-' + @model.id)
+        
         @editor.resize()
-        @editor.getSession().setUseWrapMode true
+        # wrap doesnt work - upgrade ace?
+        @editor.getSession().setUseWrapMode false
         @editor.renderer.setShowGutter false
         @editor.renderer.setHScrollBarAlwaysVisible false
         @editor.renderer.setShowPrintMargin false
         @editor.setHighlightActiveLine true
         
-        # TODO: hide scrollbar when sizing elements correctly 
-        #this.$('.ace_sb').css({overflow: 'hidden'});
+        # TODO: size of line highlight not correct
+        @$('.ace_sb').css({display: 'none', clear: 'both'});
         
         @editor.getSession().on('change', this.inputChange)
-        #// trigger initial sizing of element.  TODO: correctly size when creating template
-        #this.inputChange();
-        
         @setEditorHighlightMode()
+        # there is a race condition here looking up the line height
+        @inputChange()
     
     setEditorHighlightMode: => 
         # TODO: text mode not found, better lookup of modes
@@ -142,8 +143,10 @@ class CellView extends Backbone.View
         # TODO: implement real renderer for ace
         line_height = @editor.renderer.$textLayer.getLineHeight()
         lines = @editor.getSession().getDocument().getLength()
-        @$('.ace-container').height(line_height * lines)
+        # Add 20 here to allow scroll while wrap is broken
+        @$('.ace-container').height(20 + (line_height * lines))
         @editor.resize()
+        console.log('resized editor on', line_height, lines)
 
 
 $(document).ready ->

@@ -151,13 +151,18 @@
     CellView.prototype.afterDomInsert = function() {
       this.editor = ace.edit('input-' + this.model.id);
       this.editor.resize();
-      this.editor.getSession().setUseWrapMode(true);
+      this.editor.getSession().setUseWrapMode(false);
       this.editor.renderer.setShowGutter(false);
       this.editor.renderer.setHScrollBarAlwaysVisible(false);
       this.editor.renderer.setShowPrintMargin(false);
       this.editor.setHighlightActiveLine(true);
+      this.$('.ace_sb').css({
+        display: 'none',
+        clear: 'both'
+      });
       this.editor.getSession().on('change', this.inputChange);
-      return this.setEditorHighlightMode();
+      this.setEditorHighlightMode();
+      return this.inputChange();
     };
 
     CellView.prototype.setEditorHighlightMode = function() {
@@ -199,8 +204,9 @@
       var line_height, lines;
       line_height = this.editor.renderer.$textLayer.getLineHeight();
       lines = this.editor.getSession().getDocument().getLength();
-      this.$('.ace-container').height(line_height * lines);
-      return this.editor.resize();
+      this.$('.ace-container').height(20 + (line_height * lines));
+      this.editor.resize();
+      return console.log('resized editor on', line_height, lines);
     };
 
     return CellView;
