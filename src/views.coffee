@@ -58,9 +58,14 @@ class CellView extends Backbone.View
         "click .evaluate":  "evaluate",
         "click .delete": "destroy",
         "click .toggle": 'toggle',
+        "click .type": 'toggle',
         "click .cell-output":   'switchIoViews',
         "evaluate": "evaluate",
-        "toggle": "toggle"
+        "toggle": "toggle",
+        "keydown .cell-output": 'handleKeypress',
+        "keydown .spawn-above": 'handleKeypress',
+        "focus .cell-input" : "focusInput"
+        "blur .cell-input" : "blurInput"
     )
 
     initialize: => 
@@ -96,15 +101,15 @@ class CellView extends Backbone.View
         @el
     
     afterDomInsert: =>
+        # Perform a load of editor configuration at this point
         @editor = ace.edit('input-' + @model.id)
         
         @editor.resize()
-        # wrap doesnt work - upgrade ace?
-        @editor.getSession().setUseWrapMode false
+        @editor.getSession().setUseWrapMode true
         @editor.renderer.setShowGutter false
         @editor.renderer.setHScrollBarAlwaysVisible false
         @editor.renderer.setShowPrintMargin false
-        @editor.setHighlightActiveLine true
+        @editor.setHighlightActiveLine false
         
         # TODO: size of line highlight not correct
         @$('.ace_sb').css({display: 'none'})
@@ -114,39 +119,97 @@ class CellView extends Backbone.View
         # there is a race condition here looking up the line height
         @inputChange()
         
-        console.log('scroller', @$('.ace_scroller'))
-
-        #$(window).scroll @scroll
-        # hide markdown editors 
-        if @model.get('type') == 'markdown'
-            @switchIoViews()
+        @switchIoViews()
         
         @editor.commands.addCommand
             name: 'evaluate', 
             bindKey: { win: 'Ctrl-E', mac: 'Command-E', sender: 'editor' },
-            exec: (env, args, request) =>
-                console.log 'canon eval handler', 
-                @evaluate()
+            exec: (env, args, request) => @evaluate()
         
         @editor.commands.addCommand
             name: 'toggleMode', 
             bindKey: { win: 'Ctrl-M', mac: 'Command-M', sender: 'editor' },
-            exec: (env, args, request) =>
-                console.log 'canon eval handler'
-                @toggle()
+            exec: (env, args, request) => @toggle()
+    
+        # if we line up on the first line, we need to focus up 
+        @editor.commands.addCommand
+            name: "golineup",
+            bindKey: {win: "Up", mac: "Up|Ctrl-P", sender: 'editor'},
+            exec: (ed, args) => 
+                row = ed.getSession().getSelection().getCursor().row
+                if row == 0
+                    @$('.spawn-above').focus()
+                else
+                    ed.navigateUp(args.times) 
+
+        # if we line down on the last line, we need to focus down 
+        @editor.commands.addCommand
+            name: "golinedown",
+            bindKey: {win: "Down", mac: "Down", sender: 'editor'},
+            exec: (ed, args) => 
+                row = ed.getSession().getSelection().getCursor().row
+                last = @editor.getSession().getDocument().getLength() - 1
+
+                if row == last
+                    @output.focus()
+                else
+                    ed.navigateDown(args.times) 
 
 
 
-    scroll: => 
-        console.log 'scroll'
-        return false
+
+    handleKeypress: (e) => 
+        # 38 up 40 down
+        target = e.target.className
+        console.log 'kp' 
+        if e.keyCode == 38
+            # event up
+            switch target 
+                when 'cell-output' then @focusInput('bottom')
+                when 'spawn-above' then @focusCellAbove()
+
+        else if e.keyCode == 40
+            # event = 'down'
+            switch target 
+                when 'cell-output' then @focusCellBelow()
+                when 'spawn-above' then @focusInput('top')
+
+    focusInput: (where) =>
+        
+        # focus the input from a somewhere, and recall the focus
+        console.log 'focusInput', where
+        if where == 'top'
+            @editor.gotoLine 1
+            @editor.focus()
+
+        else if where == 'bottom'
+            @editor.gotoLine @editor.getSession().getDocument().getLength()
+            @editor.focus()
+        
+        # on focus set the highlight
+        if @editor        
+            @editor.setHighlightActiveLine(true)
+ 
+
+    blurInput: =>
+        if @editor? 
+            @editor.setHighlightActiveLine(false)
+            # TODO: hide cursor
+        @switchIoViews()    
+    
+
+    focusCellAbove: => 
+        1
+    focusCellBelow: => 
+        1
+    focus: => console.log('focus')
 
     setEditorHighlightMode: => 
         # TODO: text mode not found, better lookup of modes
         # TODO: ace markdown support
         if @model.get('type') == 'javascript'
             mode = require("ace/mode/javascript").Mode
-        else if @model.get('mode') == 'markdown'
+        else if @model.get('type') == 'markdown'
             mode = require("ace/mode/markdown").Mode
         if mode?
             @editor.getSession().setMode(new mode())
@@ -168,12 +231,20 @@ class CellView extends Backbone.View
         @model.collection.createBefore @model
     
     toggle: =>
+        @model.toggleType()
+      
+        # hide the view if necessary
+        # TODO: move to switchIoViews
         if @model.get('type') == 'markdown'
+            # tODO: check focus to see which to hide
+            @inputContainer.show()
+            @output.hide()
+            @editor.resize()
+        else
             @inputContainer.show()
             @output.show()
             @editor.resize()
-        @model.toggleType()
-    
+            
     inputChange: => 
         # resize the editor container
         # TODO: implement real renderer for ace
@@ -192,6 +263,8 @@ class CellView extends Backbone.View
                 @inputContainer.show()
                 @output.hide()
                 @editor.resize()
+                # TODO: guess the target of the click ?
+                @editor.focus()
             else
                 @output.show()
                 @inputContainer.hide()

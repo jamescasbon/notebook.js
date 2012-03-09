@@ -27,13 +27,13 @@ html ->
           div '#logo', -> 'notebook.js'
           div '#title', -> ''
         ul id: "cells" 
-        button '#spawner .full-width', -> 'Insert cell'
+        div '#spawner', -> 'Hit Enter to insert here'
 
 
     script type: "text/template", id: "cell-template", ->
       div '.cell', id: "[[= id ]]", ->
         div '.type', -> '[[= type ]]'
-        div '.spawn-above', tabindex: '[[= position ]]a', -> 'Click or hit Enter to insert here'
+        div '.spawn-above', tabindex: '[[= position ]]a', -> 'Hit Enter to insert here'
         div '.controls', ->
           button '.full-width .evaluate', -> 'evaluate'
           button '.full-width .delete', -> 'delete'

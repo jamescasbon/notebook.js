@@ -94,7 +94,12 @@
       this.destroy = __bind(this.destroy, this);
       this.evaluate = __bind(this.evaluate, this);
       this.setEditorHighlightMode = __bind(this.setEditorHighlightMode, this);
-      this.scroll = __bind(this.scroll, this);
+      this.focus = __bind(this.focus, this);
+      this.focusCellBelow = __bind(this.focusCellBelow, this);
+      this.focusCellAbove = __bind(this.focusCellAbove, this);
+      this.blurInput = __bind(this.blurInput, this);
+      this.focusInput = __bind(this.focusInput, this);
+      this.handleKeypress = __bind(this.handleKeypress, this);
       this.afterDomInsert = __bind(this.afterDomInsert, this);
       this.render = __bind(this.render, this);
       this.logev = __bind(this.logev, this);
@@ -111,9 +116,14 @@
         "click .evaluate": "evaluate",
         "click .delete": "destroy",
         "click .toggle": 'toggle',
+        "click .type": 'toggle',
         "click .cell-output": 'switchIoViews',
         "evaluate": "evaluate",
-        "toggle": "toggle"
+        "toggle": "toggle",
+        "keydown .cell-output": 'handleKeypress',
+        "keydown .spawn-above": 'handleKeypress',
+        "focus .cell-input": "focusInput",
+        "blur .cell-input": "blurInput"
       };
     };
 
@@ -156,19 +166,18 @@
       var _this = this;
       this.editor = ace.edit('input-' + this.model.id);
       this.editor.resize();
-      this.editor.getSession().setUseWrapMode(false);
+      this.editor.getSession().setUseWrapMode(true);
       this.editor.renderer.setShowGutter(false);
       this.editor.renderer.setHScrollBarAlwaysVisible(false);
       this.editor.renderer.setShowPrintMargin(false);
-      this.editor.setHighlightActiveLine(true);
+      this.editor.setHighlightActiveLine(false);
       this.$('.ace_sb').css({
         display: 'none'
       });
       this.editor.getSession().on('change', this.inputChange);
       this.setEditorHighlightMode();
       this.inputChange();
-      console.log('scroller', this.$('.ace_scroller'));
-      if (this.model.get('type') === 'markdown') this.switchIoViews();
+      this.switchIoViews();
       this.editor.commands.addCommand({
         name: 'evaluate',
         bindKey: {
@@ -177,10 +186,10 @@
           sender: 'editor'
         },
         exec: function(env, args, request) {
-          return console.log('canon eval handler', _this.evaluate());
+          return _this.evaluate();
         }
       });
-      return this.editor.commands.addCommand({
+      this.editor.commands.addCommand({
         name: 'toggleMode',
         bindKey: {
           win: 'Ctrl-M',
@@ -188,22 +197,101 @@
           sender: 'editor'
         },
         exec: function(env, args, request) {
-          console.log('canon eval handler');
           return _this.toggle();
+        }
+      });
+      this.editor.commands.addCommand({
+        name: "golineup",
+        bindKey: {
+          win: "Up",
+          mac: "Up|Ctrl-P",
+          sender: 'editor'
+        },
+        exec: function(ed, args) {
+          var row;
+          row = ed.getSession().getSelection().getCursor().row;
+          if (row === 0) {
+            return _this.$('.spawn-above').focus();
+          } else {
+            return ed.navigateUp(args.times);
+          }
+        }
+      });
+      return this.editor.commands.addCommand({
+        name: "golinedown",
+        bindKey: {
+          win: "Down",
+          mac: "Down",
+          sender: 'editor'
+        },
+        exec: function(ed, args) {
+          var last, row;
+          row = ed.getSession().getSelection().getCursor().row;
+          last = _this.editor.getSession().getDocument().getLength() - 1;
+          if (row === last) {
+            return _this.output.focus();
+          } else {
+            return ed.navigateDown(args.times);
+          }
         }
       });
     };
 
-    CellView.prototype.scroll = function() {
-      console.log('scroll');
-      return false;
+    CellView.prototype.handleKeypress = function(e) {
+      var target;
+      target = e.target.className;
+      console.log('kp');
+      if (e.keyCode === 38) {
+        switch (target) {
+          case 'cell-output':
+            return this.focusInput('bottom');
+          case 'spawn-above':
+            return this.focusCellAbove();
+        }
+      } else if (e.keyCode === 40) {
+        switch (target) {
+          case 'cell-output':
+            return this.focusCellBelow();
+          case 'spawn-above':
+            return this.focusInput('top');
+        }
+      }
+    };
+
+    CellView.prototype.focusInput = function(where) {
+      console.log('focusInput', where);
+      if (where === 'top') {
+        this.editor.gotoLine(1);
+        this.editor.focus();
+      } else if (where === 'bottom') {
+        this.editor.gotoLine(this.editor.getSession().getDocument().getLength());
+        this.editor.focus();
+      }
+      if (this.editor) return this.editor.setHighlightActiveLine(true);
+    };
+
+    CellView.prototype.blurInput = function() {
+      if (this.editor != null) this.editor.setHighlightActiveLine(false);
+      return this.switchIoViews();
+    };
+
+    CellView.prototype.focusCellAbove = function() {
+      return 1;
+    };
+
+    CellView.prototype.focusCellBelow = function() {
+      return 1;
+    };
+
+    CellView.prototype.focus = function() {
+      return console.log('focus');
     };
 
     CellView.prototype.setEditorHighlightMode = function() {
       var mode;
       if (this.model.get('type') === 'javascript') {
         mode = require("ace/mode/javascript").Mode;
-      } else if (this.model.get('mode') === 'markdown') {
+      } else if (this.model.get('type') === 'markdown') {
         mode = require("ace/mode/markdown").Mode;
       }
       if (mode != null) return this.editor.getSession().setMode(new mode());
@@ -232,12 +320,16 @@
     };
 
     CellView.prototype.toggle = function() {
+      this.model.toggleType();
       if (this.model.get('type') === 'markdown') {
         this.inputContainer.show();
+        this.output.hide();
+        return this.editor.resize();
+      } else {
+        this.inputContainer.show();
         this.output.show();
-        this.editor.resize();
+        return this.editor.resize();
       }
-      return this.model.toggleType();
     };
 
     CellView.prototype.inputChange = function() {
@@ -254,7 +346,8 @@
         if (this.$('.ace-container').is(":hidden")) {
           this.inputContainer.show();
           this.output.hide();
-          return this.editor.resize();
+          this.editor.resize();
+          return this.editor.focus();
         } else {
           this.output.show();
           return this.inputContainer.hide();
