@@ -16,7 +16,7 @@
     __extends(NotebookView, _super);
 
     function NotebookView() {
-      this.spawnCell = __bind(this.spawnCell, this);
+      this.spawnCellAtEnd = __bind(this.spawnCellAtEnd, this);
       this.addAll = __bind(this.addAll, this);
       this.addOne = __bind(this.addOne, this);
       this.render = __bind(this.render, this);
@@ -29,7 +29,7 @@
 
     NotebookView.prototype.events = function() {
       return {
-        "click #spawner": 'spawnCell'
+        "click #spawner": 'spawnCellAtEnd'
       };
     };
 
@@ -68,12 +68,10 @@
     };
 
     NotebookView.prototype.addAll = function(cells) {
-      console.log(cells);
       return cells.each(this.addOne);
     };
 
-    NotebookView.prototype.spawnCell = function() {
-      console.log('spawning cell');
+    NotebookView.prototype.spawnCellAtEnd = function() {
       return this.model.cells.createAtEnd();
     };
 
@@ -112,7 +110,6 @@
 
     CellView.prototype.events = function() {
       return {
-        "click .spawn-above": 'spawnAbove',
         "click .evaluate": "evaluate",
         "click .delete": "destroy",
         "click .toggle": 'toggle',
@@ -142,14 +139,13 @@
 
     CellView.prototype.render = function() {
       if (!(this.editor != null)) {
-        console.log('render cell', this.model.toJSON());
         $(this.el).html(this.template(this.model.toJSON()));
+        this.spawn = this.$('.spawn-above');
         this.input = this.$('.cell-input');
         this.output = this.$('.cell-output');
         this.inputContainer = this.$('.ace-container');
         this.type = this.$('.type');
       } else {
-        console.log('rerender');
         this.type.html(this.model.get('type'));
         if (!(this.model.get('error') != null)) {
           this.output.html(this.model.get('output'));
@@ -211,7 +207,7 @@
           var row;
           row = ed.getSession().getSelection().getCursor().row;
           if (row === 0) {
-            return _this.$('.spawn-above').focus();
+            return _this.spawn.focus();
           } else {
             return ed.navigateUp(args.times);
           }
@@ -267,20 +263,26 @@
         this.editor.gotoLine(this.editor.getSession().getDocument().getLength());
         this.editor.focus();
       }
-      if (this.editor) return this.editor.setHighlightActiveLine(true);
+      if (this.editor != null) return this.editor.setHighlightActiveLine(true);
     };
 
     CellView.prototype.blurInput = function() {
       if (this.editor != null) this.editor.setHighlightActiveLine(false);
-      return this.switchIoViews();
+      return this.evaluate();
     };
 
     CellView.prototype.focusCellAbove = function() {
-      return 1;
+      var index, next;
+      index = this.model.collection.indexOf(this.model);
+      next = this.model.collection.at(index - 1);
+      if (next != null) return next.view.output.focus();
     };
 
     CellView.prototype.focusCellBelow = function() {
-      return 1;
+      var index, next;
+      index = this.model.collection.indexOf(this.model);
+      next = this.model.collection.at(index + 1);
+      if (next != null) return next.view.spawn.focus();
     };
 
     CellView.prototype.focus = function() {
@@ -307,7 +309,6 @@
     };
 
     CellView.prototype.destroy = function() {
-      console.log('in cellview destroy handler');
       return this.model.destroy();
     };
 

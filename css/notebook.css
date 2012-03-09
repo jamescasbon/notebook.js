@@ -114,3 +114,7 @@ body {
 #spawner:hover {
   opacity: 1;
 }
+.spawn-above:focus,
+#spawner:focus {
+  opacity: 1;
+}
