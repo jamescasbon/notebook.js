@@ -45,7 +45,6 @@ Now:
 * Move buttons
 * html stripped from javascript input 
 * keyup in ace out of screen detection
-* Focus model wrong for markdown show/not show 
 * detect whether content changed when evaluating (short circuit)
 * Overflows on output
 * Detect when to show last line
@@ -54,6 +53,7 @@ Now:
 * Dirty cell status
 * Null output indicator?
 * CSS fold indicator 
+* Set inital focus
 
 Someday: 
 * Document name

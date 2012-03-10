@@ -278,17 +278,23 @@
     };
 
     CellView.prototype.handleKeypress = function(e) {
-      var target;
+      var inFold, target;
       if (this.rogueKeyup === true) {
         this.rogueKeyup = false;
         return;
       }
+      inFold = this.model.get('inputFold');
       target = e.target.className;
       console.log('kp', e.keyCode, target);
       if (e.keyCode === 38) {
         switch (target) {
           case 'cell-output':
-            return this.focusInput('bottom');
+            if (inFold) {
+              return this.spawn.focus();
+            } else {
+              return this.focusInput('bottom');
+            }
+            break;
           case 'spawn-above':
             return this.focusCellAbove();
         }
@@ -297,7 +303,11 @@
           case 'cell-output':
             return this.focusCellBelow();
           case 'spawn-above':
-            return this.focusInput('top');
+            if (inFold) {
+              return this.output.focus();
+            } else {
+              return this.focusInput('top');
+            }
         }
       } else if (e.keyCode === 13) {
         switch (target) {

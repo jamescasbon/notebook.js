@@ -232,23 +232,30 @@ class CellView extends Backbone.View
       @rogueKeyup = false
       return 
 
+    inFold = @model.get('inputFold')
+
     # 38 up 40 down
     target = e.target.className
     console.log 'kp', e.keyCode, target
-    if e.keyCode == 38
-      # event up
+    if e.keyCode == 38            # UP ARROW
       switch target 
-        when 'cell-output' then @focusInput('bottom')
+        when 'cell-output'
+          if inFold
+            @spawn.focus()
+          else
+            @focusInput('bottom')
         when 'spawn-above' then @focusCellAbove()
 
-    else if e.keyCode == 40
-      # event = 'down'
+    else if e.keyCode == 40       # DOWN ARROW
       switch target 
         when 'cell-output' then @focusCellBelow()
-        when 'spawn-above' then @focusInput('top')
+        when 'spawn-above'
+          if inFold
+            @output.focus()
+          else
+            @focusInput('top')
 
-    # press enter on the spawner
-    else if e.keyCode == 13 
+    else if e.keyCode == 13       # ENTER
       switch target
         when 'spawn-above' then @spawnAbove()
 
@@ -260,6 +267,7 @@ class CellView extends Backbone.View
   changeInputFold: =>
     @inputContainer.toggleClass('input-fold')
     @$('.marker-input').toggleClass('input-fold')
+    # TODO: need to check if input focus and then refocus
 
   # TODO: method is unclear, called both when focused and to focus
   focusInput: (where) =>
