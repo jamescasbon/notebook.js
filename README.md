@@ -30,6 +30,8 @@ Now:
 * html stripped from javascript input 
 * keyup in ace out of screen detection
 * Focus model wrong for markdown show/not show 
+* Consistent look to focus
+* remove cursor
 
 Someday: 
 * latex mode

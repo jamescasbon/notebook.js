@@ -13,7 +13,7 @@ class NotebookView extends Backbone.View
         "click #spawner": 'spawnCellAtEnd'
     )
 
-    # bind to dom and model events
+    # bind to dom and model events, fetch cells
     initialize: =>
         @title = @$('#title')
         @cells = @$('#cells')
