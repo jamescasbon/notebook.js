@@ -118,9 +118,6 @@ body {
   outline: none;
   color: #555;
 }
-.evaluating {
-  background: #aaa;
-}
 .marker-input,
 .marker-output {
   position: relative;
@@ -137,4 +134,15 @@ body {
 }
 .ace-container.input-fold {
   display: none;
+}
+.status-bar {
+  background: #aaa;
+  height: 0;
+  opacity: 0;
+  -webkit-transition: opacity 0 linear, height 0.25s ease;
+}
+.status-bar.evaluating {
+  opacity: 1;
+  background: #fff;
+  height: 50px;
 }

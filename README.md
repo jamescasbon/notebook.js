@@ -64,7 +64,11 @@ Someday:
 * Drag cell to reorder
 * ace/virtual_renderer.js without scrollbar layers
 * Holding keydown focus properly 
-
+* CTRL-fold
+* print indicator (running engine)
+* interupt on print indicator
+* toolbar jump to print indicator
+* toolbar rerun engine
 
 CSS stuff http://css-tricks.com/different-transitions-for-hover-on-hover-off/
 

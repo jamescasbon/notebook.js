@@ -48,8 +48,10 @@ html ->
         # we can control the container size, but not the editor
         div 'marker-input', -> '>'
         div 'ace-container', ->
-          div class: "cell-input", style: "top:0;bottom:0;left:0;right:0;", id: "input-[[= id ]]"
+          div class: "cell-input", style: "top:0;bottom:0;left:0;right:0;", id: "input-[[= id ]]", ->
         div 'cell-output', tabindex: "[[= position ]]c", ->
           '[[= output ]]'
+        div 'status-bar', -> 
+          'Evaluating'
 
 

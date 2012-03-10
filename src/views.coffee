@@ -107,6 +107,7 @@ class CellView extends Backbone.View
     
     "click .cell-output":  'switchIoViews',
     "click .marker-input":  'toggleInputFold',
+    "dblclick .cell-output":  'toggleInputFold',
 
     "evaluate": "evaluate",
     "toggle": "toggle",
@@ -138,6 +139,7 @@ class CellView extends Backbone.View
       @output = @$('.cell-output')
       @inputContainer = @$('.ace-container')
       @type = @$('.type')
+      @statusbar = @$('.status-bar')
 
     @el
   
@@ -148,15 +150,13 @@ class CellView extends Backbone.View
 
   # handle state changes 
   changeState: => 
+    #@output.toggleClass('evaluating')
+    @statusbar.toggleClass('evaluating')
+
     if @model.get('state') == 'evaluating'
-      @output.toggleClass('evaluating')
       @output.html('eval')
     else
-      # the promise allows the fade out to complete
-      # TODO: prevent 
-      @output.toggleClass('evaluating')
       @output.html(@model.get('output'))
-      #@output.promise().done(=> @output.html(@model.get('output')).fadeIn())
       MathJax.Hub.Typeset(@output[0])
 
   # Ace initialization and configuration happens after DOM insertion
@@ -285,7 +285,6 @@ class CellView extends Backbone.View
   focusInput: (where) =>
     
     # focus the input from a somewhere, and recall the focus
-    console.log 'focusInput', where
     if where == 'top'
       @editor.gotoLine 1
       @editor.focus()

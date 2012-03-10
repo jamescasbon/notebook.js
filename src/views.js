@@ -143,6 +143,7 @@
         "click .type": 'toggle',
         "click .cell-output": 'switchIoViews',
         "click .marker-input": 'toggleInputFold',
+        "dblclick .cell-output": 'toggleInputFold',
         "evaluate": "evaluate",
         "toggle": "toggle",
         "click .interrupt": "interrupt",
@@ -175,6 +176,7 @@
         this.output = this.$('.cell-output');
         this.inputContainer = this.$('.ace-container');
         this.type = this.$('.type');
+        this.statusbar = this.$('.status-bar');
       }
       return this.el;
     };
@@ -185,11 +187,10 @@
     };
 
     CellView.prototype.changeState = function() {
+      this.statusbar.toggleClass('evaluating');
       if (this.model.get('state') === 'evaluating') {
-        this.output.toggleClass('evaluating');
         return this.output.html('eval');
       } else {
-        this.output.toggleClass('evaluating');
         this.output.html(this.model.get('output'));
         return MathJax.Hub.Typeset(this.output[0]);
       }
@@ -344,7 +345,6 @@
     };
 
     CellView.prototype.focusInput = function(where) {
-      console.log('focusInput', where);
       if (where === 'top') {
         this.editor.gotoLine(1);
         this.editor.focus();

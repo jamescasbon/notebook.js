@@ -136,10 +136,6 @@ body
         outline: none 
         color: #555
 
-.evaluating 
-    background: #AAA
-
-
 .marker-input, .marker-output
     position: relative
     left: -20px
@@ -156,4 +152,15 @@ body
 .ace-container.input-fold
     display: none
 
+.status-bar
 
+    background: #AAA
+    height: 0
+    opacity: 0
+    -webkit-transition: opacity 0 linear, height 0.25s ease
+
+.status-bar.evaluating 
+    opacity: 1
+
+    background: #FFF
+    height: 50px
