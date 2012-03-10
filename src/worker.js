@@ -1,10 +1,17 @@
 (function() {
-  var _this = this;
+  var evals,
+    _this = this;
+
+  evals = {};
 
   self.onmessage = function(ev) {
     var inputId, print, result, src;
     inputId = ev.data.id;
     src = ev.data.src;
+    self.postMessage({
+      inputId: inputId,
+      msg: 'worker msg handler start'
+    });
     print = function(d) {
       return self.postMessage({
         inputId: inputId,
@@ -12,11 +19,11 @@
         data: d
       });
     };
-    self.postMessage({
-      inputId: inputId,
-      msg: 'evalBegin'
-    });
     try {
+      self.postMessage({
+        inputId: inputId,
+        msg: 'evalBegin'
+      });
       result = eval(src);
       if (result != null) {
         return self.postMessage({

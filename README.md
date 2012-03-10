@@ -52,12 +52,13 @@ Now:
 * Enable new line on new cell
 * Skip null output
 * Dirty cell status
+* Null output indicator?
 
 Someday: 
 * Document name
 * Insert cell scroll
 * Focus ace line where clicked
-
+* Drag cell to reorder
 * ace/virtual_renderer.js without scrollbar layers
 
 CSS stuff http://css-tricks.com/different-transitions-for-hover-on-hover-off/

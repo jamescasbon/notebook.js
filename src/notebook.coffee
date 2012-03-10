@@ -36,8 +36,13 @@ class Cell extends Backbone.Model
     @set(output: null, error: null, state: 'evaluating')
     # should we save the model at this point?
     # how to look up handler?
-    handler = root.engines[@get('type')]
-    handler.evaluate @get('input'), @
+    @handler = root.engines[@get('type')]
+    @handler.evaluate @get('input'), @
+
+  interrupt: => 
+    if @handler?
+      @handler.interrupt()
+      @set state: null
 
   evaluateSuccess: (output) => 
     @set output: output, error: null
@@ -48,7 +53,7 @@ class Cell extends Backbone.Model
     @save
 
   handleMessage: (data) => 
-    console.log('cell message', data)
+    console.log('cell message', data['msg'])
     switch data.msg
       when 'evalEnd' 
         @set(state: null)

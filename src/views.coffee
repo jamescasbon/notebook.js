@@ -98,6 +98,7 @@ class CellView extends Backbone.View
     "click .cell-output":  'switchIoViews',
     "evaluate": "evaluate",
     "toggle": "toggle",
+    "click .interrupt": "interrupt",
     "keyup .cell-output": 'handleKeypress',
     "focus .cell-input" : "focusInput",
     "blur .cell-input" : "blurInput"
@@ -302,6 +303,10 @@ class CellView extends Backbone.View
 
   destroy: =>
     @model.destroy()
+
+  interrupt: => 
+    console.log 'int'
+    @model.interrupt()
 
   remove: => 
     $(@el).fadeOut('fast', $(@el).remove)

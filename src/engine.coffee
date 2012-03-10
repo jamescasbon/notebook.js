@@ -47,11 +47,18 @@ class WorkerEval
     @worker.postMessage(src: input, id: @inputId)
 
   handleMessage: (ev) =>
-    console.log('got msg from worker', ev.msg)
+    console.log 'received worker data', ev.data
     inputId = ev.data.inputId
     handler = @handlers[inputId]
     handler.handleMessage(ev.data)
     #TODO: remove handler when finished
+    
+  interrupt: =>
+    # TODO: cannot currently interrupt the worker, so we restart
+    @worker.terminate()
+    @worker = new Worker('/src/worker.js')
+    @worker.onmessage = @handleMessage
+
     
 
 

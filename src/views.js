@@ -97,6 +97,7 @@
       this.toggle = __bind(this.toggle, this);
       this.spawnAbove = __bind(this.spawnAbove, this);
       this.remove = __bind(this.remove, this);
+      this.interrupt = __bind(this.interrupt, this);
       this.destroy = __bind(this.destroy, this);
       this.evaluate = __bind(this.evaluate, this);
       this.setEditorHighlightMode = __bind(this.setEditorHighlightMode, this);
@@ -129,6 +130,7 @@
         "click .cell-output": 'switchIoViews',
         "evaluate": "evaluate",
         "toggle": "toggle",
+        "click .interrupt": "interrupt",
         "keyup .cell-output": 'handleKeypress',
         "focus .cell-input": "focusInput",
         "blur .cell-input": "blurInput"
@@ -361,6 +363,11 @@
 
     CellView.prototype.destroy = function() {
       return this.model.destroy();
+    };
+
+    CellView.prototype.interrupt = function() {
+      console.log('int');
+      return this.model.interrupt();
     };
 
     CellView.prototype.remove = function() {

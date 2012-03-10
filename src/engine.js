@@ -76,6 +76,7 @@
   WorkerEval = (function() {
 
     function WorkerEval() {
+      this.interrupt = __bind(this.interrupt, this);
       this.handleMessage = __bind(this.handleMessage, this);
       this.evaluate = __bind(this.evaluate, this);      this.worker = new Worker('/src/worker.js');
       this.worker.onmessage = this.handleMessage;
@@ -94,10 +95,16 @@
 
     WorkerEval.prototype.handleMessage = function(ev) {
       var handler, inputId;
-      console.log('got msg from worker', ev.msg);
+      console.log('received worker data', ev.data);
       inputId = ev.data.inputId;
       handler = this.handlers[inputId];
       return handler.handleMessage(ev.data);
+    };
+
+    WorkerEval.prototype.interrupt = function() {
+      this.worker.terminate();
+      this.worker = new Worker('/src/worker.js');
+      return this.worker.onmessage = this.handleMessage;
     };
 
     return WorkerEval;

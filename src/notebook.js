@@ -55,6 +55,7 @@
       this.handleMessage = __bind(this.handleMessage, this);
       this.evaluateError = __bind(this.evaluateError, this);
       this.evaluateSuccess = __bind(this.evaluateSuccess, this);
+      this.interrupt = __bind(this.interrupt, this);
       this.evaluate = __bind(this.evaluate, this);
       this.toggleType = __bind(this.toggleType, this);
       this.defaults = __bind(this.defaults, this);
@@ -87,15 +88,23 @@
     };
 
     Cell.prototype.evaluate = function() {
-      var handler;
       this.save();
       this.set({
         output: null,
         error: null,
         state: 'evaluating'
       });
-      handler = root.engines[this.get('type')];
-      return handler.evaluate(this.get('input'), this);
+      this.handler = root.engines[this.get('type')];
+      return this.handler.evaluate(this.get('input'), this);
+    };
+
+    Cell.prototype.interrupt = function() {
+      if (this.handler != null) {
+        this.handler.interrupt();
+        return this.set({
+          state: null
+        });
+      }
     };
 
     Cell.prototype.evaluateSuccess = function(output) {
@@ -115,7 +124,7 @@
     };
 
     Cell.prototype.handleMessage = function(data) {
-      console.log('cell message', data);
+      console.log('cell message', data['msg']);
       switch (data.msg) {
         case 'evalEnd':
           this.set({
