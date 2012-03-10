@@ -164,6 +164,8 @@ class CellView extends Backbone.View
     @editor = ace.edit('input-' + @model.id)
     
     @editor.resize()
+    # set the content now, not in the template because HTML is lost in the template textarea
+    @editor.getSession().setValue(@model.get('input'))
     @editor.getSession().setUseWrapMode true
     @editor.renderer.setShowGutter false
     @editor.renderer.setHScrollBarAlwaysVisible false

@@ -41,7 +41,7 @@ Frontend
 Now:
 
 * cant go back to top line on overflow
-* Errors not persistent
+* Errors styling
 * Move buttons
 * html stripped from javascript input 
 * keyup in ace out of screen detection
@@ -54,6 +54,8 @@ Now:
 * Null output indicator?
 * CSS fold indicator 
 * Set inital focus
+* Hit enter on
+* double click on output/ace fold
 
 Someday: 
 * Document name
@@ -61,6 +63,8 @@ Someday:
 * Focus ace line where clicked
 * Drag cell to reorder
 * ace/virtual_renderer.js without scrollbar layers
+* Holding keydown focus properly 
+
 
 CSS stuff http://css-tricks.com/different-transitions-for-hover-on-hover-off/
 

@@ -198,6 +198,7 @@
       var _this = this;
       this.editor = ace.edit('input-' + this.model.id);
       this.editor.resize();
+      this.editor.getSession().setValue(this.model.get('input'));
       this.editor.getSession().setUseWrapMode(true);
       this.editor.renderer.setShowGutter(false);
       this.editor.renderer.setHScrollBarAlwaysVisible(false);
