@@ -40,6 +40,9 @@ body {
   list-style-type: none;
   padding: 0;
 }
+#cells li {
+  margin: 0;
+}
 .controls {
   margin-top: 10px;
   margin-bottom: 10px;
@@ -60,10 +63,8 @@ body {
 .ace-container {
   position: relative;
   height: 100px;
-  padding: 5px;
 }
 .cell-output {
-  margin-top: 10px;
   -webkit-transition: background 0.25s ease, height 2s ease;
 }
 .cell-output .print {
@@ -78,6 +79,7 @@ body {
 }
 .type {
   position: absolute;
+  left: 100px;
   -webkit-transform-origin: top left;
   -webkit-transform: rotate(90deg);
   -moz-transform-origin: top left;
@@ -91,30 +93,41 @@ body {
   -moz-box-shadow: rgba(0,0,0,0.50) 0 0 8px;
   z-index: -10;
   border-radius: 5px;
-  margin-top: 15px;
+  margin-top: 5px;
 }
 .spawn-above,
 #spawner {
   font-family: "Courier New", "monospace";
-  margin-top: 5px;
-  margin-bottom: 5px;
+  font-size: 80%;
   opacity: 0.2;
-  border-radius: 5px;
-  -webkit-transition: opacity 0.25s linear;
+  border-radius: 0px;
+  -webkit-transition: opacity 0.25s linear, background-color 0.25s linear, color 0.25s linear;
   text-align: center;
-  border: 1px #111 dashed;
-  color: #777;
-  background-color: rgba(0,0,0,0.07);
-}
-.spawn-above:hover,
-#spawner:hover {
-  opacity: 1;
+  border: 1px #111 solid;
+  border-left: none;
+  border-right: none;
+  color: #fff;
 }
 .spawn-above:focus,
 #spawner:focus {
+  background-color: rgba(0,0,0,0.07);
   opacity: 1;
   outline: none;
+  color: #555;
 }
 .evaluating {
   background: #aaa;
+}
+.marker-input,
+.marker-output {
+  position: relative;
+  left: -20px;
+  float: left;
+  color: #aaa;
+}
+.marker-input.input-fold {
+  color: #f00;
+}
+.ace-container.input-fold {
+  display: none;
 }

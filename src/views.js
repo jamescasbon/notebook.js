@@ -106,6 +106,8 @@
       this.focusCellAbove = __bind(this.focusCellAbove, this);
       this.blurInput = __bind(this.blurInput, this);
       this.focusInput = __bind(this.focusInput, this);
+      this.changeInputFold = __bind(this.changeInputFold, this);
+      this.toggleInputFold = __bind(this.toggleInputFold, this);
       this.handleKeypress = __bind(this.handleKeypress, this);
       this.afterDomInsert = __bind(this.afterDomInsert, this);
       this.changeState = __bind(this.changeState, this);
@@ -128,6 +130,7 @@
         "click .toggle": 'toggle',
         "click .type": 'toggle',
         "click .cell-output": 'switchIoViews',
+        "click .marker-input": 'toggleInputFold',
         "evaluate": "evaluate",
         "toggle": "toggle",
         "click .interrupt": "interrupt",
@@ -141,6 +144,7 @@
       this.template = _.template($('#cell-template').html());
       this.model.bind('change:state', this.changeState);
       this.model.bind('change:type', this.changeType);
+      this.model.bind('change:inputFold', this.changeInputFold);
       this.model.bind('destroy', this.remove);
       this.model.view = this;
       this.editor = null;
@@ -194,6 +198,7 @@
       this.setEditorHighlightMode();
       this.inputChange();
       this.switchIoViews();
+      if (this.model.get('inputFold')) this.changeInputFold();
       this.editor.commands.addCommand({
         name: 'evaluate',
         bindKey: {
@@ -300,6 +305,16 @@
             return this.spawnAbove();
         }
       }
+    };
+
+    CellView.prototype.toggleInputFold = function() {
+      console.log('tif');
+      return this.model.toggleInputFold();
+    };
+
+    CellView.prototype.changeInputFold = function() {
+      this.inputContainer.toggleClass('input-fold');
+      return this.$('.marker-input').toggleClass('input-fold');
     };
 
     CellView.prototype.focusInput = function(where) {

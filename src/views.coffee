@@ -91,11 +91,15 @@ class CellView extends Backbone.View
   events: => (
     "keyup .spawn-above": 'handleKeypress',
     "dblclick .spawn-above" : "spawnAbove"
+
     "click .evaluate": "evaluate",
     "click .delete": "destroy",
     "click .toggle": 'toggle',
     "click .type": 'toggle',
+    
     "click .cell-output":  'switchIoViews',
+    "click .marker-input":  'toggleInputFold',
+
     "evaluate": "evaluate",
     "toggle": "toggle",
     "click .interrupt": "interrupt",
@@ -109,6 +113,7 @@ class CellView extends Backbone.View
     @template = _.template($('#cell-template').html())
     @model.bind 'change:state', @changeState
     @model.bind 'change:type', @changeType
+    @model.bind 'change:inputFold', @changeInputFold
     @model.bind 'destroy', @remove
     @model.view = @
     @editor = null
@@ -166,6 +171,9 @@ class CellView extends Backbone.View
     @inputChange()
     
     @switchIoViews()
+
+    if @model.get('inputFold') 
+      @changeInputFold()
     
     @editor.commands.addCommand
       name: 'evaluate', 
@@ -243,6 +251,15 @@ class CellView extends Backbone.View
     else if e.keyCode == 13 
       switch target
         when 'spawn-above' then @spawnAbove()
+
+
+  toggleInputFold: => 
+    console.log 'tif'
+    @model.toggleInputFold()
+
+  changeInputFold: =>
+    @inputContainer.toggleClass('input-fold')
+    @$('.marker-input').toggleClass('input-fold')
 
   # TODO: method is unclear, called both when focused and to focus
   focusInput: (where) =>

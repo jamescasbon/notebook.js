@@ -48,6 +48,9 @@ body
     list-style-type: none
     padding: 0     
 
+#cells li 
+    margin: 0
+
 .controls 
     margin-top: 10px
     margin-bottom: 10px
@@ -70,13 +73,11 @@ body
 .ace-container
     position: relative 
     height: 100px
-    padding: 5px
 
 .cell-output 
     .print
         font-family: "Courier New", "monospace"
     
-    margin-top: 10px
     ul
         list-style-type: disc    
     &:focus
@@ -90,6 +91,7 @@ body
     // The mode is absolute position wrt to the cell's relative position */
     //    border: 1px solid red*/
     position: absolute
+    left: 100px
     -webkit-transform-origin: top left   
     -webkit-transform: rotate(90deg) 
     -moz-transform-origin: top left  
@@ -103,30 +105,41 @@ body
     -moz-box-shadow: rgba(0, 0, 0, 0.496094) 0 0 8px
     z-index: -10
     border-radius: 5px
-    margin-top: 15px
+    margin-top: 5px
 
 
 
 .spawn-above, #spawner
     font-family: "Courier New", "monospace"
-    margin-top: 5px
-    margin-bottom: 5px
+    font-size: 80%
+
+
     opacity:0.2
-    border-radius: 5px
-    -webkit-transition: opacity 0.25s linear
+    border-radius: 0px
+    -webkit-transition: opacity 0.25s linear, background-color 0.25s linear, color 0.25s linear
     text-align: center
-    border: 1px #111 dashed
-    color: #777
-    background-color: line-highlight
+    border: 1px #111 solid
+    border-left: none
+    border-right: none
+    color: #FFF
     
-    &:hover
-        opacity:1
     &:focus
+        background-color: line-highlight
         opacity:1
         outline: none 
-
+        color: #555
 .evaluating 
     background: #AAA
 
 
+.marker-input, .marker-output
+    position: relative
+    left: -20px
+    float: left
+    color: #AAA
 
+
+.marker-input.input-fold
+    color: red
+.ace-container.input-fold
+    display: none

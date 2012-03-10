@@ -19,6 +19,7 @@ class Cell extends Backbone.Model
   defaults: => 
     input: "", 
     type: "javascript", 
+    inputFold: false
     output: null, 
     position: null,
     error: null,
@@ -31,6 +32,10 @@ class Cell extends Backbone.Model
       @set type: 'javascript'
     #@evaluate()
 
+  toggleInputFold: => 
+    @set inputFold: not @get('inputFold')
+    @save()
+      
   evaluate: =>
     @save()
     @set(output: null, error: null, state: 'evaluating')

@@ -53,6 +53,7 @@ Now:
 * Skip null output
 * Dirty cell status
 * Null output indicator?
+* CSS fold indicator 
 
 Someday: 
 * Document name

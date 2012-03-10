@@ -57,6 +57,7 @@
       this.evaluateSuccess = __bind(this.evaluateSuccess, this);
       this.interrupt = __bind(this.interrupt, this);
       this.evaluate = __bind(this.evaluate, this);
+      this.toggleInputFold = __bind(this.toggleInputFold, this);
       this.toggleType = __bind(this.toggleType, this);
       this.defaults = __bind(this.defaults, this);
       Cell.__super__.constructor.apply(this, arguments);
@@ -68,6 +69,7 @@
       return {
         input: "",
         type: "javascript",
+        inputFold: false,
         output: null,
         position: null,
         error: null,
@@ -85,6 +87,13 @@
           type: 'javascript'
         });
       }
+    };
+
+    Cell.prototype.toggleInputFold = function() {
+      this.set({
+        inputFold: !this.get('inputFold')
+      });
+      return this.save();
     };
 
     Cell.prototype.evaluate = function() {
