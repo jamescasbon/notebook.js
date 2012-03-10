@@ -121,8 +121,10 @@
       this.changeInputFold = __bind(this.changeInputFold, this);
       this.toggleInputFold = __bind(this.toggleInputFold, this);
       this.handleKeypress = __bind(this.handleKeypress, this);
+      this.editorChange = __bind(this.editorChange, this);
       this.afterDomInsert = __bind(this.afterDomInsert, this);
       this.changeState = __bind(this.changeState, this);
+      this.changeOutput = __bind(this.changeOutput, this);
       this.changeType = __bind(this.changeType, this);
       this.render = __bind(this.render, this);
       this.logev = __bind(this.logev, this);
@@ -157,6 +159,7 @@
       this.template = _.template($('#cell-template').html());
       this.model.bind('change:state', this.changeState);
       this.model.bind('change:type', this.changeType);
+      this.model.bind('change:output', this.changeOutput);
       this.model.bind('change:inputFold', this.changeInputFold);
       this.model.bind('destroy', this.remove);
       this.model.view = this;
@@ -176,7 +179,8 @@
         this.output = this.$('.cell-output');
         this.inputContainer = this.$('.ace-container');
         this.type = this.$('.type');
-        this.statusbar = this.$('.status-bar');
+        this.intButton = this.$('.interrupt');
+        this.evalButton = this.$('.evaluate');
       }
       return this.el;
     };
@@ -186,13 +190,23 @@
       return this.type.html(this.model.get('type'));
     };
 
+    CellView.prototype.changeOutput = function() {
+      console.log('changeOputput');
+      this.output.html(this.model.get('output'));
+      return MathJax.Hub.Typeset(this.output[0]);
+    };
+
     CellView.prototype.changeState = function() {
-      this.statusbar.toggleClass('evaluating');
-      if (this.model.get('state') === 'evaluating') {
-        return this.output.html('eval');
-      } else {
-        this.output.html(this.model.get('output'));
-        return MathJax.Hub.Typeset(this.output[0]);
+      console.log('view changing state to', this.model.get('state'));
+      switch (this.model.get('state')) {
+        case 'evaluating':
+          console.log('add active to', this.intButton);
+          this.output.html('...');
+          return this.intButton.addClass('active');
+        case 'dirty':
+          return console.log('vd');
+        case null:
+          return this.intButton.removeClass('active');
       }
     };
 
@@ -201,6 +215,10 @@
       this.editor = ace.edit('input-' + this.model.id);
       this.editor.resize();
       this.editor.getSession().setValue(this.model.get('input'));
+      this.model.set({
+        state: null
+      });
+      this.editor.getSession().on('change', this.editorChange);
       this.editor.getSession().setUseWrapMode(true);
       this.editor.renderer.setShowGutter(false);
       this.editor.renderer.setHScrollBarAlwaysVisible(false);
@@ -289,6 +307,12 @@
             return _this.editor.remove("left");
           }
         }
+      });
+    };
+
+    CellView.prototype.editorChange = function() {
+      return this.model.set({
+        state: 'dirty'
       });
     };
 
@@ -435,8 +459,7 @@
       line_height = this.editor.renderer.$textLayer.getLineHeight();
       lines = this.editor.getSession().getDocument().getLength();
       this.$('.ace-container').height(20 + (18 * lines));
-      this.editor.resize();
-      return console.log('resized editor on', 18, lines);
+      return this.editor.resize();
     };
 
     CellView.prototype.switchIoViews = function() {

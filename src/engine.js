@@ -95,7 +95,6 @@
 
     WorkerEval.prototype.handleMessage = function(ev) {
       var handler, inputId;
-      console.log('received worker data', ev.data);
       inputId = ev.data.inputId;
       handler = this.handlers[inputId];
       return handler.handleMessage(ev.data);

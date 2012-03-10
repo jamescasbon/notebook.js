@@ -122,6 +122,7 @@ class CellView extends Backbone.View
     @template = _.template($('#cell-template').html())
     @model.bind 'change:state', @changeState
     @model.bind 'change:type', @changeType
+    @model.bind 'change:output', @changeOutput
     @model.bind 'change:inputFold', @changeInputFold
     @model.bind 'destroy', @remove
     @model.view = @
@@ -139,8 +140,8 @@ class CellView extends Backbone.View
       @output = @$('.cell-output')
       @inputContainer = @$('.ace-container')
       @type = @$('.type')
-      @statusbar = @$('.status-bar')
-
+      @intButton = @$('.interrupt')
+      @evalButton = @$('.evaluate')
     @el
   
   # update the view based on a cell type change
@@ -148,16 +149,27 @@ class CellView extends Backbone.View
     @setEditorHighlightMode()
     @type.html @model.get('type')
 
+  changeOutput: => 
+    console.log 'changeOputput'
+    @output.html(@model.get('output'))
+    MathJax.Hub.Typeset(@output[0])
+
   # handle state changes 
   changeState: => 
-    #@output.toggleClass('evaluating')
-    @statusbar.toggleClass('evaluating')
+   
+    console.log('view changing state to', @model.get('state'))
+    
+    switch @model.get('state')
+      when 'evaluating'
+        console.log('add active to', @intButton)
+        @output.html('...')
+        @intButton.addClass('active')
 
-    if @model.get('state') == 'evaluating'
-      @output.html('eval')
-    else
-      @output.html(@model.get('output'))
-      MathJax.Hub.Typeset(@output[0])
+      when 'dirty'
+        console.log 'vd'
+
+      when null
+        @intButton.removeClass('active')
 
   # Ace initialization and configuration happens after DOM insertion
   afterDomInsert: =>
@@ -167,6 +179,9 @@ class CellView extends Backbone.View
     @editor.resize()
     # set the content now, not in the template because HTML is lost in the template
     @editor.getSession().setValue(@model.get('input'))
+    @model.set state: null 
+    @editor.getSession().on('change', @editorChange)
+
     @editor.getSession().setUseWrapMode true
     @editor.renderer.setShowGutter false
     @editor.renderer.setHScrollBarAlwaysVisible false
@@ -234,6 +249,9 @@ class CellView extends Backbone.View
           @destroy()
         else
           @editor.remove("left")
+
+  editorChange: => 
+    @model.set( state: 'dirty' )
 
   # intercept keypresses to enable focus model on output and spawner
   handleKeypress: (e) => 
@@ -357,18 +375,6 @@ class CellView extends Backbone.View
   toggle: =>
     @model.toggleType()
    
-    # hide the view if necessary
-    # TODO: move to switchIoViews
-    #if @model.get('type') == 'markdown'
-    #  # tODO: check focus to see which to hide
-    #  @inputContainer.show()
-    #  @output.hide()
-    #  @editor.resize()
-    #else
-    #  @inputContainer.show()
-    #  @output.show()
-    #  @editor.resize()
-      
   inputChange: => 
     # resize the editor container
     # TODO: implement real renderer for ace
@@ -378,7 +384,6 @@ class CellView extends Backbone.View
     @$('.ace-container').height(20 + (18 * lines))
     @editor.resize()
     # TODO get real line height 
-    console.log('resized editor on', 18, lines)
   
 
   # manage hiding ace editor for text cells

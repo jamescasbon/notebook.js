@@ -47,7 +47,7 @@ class WorkerEval
     @worker.postMessage(src: input, id: @inputId)
 
   handleMessage: (ev) =>
-    console.log 'received worker data', ev.data
+    #console.log 'received worker data', ev.data
     inputId = ev.data.inputId
     handler = @handlers[inputId]
     handler.handleMessage(ev.data)

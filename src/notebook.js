@@ -97,12 +97,14 @@
     };
 
     Cell.prototype.evaluate = function() {
-      this.save();
       this.set({
         output: null,
-        error: null,
+        error: null
+      });
+      this.set({
         state: 'evaluating'
       });
+      this.save();
       this.handler = root.engines[this.get('type')];
       return this.handler.evaluate(this.get('input'), this);
     };
@@ -134,7 +136,6 @@
     };
 
     Cell.prototype.handleMessage = function(data) {
-      console.log('cell message', data['msg']);
       switch (data.msg) {
         case 'evalEnd':
           this.set({

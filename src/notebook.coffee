@@ -14,6 +14,13 @@ class Notebooks extends Backbone.Collection
   localStorage: new Store('Notebooks') 
 
 
+# Cell has state and dispatches evaluations to handler
+#
+# States: 
+#  - null: default unedited state
+#  - dirty: edits to input made
+#  - evaluating: waiting for handler
+#
 class Cell extends Backbone.Model
   tagName: 'li'
   defaults: => 
@@ -37,8 +44,9 @@ class Cell extends Backbone.Model
     @save()
       
   evaluate: =>
+    @set(output: null, error: null)
+    @set state: 'evaluating'
     @save()
-    @set(output: null, error: null, state: 'evaluating')
     # should we save the model at this point?
     # how to look up handler?
     @handler = root.engines[@get('type')]
@@ -51,8 +59,6 @@ class Cell extends Backbone.Model
       @handler.interrupt()
       @set state: null
 
-
-
   evaluateSuccess: (output) => 
     @set output: output, error: null
     @save()
@@ -62,7 +68,6 @@ class Cell extends Backbone.Model
     @save
 
   handleMessage: (data) => 
-    console.log('cell message', data['msg'])
     switch data.msg
       when 'evalEnd' 
         @set(state: null)

@@ -99,7 +99,7 @@ body
     // The mode is absolute position wrt to the cell's relative position */
     //    border: 1px solid red*/
     position: absolute
-    left: 100px
+    left: 103px
     -webkit-transform-origin: top left   
     -webkit-transform: rotate(90deg) 
     -moz-transform-origin: top left  
@@ -128,7 +128,8 @@ body
     -webkit-transition: opacity 0 linear, color 0.25s linear
     text-align: center
     color: #FFF
-     
+    margin-top: 5px
+    margin: bottom 5px 
     background-color: line-highlight
     
     &:focus
@@ -153,14 +154,17 @@ body
     display: none
 
 .status-bar
+    float: right
+    img
+        -webkit-transition: opacity 0 linear, height 0.25s ease
+        opacity: 0
+        position: relative
+        right: -25px
+        top: -15px
+        
+    img.active 
+        opacity: 1
 
-    background: #AAA
-    height: 0
-    opacity: 0
-    -webkit-transition: opacity 0 linear, height 0.25s ease
 
-.status-bar.evaluating 
-    opacity: 1
 
-    background: #FFF
-    height: 50px
+

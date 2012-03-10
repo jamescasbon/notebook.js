@@ -44,14 +44,16 @@ html ->
           button 'full-width evaluate', -> 'evaluate'
           button 'full-width delete', -> 'delete'
           button 'full-width toggle', -> 'toggle'
-          button 'full-width interrupt', -> 'interrupt'
         # we can control the container size, but not the editor
         div 'marker-input', -> '>'
+        div 'status-bar', -> 
+          img 'evaluate', src: '/img/ajax-loader.gif'
+
         div 'ace-container', ->
           div class: "cell-input", style: "top:0;bottom:0;left:0;right:0;", id: "input-[[= id ]]", ->
         div 'cell-output', tabindex: "[[= position ]]c", ->
           '[[= output ]]'
         div 'status-bar', -> 
-          'Evaluating'
+          img 'interrupt', src: '/img/ajax-loader.gif'
 
 
