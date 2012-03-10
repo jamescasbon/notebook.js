@@ -49,9 +49,12 @@ Now:
 * Focus model wrong for markdown show/not show 
 * Consistent look to focus
 * remove cursor
+* detect whether content changed when evaluating (short circuit)
+* Enter on spawn does not work 
+* Backspace on empty cell
+
 
 Someday: 
-* latex mode
 * Document name
 * Insert cell scroll
 * Focus ace line where clicked

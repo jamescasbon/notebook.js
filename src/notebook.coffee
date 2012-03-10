@@ -29,7 +29,7 @@ class Cell extends Backbone.Model
       @set type: 'markdown'
     else
       @set type: 'javascript'
-    @evaluate()
+    #@evaluate()
 
   evaluate: =>
     @save()
@@ -53,7 +53,7 @@ class Cell extends Backbone.Model
       when 'evalEnd' 
         @set(state: null)
         @save()
-      when 'error' then @onError(data.data)
+      when 'error' then @onPrint(data.data)
       when 'print' then @onPrint(data.data, 'print')
       when 'result' then @onPrint(data.data, 'print')
       when 'raw' then @onPrint(data.data, 'raw')

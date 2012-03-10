@@ -76,15 +76,14 @@
 
     Cell.prototype.toggleType = function() {
       if (this.get('type') === 'javascript') {
-        this.set({
+        return this.set({
           type: 'markdown'
         });
       } else {
-        this.set({
+        return this.set({
           type: 'javascript'
         });
       }
-      return this.evaluate();
     };
 
     Cell.prototype.evaluate = function() {
@@ -124,7 +123,7 @@
           });
           return this.save();
         case 'error':
-          return this.onError(data.data);
+          return this.onPrint(data.data);
         case 'print':
           return this.onPrint(data.data, 'print');
         case 'result':

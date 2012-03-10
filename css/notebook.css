@@ -68,6 +68,7 @@ body {
 }
 .cell-output {
   margin-top: 10px;
+  -webkit-transition: background 0.25s ease, height 2s ease;
 }
 .cell-output .print {
   font-family: "Courier New", "monospace";
@@ -117,4 +118,7 @@ body {
 .spawn-above:focus,
 #spawner:focus {
   opacity: 1;
+}
+.evaluating {
+  background: #aaa;
 }

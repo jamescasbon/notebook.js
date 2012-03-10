@@ -55,13 +55,41 @@ class NotebookView extends Backbone.View
     # perform initial typeset of output elements
     _.each(@$('.cell-output'), (el) -> MathJax.Hub.Typeset(el) )
 
-# Cell view does the management of Ace and the focus model
+# CellView manages the Dom elements associated with a cell 
+#
+# A cell view has several dom elements (see the template in index.coffee): 
+#  * the cell spawner (allows a cell to be inserted)
+#  * the cell input (is replaced by ace ajax input 
+#  * the cell output 
+#
+# There are currently three phases to the rendering: 
+# * render: called by containing view 
+# * afterDomInsert: called after containing view has placed the element 
+# * MathJax: called when it is ready
+#
+# The Ace editor needs at least some configuration after placement.  It certainly 
+# needs a resize call to make it respect the container size.  We manually update 
+# the ace-container element's size to prevent scrolling in Ace.  This could all 
+# go away if the virtual renderer was replaced.
+#
+# The output needs post processing by MathJax, which can only happen once it is ready.
+# Therefore we hook into the ready call and update all the elements then.  
+# When a cell's output changes it needs to be called again.
+#
+# We take some effort to respond to specific changes in model state rather than 
+# repainting the entire view.
+# 
+# Effects should happen by assigning classes and using CSS3 transitions
+#
+# TODO: escape text for Ace
+# TODO: how to respond to print statements 
+#
 class CellView extends Backbone.View
   tagName: 'li'
 
   events: => (
     # TODO: change this click to a keypress
-    #"click .spawn-above": 'spawnAbove',
+    "keydown .spawn-above": 'handleKeypress',
     "click .evaluate": "evaluate",
     "click .delete": "destroy",
     "click .toggle": 'toggle',
@@ -78,7 +106,8 @@ class CellView extends Backbone.View
   # get template and bind to events
   initialize: => 
     @template = _.template($('#cell-template').html())
-    @model.bind 'change', @render
+    @model.bind 'change:state', @changeState
+    @model.bind 'change:type', @changeType
     @model.bind 'destroy', @remove
     @model.view = @
     @editor = null
@@ -87,36 +116,37 @@ class CellView extends Backbone.View
   logev: (ev) =>
     console.log('in ev', ev)
 
-  # we render the element or update if it exists
-  render: =>
-    if not @editor?
-      # initialize
+  render: (ev) =>
+    if not @editor? # if the editor exists we do not want to clobber it
       $(@el).html(@template(@model.toJSON()))
       @spawn = @$('.spawn-above')
       @input = @$('.cell-input')
       @output = @$('.cell-output')
       @inputContainer = @$('.ace-container')
       @type = @$('.type')
-    else
-      # update
-      @type.html @model.get('type')
-      if not @model.get('error')?
-        @output.html @model.get('output')
-      else 
-        console.log 'error', @model.get('error')
-        @output.html @model.get('error')
-      @setEditorHighlightMode()
-      
-      # TODO: the update method could be more efficient by only updating the output 
-      # if it has changed
-      MathJax.Hub.Typeset(@output[0])
-
 
     @el
   
+  # update the view based on a cell type change
+  changeType: => 
+    @setEditorHighlightMode()
+    @type.html @model.get('type')
+
+  # handle state changes 
+  changeState: => 
+    if @model.get('state') == 'evaluating'
+      @output.toggleClass('evaluating')
+    else
+      # the promise allows the fade out to complete
+      # TODO: prevent 
+      @output.toggleClass('evaluating')
+      @output.html(@model.get('output'))
+      #@output.promise().done(=> @output.html(@model.get('output')).fadeIn())
+      MathJax.Hub.Typeset(@output[0])
+
   # Ace initialization and configuration happens after DOM insertion
   afterDomInsert: =>
-    
+    # create the editor 
     @editor = ace.edit('input-' + @model.id)
     
     @editor.resize()
@@ -170,13 +200,11 @@ class CellView extends Backbone.View
         else
           ed.navigateDown(args.times) 
 
-
-
   # intercept keypresses to enable focus model on output and spawner
   handleKeypress: (e) => 
     # 38 up 40 down
     target = e.target.className
-    console.log 'kp' 
+    console.log 'kp', e.keyCode, target
     if e.keyCode == 38
       # event up
       switch target 
@@ -188,6 +216,11 @@ class CellView extends Backbone.View
       switch target 
         when 'cell-output' then @focusCellBelow()
         when 'spawn-above' then @focusInput('top')
+
+    # press enter on the spawner
+    else if e.keyCode == 13 
+      switch target
+        when 'spawn-above' then @spawnAbove()
 
   # TODO: method is unclear, called both when focused and to focus
   focusInput: (where) =>
@@ -205,13 +238,17 @@ class CellView extends Backbone.View
     # on focus set the highlight
     if @editor?
       @editor.setHighlightActiveLine(true)
+      @$('.ace_cursor-layer').show()
+
  
   # remove editor decoration
   blurInput: =>
     if @editor? 
       @editor.setHighlightActiveLine(false)
-      # TODO: hide cursor
-    @evaluate()
+      @$('.ace_cursor-layer').hide() # cannot use renderer.hideCursor as it leaves a mark
+    
+    # TODO: only revaluate if not pressing eval button
+    #@evaluate()
   
 
   focusCellAbove: => 
@@ -229,8 +266,6 @@ class CellView extends Backbone.View
   focus: => console.log('focus')
 
   setEditorHighlightMode: => 
-    # TODO: text mode not found, better lookup of modes
-    # TODO: ace markdown support
     if @model.get('type') == 'javascript'
       mode = require("ace/mode/javascript").Mode
     else if @model.get('type') == 'markdown'
@@ -251,6 +286,7 @@ class CellView extends Backbone.View
     $(@el).fadeOut('fast', $(@el).remove)
 
   spawnAbove: =>
+    console.log 'sa'
     @model.collection.createBefore @model
   
   toggle: =>
@@ -258,15 +294,15 @@ class CellView extends Backbone.View
    
     # hide the view if necessary
     # TODO: move to switchIoViews
-    if @model.get('type') == 'markdown'
-      # tODO: check focus to see which to hide
-      @inputContainer.show()
-      @output.hide()
-      @editor.resize()
-    else
-      @inputContainer.show()
-      @output.show()
-      @editor.resize()
+    #if @model.get('type') == 'markdown'
+    #  # tODO: check focus to see which to hide
+    #  @inputContainer.show()
+    #  @output.hide()
+    #  @editor.resize()
+    #else
+    #  @inputContainer.show()
+    #  @output.show()
+    #  @editor.resize()
       
   inputChange: => 
     # resize the editor container

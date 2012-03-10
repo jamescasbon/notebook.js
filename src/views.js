@@ -106,6 +106,8 @@
       this.focusInput = __bind(this.focusInput, this);
       this.handleKeypress = __bind(this.handleKeypress, this);
       this.afterDomInsert = __bind(this.afterDomInsert, this);
+      this.changeState = __bind(this.changeState, this);
+      this.changeType = __bind(this.changeType, this);
       this.render = __bind(this.render, this);
       this.logev = __bind(this.logev, this);
       this.initialize = __bind(this.initialize, this);
@@ -117,6 +119,7 @@
 
     CellView.prototype.events = function() {
       return {
+        "keydown .spawn-above": 'handleKeypress',
         "click .evaluate": "evaluate",
         "click .delete": "destroy",
         "click .toggle": 'toggle',
@@ -133,7 +136,8 @@
 
     CellView.prototype.initialize = function() {
       this.template = _.template($('#cell-template').html());
-      this.model.bind('change', this.render);
+      this.model.bind('change:state', this.changeState);
+      this.model.bind('change:type', this.changeType);
       this.model.bind('destroy', this.remove);
       this.model.view = this;
       this.editor = null;
@@ -144,7 +148,7 @@
       return console.log('in ev', ev);
     };
 
-    CellView.prototype.render = function() {
+    CellView.prototype.render = function(ev) {
       if (!(this.editor != null)) {
         $(this.el).html(this.template(this.model.toJSON()));
         this.spawn = this.$('.spawn-above');
@@ -152,18 +156,23 @@
         this.output = this.$('.cell-output');
         this.inputContainer = this.$('.ace-container');
         this.type = this.$('.type');
-      } else {
-        this.type.html(this.model.get('type'));
-        if (!(this.model.get('error') != null)) {
-          this.output.html(this.model.get('output'));
-        } else {
-          console.log('error', this.model.get('error'));
-          this.output.html(this.model.get('error'));
-        }
-        this.setEditorHighlightMode();
-        MathJax.Hub.Typeset(this.output[0]);
       }
       return this.el;
+    };
+
+    CellView.prototype.changeType = function() {
+      this.setEditorHighlightMode();
+      return this.type.html(this.model.get('type'));
+    };
+
+    CellView.prototype.changeState = function() {
+      if (this.model.get('state') === 'evaluating') {
+        return this.output.toggleClass('evaluating');
+      } else {
+        this.output.toggleClass('evaluating');
+        this.output.html(this.model.get('output'));
+        return MathJax.Hub.Typeset(this.output[0]);
+      }
     };
 
     CellView.prototype.afterDomInsert = function() {
@@ -244,7 +253,7 @@
     CellView.prototype.handleKeypress = function(e) {
       var target;
       target = e.target.className;
-      console.log('kp');
+      console.log('kp', e.keyCode, target);
       if (e.keyCode === 38) {
         switch (target) {
           case 'cell-output':
@@ -259,6 +268,11 @@
           case 'spawn-above':
             return this.focusInput('top');
         }
+      } else if (e.keyCode === 13) {
+        switch (target) {
+          case 'spawn-above':
+            return this.spawnAbove();
+        }
       }
     };
 
@@ -271,12 +285,17 @@
         this.editor.gotoLine(this.editor.getSession().getDocument().getLength());
         this.editor.focus();
       }
-      if (this.editor != null) return this.editor.setHighlightActiveLine(true);
+      if (this.editor != null) {
+        this.editor.setHighlightActiveLine(true);
+        return this.$('.ace_cursor-layer').show();
+      }
     };
 
     CellView.prototype.blurInput = function() {
-      if (this.editor != null) this.editor.setHighlightActiveLine(false);
-      return this.evaluate();
+      if (this.editor != null) {
+        this.editor.setHighlightActiveLine(false);
+        return this.$('.ace_cursor-layer').hide();
+      }
     };
 
     CellView.prototype.focusCellAbove = function() {
@@ -325,20 +344,12 @@
     };
 
     CellView.prototype.spawnAbove = function() {
+      console.log('sa');
       return this.model.collection.createBefore(this.model);
     };
 
     CellView.prototype.toggle = function() {
-      this.model.toggleType();
-      if (this.model.get('type') === 'markdown') {
-        this.inputContainer.show();
-        this.output.hide();
-        return this.editor.resize();
-      } else {
-        this.inputContainer.show();
-        this.output.show();
-        return this.editor.resize();
-      }
+      return this.model.toggleType();
     };
 
     CellView.prototype.inputChange = function() {
