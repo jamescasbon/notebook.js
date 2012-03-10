@@ -17,6 +17,7 @@
 
     function NotebookView() {
       this.mathjaxReady = __bind(this.mathjaxReady, this);
+      this.spawnKeypress = __bind(this.spawnKeypress, this);
       this.spawnCellAtEnd = __bind(this.spawnCellAtEnd, this);
       this.addAll = __bind(this.addAll, this);
       this.addOne = __bind(this.addOne, this);
@@ -30,7 +31,8 @@
 
     NotebookView.prototype.events = function() {
       return {
-        "click #spawner": 'spawnCellAtEnd'
+        "dblclick #spawner": 'spawnCellAtEnd',
+        "keyup #spawner": 'spawnKeypress'
       };
     };
 
@@ -75,6 +77,16 @@
 
     NotebookView.prototype.spawnCellAtEnd = function() {
       return this.model.cells.createAtEnd();
+    };
+
+    NotebookView.prototype.spawnKeypress = function(e) {
+      var ncells;
+      if (e.keyCode === 13) {
+        return this.model.cells.createAtEnd();
+      } else if (e.keyCode === 38) {
+        ncells = this.model.cells.length;
+        return this.model.cells.at(ncells - 1).view.output.focus();
+      }
     };
 
     NotebookView.prototype.mathjaxReady = function() {
@@ -313,6 +325,8 @@
         switch (target) {
           case 'spawn-above':
             return this.spawnAbove();
+          case 'cell-output':
+            return this.toggleInputFold();
         }
       }
     };
@@ -360,7 +374,13 @@
       var index, next;
       index = this.model.collection.indexOf(this.model);
       next = this.model.collection.at(index + 1);
-      if (next != null) return next.view.spawn.focus();
+      console.log('fcb', next);
+      if (next != null) {
+        return next.view.spawn.focus();
+      } else {
+        console.log('focus nb spawn');
+        return $('#spawner').focus();
+      }
     };
 
     CellView.prototype.focus = function() {

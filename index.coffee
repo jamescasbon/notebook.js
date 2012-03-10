@@ -31,26 +31,22 @@ html ->
         div '#navbar', ->
           div '#logo', -> 'notebook.js'
           div '#title', -> ''
-        ul id: "cells" 
-        div '#spawner', -> '< Hit Enter to insert a cell here >'
-        #p 'When $a \\ne 0$, there are two solutions to $(ax^2 + bx + c = 0)$ and they are $$x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$'
+        ul id: "cells"
+        div id: 'spawner', tabindex: "1000000000"
         
           
 
     script type: "text/template", id: "cell-template", ->
       div '.cell', id: "[[= id ]]", ->
         div 'type', -> '[[= type ]]'
-        div 'spawn-above', tabindex: '[[= position ]]a', -> 
-          '< Hit Enter to insert a cell here >'
-          hr ''
+        div 'spawn-above', tabindex: '[[= position ]]a'
         div 'controls', ->
           button 'full-width evaluate', -> 'evaluate'
           button 'full-width delete', -> 'delete'
           button 'full-width toggle', -> 'toggle'
           button 'full-width interrupt', -> 'interrupt'
         # we can control the container size, but not the editor
-        div 'marker-input', -> 
-          a '>'
+        div 'marker-input', -> '>'
         div 'ace-container', ->
           div class: "cell-input", style: "top:0;bottom:0;left:0;right:0;", id: "input-[[= id ]]", ->
             '[[= input ]]'

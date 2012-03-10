@@ -10,7 +10,8 @@ class NotebookView extends Backbone.View
  
   events: => (
     # there is a lone spawner at the bottom of the page
-    "click #spawner": 'spawnCellAtEnd'
+    "dblclick #spawner": 'spawnCellAtEnd'
+    "keyup #spawner": 'spawnKeypress'
   )
 
   # bind to dom and model events, fetch cells
@@ -51,6 +52,13 @@ class NotebookView extends Backbone.View
    
   spawnCellAtEnd: => 
     @model.cells.createAtEnd()
+
+  spawnKeypress: (e) => 
+    if e.keyCode == 13
+      @model.cells.createAtEnd()
+    else if e.keyCode == 38
+      ncells = @model.cells.length
+      @model.cells.at(ncells - 1).view.output.focus()
 
   mathjaxReady: => 
     # perform initial typeset of output elements
@@ -258,6 +266,7 @@ class CellView extends Backbone.View
     else if e.keyCode == 13       # ENTER
       switch target
         when 'spawn-above' then @spawnAbove()
+        when 'cell-output' then @toggleInputFold()
 
 
   toggleInputFold: => 
@@ -307,9 +316,12 @@ class CellView extends Backbone.View
   focusCellBelow: => 
     index = @model.collection.indexOf(@model)
     next = @model.collection.at(index+1)
+    console.log 'fcb', next
     if next?
      next.view.spawn.focus()
-
+    else
+      console.log('focus nb spawn')
+      $('#spawner').focus()
   focus: => console.log('focus')
 
   setEditorHighlightMode: => 
