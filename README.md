@@ -43,16 +43,15 @@ Now:
 * cant go back to top line on overflow
 * Errors not persistent
 * Move buttons
-* backspace supress
 * html stripped from javascript input 
 * keyup in ace out of screen detection
 * Focus model wrong for markdown show/not show 
 * detect whether content changed when evaluating (short circuit)
-* Backspace on empty cell
 * Overflows on output
 * Detect when to show last line
 * Enable new line on new cell
 * Skip null output
+* Dirty cell status
 
 Someday: 
 * Document name

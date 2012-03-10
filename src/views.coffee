@@ -184,6 +184,7 @@ class CellView extends Backbone.View
         row = ed.getSession().getSelection().getCursor().row
         if row == 0
           @spawn.focus()
+          @rogueKeyup = true
         else
           ed.navigateUp(args.times) 
 
@@ -197,6 +198,7 @@ class CellView extends Backbone.View
 
         if row == last
           @output.focus()
+          @rogueKeyup = true
         else
           ed.navigateDown(args.times) 
 
@@ -215,6 +217,12 @@ class CellView extends Backbone.View
 
   # intercept keypresses to enable focus model on output and spawner
   handleKeypress: (e) => 
+    # if we move out of ace with a line up/line down, the keyup event is 
+    # given to the newly focused object, so we ignore the first keyup event
+    if @rogueKeyup == true
+      @rogueKeyup = false
+      return 
+
     # 38 up 40 down
     target = e.target.className
     console.log 'kp', e.keyCode, target

@@ -225,7 +225,8 @@
           var row;
           row = ed.getSession().getSelection().getCursor().row;
           if (row === 0) {
-            return _this.spawn.focus();
+            _this.spawn.focus();
+            return _this.rogueKeyup = true;
           } else {
             return ed.navigateUp(args.times);
           }
@@ -243,7 +244,8 @@
           row = ed.getSession().getSelection().getCursor().row;
           last = _this.editor.getSession().getDocument().getLength() - 1;
           if (row === last) {
-            return _this.output.focus();
+            _this.output.focus();
+            return _this.rogueKeyup = true;
           } else {
             return ed.navigateDown(args.times);
           }
@@ -270,6 +272,10 @@
 
     CellView.prototype.handleKeypress = function(e) {
       var target;
+      if (this.rogueKeyup === true) {
+        this.rogueKeyup = false;
+        return;
+      }
       target = e.target.className;
       console.log('kp', e.keyCode, target);
       if (e.keyCode === 38) {
