@@ -186,7 +186,8 @@
 
     CellView.prototype.changeState = function() {
       if (this.model.get('state') === 'evaluating') {
-        return this.output.toggleClass('evaluating');
+        this.output.toggleClass('evaluating');
+        return this.output.html('eval');
       } else {
         this.output.toggleClass('evaluating');
         this.output.html(this.model.get('output'));

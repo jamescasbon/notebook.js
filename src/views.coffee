@@ -150,6 +150,7 @@ class CellView extends Backbone.View
   changeState: => 
     if @model.get('state') == 'evaluating'
       @output.toggleClass('evaluating')
+      @output.html('eval')
     else
       # the promise allows the fade out to complete
       # TODO: prevent 
@@ -164,7 +165,7 @@ class CellView extends Backbone.View
     @editor = ace.edit('input-' + @model.id)
     
     @editor.resize()
-    # set the content now, not in the template because HTML is lost in the template textarea
+    # set the content now, not in the template because HTML is lost in the template
     @editor.getSession().setValue(@model.get('input'))
     @editor.getSession().setUseWrapMode true
     @editor.renderer.setShowGutter false

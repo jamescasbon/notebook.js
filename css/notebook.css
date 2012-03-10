@@ -1,10 +1,10 @@
 body {
-  background-color: #b0a08f;
+  background-image: url("/img/stripe.png");
   margin: 0;
 }
 #navbar {
-  height: 34px;
-  background-color: #3d5963;
+  height: 30px;
+  background-color: rgba(0,0,0,0.80);
   position: fixed;
   z-index: 99;
   top: 0;
@@ -18,15 +18,16 @@ body {
 #logo {
   margin-right: 10px;
   margin-top: 5px;
-  font-size: 26px;
-  color: #fff;
+  font-size: 20px;
   float: right;
-  font-family: "Courier New", "monospace";
+  color: #807b77;
+  letter-spacing: 5px;
+  font-family: sans-serif;
   font-weight: bold;
 }
 #notebook {
   width: 760px;
-  padding-top: 40px;
+  padding-top: 50px;
   margin-left: auto;
   margin-right: auto;
   padding-bottom: 40px;
@@ -97,6 +98,7 @@ body {
   z-index: -10;
   border-radius: 5px;
   margin-top: 5px;
+  font-size: 80%;
 }
 .spawn-above,
 #spawner {

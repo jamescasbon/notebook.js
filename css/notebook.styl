@@ -1,14 +1,16 @@
 line-highlight = rgba(0, 0, 0, 0.07)
 cell-padding = 50px
+navbar-height = 30px
 
 
 body
-    background-color: #B0A08F
+    background-image: url('/img/stripe.png' )
+
     margin: 0
 
 #navbar
-    height: 34px
-    background-color: #3D5963 
+    height: navbar-height
+    background-color: rgba(0, 0, 0, 0.8) 
     position: fixed
     z-index: 99
     top: 0
@@ -22,15 +24,18 @@ body
 #logo
     margin-right: 10px
     margin-top: 5px
-    font-size: 26px
-    color: white
+    font-size: 20px
     float: right
-    font-family: "Courier New", "monospace"
+    color: #807B77
+    letter-spacing: 5px
+    font-family: sans-serif
+    
     font-weight: bold
+
 
 #notebook
     width: 760px
-    padding-top: 40px
+    padding-top: navbar-height + 20
     margin-left: auto
     margin-right: auto    
     padding-bottom: 40px
@@ -109,6 +114,7 @@ body
     z-index: -10
     border-radius: 5px
     margin-top: 5px
+    font-size: 80%
 
 
 

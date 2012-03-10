@@ -46,8 +46,12 @@ class Cell extends Backbone.Model
 
   interrupt: => 
     if @handler?
+
+      @onPrint('Interrupted', 'raw')
       @handler.interrupt()
       @set state: null
+
+
 
   evaluateSuccess: (output) => 
     @set output: output, error: null

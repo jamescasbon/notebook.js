@@ -109,6 +109,7 @@
 
     Cell.prototype.interrupt = function() {
       if (this.handler != null) {
+        this.onPrint('Interrupted', 'raw');
         this.handler.interrupt();
         return this.set({
           state: null
