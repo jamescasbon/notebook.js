@@ -51,6 +51,9 @@ class NotebookView extends Backbone.View
   spawnCellAtEnd: => 
     @model.cells.createAtEnd()
 
+  mathjaxReady: => 
+    # perform initial typeset of output elements
+    _.each(@$('.cell-output'), (el) -> MathJax.Hub.Typeset(el) )
 
 # Cell view does the management of Ace and the focus model
 class CellView extends Backbone.View
@@ -98,15 +101,22 @@ class CellView extends Backbone.View
       # update
       @type.html @model.get('type')
       if not @model.get('error')?
-        @output.html @model.get('output') 
+        @output.html @model.get('output')
       else 
         console.log 'error', @model.get('error')
         @output.html @model.get('error')
       @setEditorHighlightMode()
+      
+      # TODO: the update method could be more efficient by only updating the output 
+      # if it has changed
+      MathJax.Hub.Typeset(@output[0])
+
+
     @el
   
   # Ace initialization and configuration happens after DOM insertion
   afterDomInsert: =>
+    
     @editor = ace.edit('input-' + @model.id)
     
     @editor.resize()
@@ -273,6 +283,7 @@ class CellView extends Backbone.View
   # manage hiding ace editor for text cells
   # TODO: logic is wrong here, when press evaluate button
   switchIoViews: => 
+    return 0
     if @model.get('type') == 'markdown'
   
       if @$('.ace-container').is(":hidden")
@@ -291,5 +302,6 @@ $(document).ready ->
   notebooks = new Notebooks()
   notebook = notebooks.create()
   root.app = new NotebookView(model: notebook)
+  MathJax.Hub.Register.StartupHook('End', root.app.mathjaxReady)
 
   root.n = notebook

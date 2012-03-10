@@ -7,12 +7,17 @@ html ->
     script src: "/lib/backbone.js" 
     script src: "/lib/backbone.localStorage.js"
     script src: "/lib/showdown.js"
-    script src: "/lib/ace/ace.js"
-    script src: "/lib/ace/mode-javascript.js"
-    script src: "/lib/ace/mode-markdown.js"
+    script src: "/ace/build/src/ace.js"
+    script src: "/ace/build/src/mode-javascript.js"
+    script src: "/ace/build/src/mode-markdown.js"
     script src: "/src/engine.js" 
     script src: "/src/notebook.js" 
     script src: "/src/views.js" 
+    
+    if true
+      script type: 'text/x-mathjax-config'
+        "MathJax.Hub.Config({messageStyle: 'none', skipStartupTypeset: true, tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});"
+      script src: "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
 
     link rel: 'stylesheet', href: '/css/base.css'
     link rel: 'stylesheet', href: '/css/skeleton.css'
@@ -28,7 +33,9 @@ html ->
           div '#title', -> ''
         ul id: "cells" 
         div '#spawner', -> 'Hit Enter to insert here'
-
+        #p 'When $a \\ne 0$, there are two solutions to $(ax^2 + bx + c = 0)$ and they are $$x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$'
+        
+          
 
     script type: "text/template", id: "cell-template", ->
       div '.cell', id: "[[= id ]]", ->

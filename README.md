@@ -1,18 +1,35 @@
+Running
+=======
+
+You can serve the notebook with 'python -m SimpleHTTPServer', then visit http://localhost:8000
+
 
 Developing
 ==========
 
+Requirements
+------------
+
+npm packages: coffeecup, stylus and coffee-script
+
+you need to fetch ace with git submodule init && git submodule update
+
+Compilation
+-----------
+
+Use the watch flag and background the process to build automatically...
+
 Compile template: 
   
-  coffeecup index.coffee
+  coffeecup -w index.coffee &
 
 Compile model: 
 
-  coffeescript -c -w ./src
+  coffeescript -c -w ./src &
 
 Compile css
   
-  stylus -w css/
+  stylus -w css/ &
   
 
 TODO: 

@@ -16,6 +16,7 @@
     __extends(NotebookView, _super);
 
     function NotebookView() {
+      this.mathjaxReady = __bind(this.mathjaxReady, this);
       this.spawnCellAtEnd = __bind(this.spawnCellAtEnd, this);
       this.addAll = __bind(this.addAll, this);
       this.addOne = __bind(this.addOne, this);
@@ -73,6 +74,12 @@
 
     NotebookView.prototype.spawnCellAtEnd = function() {
       return this.model.cells.createAtEnd();
+    };
+
+    NotebookView.prototype.mathjaxReady = function() {
+      return _.each(this.$('.cell-output'), function(el) {
+        return MathJax.Hub.Typeset(el);
+      });
     };
 
     return NotebookView;
@@ -154,6 +161,7 @@
           this.output.html(this.model.get('error'));
         }
         this.setEditorHighlightMode();
+        MathJax.Hub.Typeset(this.output[0]);
       }
       return this.el;
     };
@@ -343,6 +351,7 @@
     };
 
     CellView.prototype.switchIoViews = function() {
+      return 0;
       if (this.model.get('type') === 'markdown') {
         if (this.$('.ace-container').is(":hidden")) {
           this.inputContainer.show();
@@ -368,6 +377,7 @@
     root.app = new NotebookView({
       model: notebook
     });
+    MathJax.Hub.Register.StartupHook('End', root.app.mathjaxReady);
     return root.n = notebook;
   });
 
