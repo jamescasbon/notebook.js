@@ -54,8 +54,8 @@ body {
   margin: 5px;
 }
 .cell {
-  padding-left: 40px;
-  padding-right: 40px;
+  padding-left: 50px;
+  padding-right: 50px;
 }
 .ace-container {
   position: relative;

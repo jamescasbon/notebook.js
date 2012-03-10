@@ -65,7 +65,7 @@
 
     Cell.prototype.defaults = function() {
       return {
-        input: "something",
+        input: "",
         type: "javascript",
         output: null,
         position: null,

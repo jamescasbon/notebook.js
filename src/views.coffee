@@ -44,6 +44,7 @@ class NotebookView extends Backbone.View
    
     # provide a hook for the view after insertion of the el into the DOM
     view.afterDomInsert()
+    view.focusInput()
 
   addAll: (cells) =>
     cells.each @addOne
@@ -88,8 +89,8 @@ class CellView extends Backbone.View
   tagName: 'li'
 
   events: => (
-    # TODO: change this click to a keypress
-    "keydown .spawn-above": 'handleKeypress',
+    "keyup .spawn-above": 'handleKeypress',
+    "dblclick .spawn-above" : "spawnAbove"
     "click .evaluate": "evaluate",
     "click .delete": "destroy",
     "click .toggle": 'toggle',
@@ -97,9 +98,8 @@ class CellView extends Backbone.View
     "click .cell-output":  'switchIoViews',
     "evaluate": "evaluate",
     "toggle": "toggle",
-    "keydown .cell-output": 'handleKeypress',
-    "keydown .spawn-above": 'handleKeypress',
-    "focus .cell-input" : "focusInput"
+    "keyup .cell-output": 'handleKeypress',
+    "focus .cell-input" : "focusInput",
     "blur .cell-input" : "blurInput"
   )
  
@@ -199,6 +199,19 @@ class CellView extends Backbone.View
           @output.focus()
         else
           ed.navigateDown(args.times) 
+
+    # backspace on empty cell deletes cell
+    @editor.commands.addCommand
+      name: "backspace",
+      bindKey: {win: "Backspace", mac: "Backspace", sender: 'editor'},
+      exec: (ed, args) => 
+        session = ed.getSession()
+        if session.getLength() == 1 and session.getValue() == ""
+          # TODO: just spaces as well??
+          # TODO: focus 
+          @destroy()
+        else
+          @editor.remove("left")
 
   # intercept keypresses to enable focus model on output and spawner
   handleKeypress: (e) => 

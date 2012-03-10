@@ -65,7 +65,8 @@
         previousView = previous.view;
         $(previousView.el).after(newEl);
       }
-      return view.afterDomInsert();
+      view.afterDomInsert();
+      return view.focusInput();
     };
 
     NotebookView.prototype.addAll = function(cells) {
@@ -119,7 +120,8 @@
 
     CellView.prototype.events = function() {
       return {
-        "keydown .spawn-above": 'handleKeypress',
+        "keyup .spawn-above": 'handleKeypress',
+        "dblclick .spawn-above": "spawnAbove",
         "click .evaluate": "evaluate",
         "click .delete": "destroy",
         "click .toggle": 'toggle',
@@ -127,8 +129,7 @@
         "click .cell-output": 'switchIoViews',
         "evaluate": "evaluate",
         "toggle": "toggle",
-        "keydown .cell-output": 'handleKeypress',
-        "keydown .spawn-above": 'handleKeypress',
+        "keyup .cell-output": 'handleKeypress',
         "focus .cell-input": "focusInput",
         "blur .cell-input": "blurInput"
       };
@@ -230,7 +231,7 @@
           }
         }
       });
-      return this.editor.commands.addCommand({
+      this.editor.commands.addCommand({
         name: "golinedown",
         bindKey: {
           win: "Down",
@@ -245,6 +246,23 @@
             return _this.output.focus();
           } else {
             return ed.navigateDown(args.times);
+          }
+        }
+      });
+      return this.editor.commands.addCommand({
+        name: "backspace",
+        bindKey: {
+          win: "Backspace",
+          mac: "Backspace",
+          sender: 'editor'
+        },
+        exec: function(ed, args) {
+          var session;
+          session = ed.getSession();
+          if (session.getLength() === 1 && session.getValue() === "") {
+            return _this.destroy();
+          } else {
+            return _this.editor.remove("left");
           }
         }
       });

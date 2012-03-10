@@ -47,12 +47,12 @@ Now:
 * html stripped from javascript input 
 * keyup in ace out of screen detection
 * Focus model wrong for markdown show/not show 
-* Consistent look to focus
 * detect whether content changed when evaluating (short circuit)
-* Enter on spawn does not work 
 * Backspace on empty cell
 * Overflows on output
-
+* Detect when to show last line
+* Enable new line on new cell
+* Skip null output
 
 Someday: 
 * Document name

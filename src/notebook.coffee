@@ -17,7 +17,7 @@ class Notebooks extends Backbone.Collection
 class Cell extends Backbone.Model
   tagName: 'li'
   defaults: => 
-    input: "something", 
+    input: "", 
     type: "javascript", 
     output: null, 
     position: null,
