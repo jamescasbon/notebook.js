@@ -54,12 +54,8 @@ body {
   margin: 5px;
 }
 .cell {
-  padding: 0;
-}
-.ace-container,
-.cell-output {
-  margin-left: 20px;
-  margin-right: 20px;
+  padding-left: 40px;
+  padding-right: 40px;
 }
 .ace-container {
   position: relative;
@@ -77,7 +73,8 @@ body {
   list-style-type: disc;
 }
 .cell-output:focus {
-  background-color: #e8f2fe;
+  background-color: rgba(0,0,0,0.07);
+  outline: none;
 }
 .type {
   position: absolute;
@@ -101,15 +98,13 @@ body {
   font-family: "Courier New", "monospace";
   margin-top: 5px;
   margin-bottom: 5px;
-  margin-left: 5%;
-  margin-right: 5%;
-  opacity: 0.1;
+  opacity: 0.2;
   border-radius: 5px;
   -webkit-transition: opacity 0.25s linear;
-  width: 90%;
   text-align: center;
-  border: 1px #aaa dashed;
+  border: 1px #111 dashed;
   color: #777;
+  background-color: rgba(0,0,0,0.07);
 }
 .spawn-above:hover,
 #spawner:hover {
@@ -118,6 +113,7 @@ body {
 .spawn-above:focus,
 #spawner:focus {
   opacity: 1;
+  outline: none;
 }
 .evaluating {
   background: #aaa;
