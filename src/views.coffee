@@ -2,7 +2,18 @@
 _.templateSettings = {interpolate : /\[\[=(.+?)\]\]/g, evaluate: /\[\[(.+?)\]\]/g}
 
 root = exports ? this
-  
+ 
+NAVBAR_HEIGHT = 30
+
+isScrolledIntoView = (elem) -> 
+  docViewTop = $(window).scrollTop() + (2 * NAVBAR_HEIGHT)
+  docViewBottom = docViewTop + $(window).height() - (2 * NAVBAR_HEIGHT)
+
+  elemTop = elem.offset().top
+  elemBottom = elemTop + elem.height()
+
+  return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop))
+
 
 # NotebookView is the main app view and manages a list of cells
 class NotebookView extends Backbone.View
@@ -106,7 +117,7 @@ class CellView extends Backbone.View
     "click .type": 'toggle',
     
     "click .cell-output":  'switchIoViews',
-    "click .marker-input":  'toggleInputFold',
+    "click .fold-button":  'toggleInputFold',
     "dblclick .cell-output":  'toggleInputFold',
 
     "evaluate": "evaluate",
@@ -223,6 +234,12 @@ class CellView extends Backbone.View
       name: "golineup",
       bindKey: {win: "Up", mac: "Up|Ctrl-P", sender: 'editor'},
       exec: (ed, args) => 
+        cursor = @$('.ace_cursor')
+        console.log 'lineup,inview?', isScrolledIntoView(cursor)
+        if not isScrolledIntoView(cursor)
+          # FIXME: make this code explici3t
+          $('body').scrollTop(cursor.offset().top - 4 * NAVBAR_HEIGHT)
+
         row = ed.getSession().getSelection().getCursor().row
         if row == 0
           @spawn.focus()
@@ -235,6 +252,11 @@ class CellView extends Backbone.View
       name: "golinedown",
       bindKey: {win: "Down", mac: "Down", sender: 'editor'},
       exec: (ed, args) => 
+        cursor = @$('.ace_cursor')
+        if not isScrolledIntoView(cursor)
+          # FIXME: make this code explicit 
+          $('body').scrollTop(cursor.offset().top - $(window).height() + 3 *  NAVBAR_HEIGHT)
+
         row = ed.getSession().getSelection().getCursor().row
         last = @editor.getSession().getDocument().getLength() - 1
 
@@ -303,7 +325,7 @@ class CellView extends Backbone.View
 
   changeInputFold: =>
     @inputContainer.toggleClass('input-fold')
-    @$('.marker-input').toggleClass('input-fold')
+    @$('.fold-button').toggleClass('input-fold')
     @$('hr').toggleClass('input-fold')
     # TODO: need to check if input focus and then refocus
 

@@ -29,7 +29,7 @@ body
     color: #807B77
     letter-spacing: 5px
     font-family: sans-serif
-    
+    text-transform: uppercase 
     font-weight: bold
 
 
@@ -44,34 +44,12 @@ body
     -moz-box-shadow: rgba(0, 0, 0, 0.496094) 0 0 8px
 
 
-// The spawner allows the user to insert a cell.
-// There is one at the top and after each cell.
-#spawner
-    // clear the floats sizes the notebook div correctly
-    clear: both
-    margin-left: cell-padding
-    margin-right: cell-padding
-
 #cells 
     list-style-type: none
     padding: 0     
 
 #cells li 
     margin: 0
-
-.controls 
-    margin-top: 10px
-    margin-bottom: 10px
-    position: absolute
-    margin-left: 780px
-    float: right 
- 
-    button 
-        margin: 0
-
-
-.controls span
-    margin 5px
 
 .cell
     padding-left: cell-padding
@@ -102,6 +80,7 @@ body
         outline: none
 
     -webkit-transition: background 0s ease, height 2s ease;  
+    cursor: text
 
 
 .type 
@@ -117,12 +96,13 @@ body
     padding: 5px
     font-weight: bold
     font-family: sans-serif
-    -webkit-box-shadow: rgba(0, 0, 0, 0.496094) 0 0 8px
-    -moz-box-shadow: rgba(0, 0, 0, 0.496094) 0 0 8px
+    -webkit-box-shadow: rgba(0, 0, 0, 0.496094) 2px 4px 8px
+    -moz-box-shadow: rgba(0, 0, 0, 0.496094) 2px 4px 8px
     z-index: 1
     border-radius: 5px
     margin-top: 5px
     font-size: 80%
+    cursor: pointer
     
 a
     text-decoration: none
@@ -130,7 +110,11 @@ a
         color: white
 
 
+// The spawner allows the user to insert a cell.
+// There is one at the top and after each cell.
+// TODO: replace with HR
 .spawn-above, #spawner
+
     font-family: "Courier New", "monospace"
     font-size: 80%
 
@@ -149,7 +133,19 @@ a
         outline: none 
         color: #555
 
-.marker-input, .marker-output
+    cursor: pointer
+
+// Match the cell padding for the end of notebook spawner
+#spawner
+    // clear the floats sizes the notebook div correctly
+    margin-left: cell-padding
+    margin-right: cell-padding
+
+
+
+
+// Fold control is the '>' in the margin that hides input
+.fold-button
     position: relative
     left: -20px
     float: left
@@ -157,25 +153,52 @@ a
     -webkit-transition: rotate 0.25s linear
     -webkit-transform-origin: center   
     -webkit-transform: rotate(90deg) 
+    cursor: pointer
 
-.marker-input.input-fold
+.fold-button.input-fold
     -webkit-transform-origin: center   
     -webkit-transform: rotate(0deg) 
-    clear: both
 
+
+.tooltip 
+    &:before 
+        content:attr(tooltip)
+        display:none
+        position: absolute
+        float: left
+        z-index: 10
+    &:hover::before 
+        display: block 
+        width:200px
+        background:yellow
+        border:1px solid black
+        padding:8px
+        margin:25px 0 0 10px
+
+
+
+
+.fold-button.input-fold
+    -webkit-transform-origin: center   
+    -webkit-transform: rotate(0deg) 
+
+
+
+
+// hide the input text when active
 .ace-container.input-fold
     display: none
 
 .status-bar
     position: relative
     img
-        -webkit-transition: opacity 0 linear, height 0.25s ease
-        opacity: 0
+        cursor: pointer
+        display: none
     
     left: -25px
 
     img.active 
-        opacity: 1
+        display: block
 
 
 

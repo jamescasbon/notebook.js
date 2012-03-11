@@ -38,13 +38,20 @@ html ->
 
     script type: "text/template", id: "cell-template", ->
       div '.cell', id: "[[= id ]]", ->
-        a 'type', -> '[[= type ]]'
-        div 'spawn-above', tabindex: '[[= position ]]a'
-        div 'controls', ->
-          button 'full-width delete', -> 'delete'
-        # we can control the container size, but not the editor
-        div 'marker-input', -> '>'
 
+        # the cell type indicator
+        # we enclose in a tooltip div to avoid rotating the tooltip
+        div 'tooltip', tooltip: 'Click to change cell type', ->
+          a 'type', -> '[[= type ]]'
+        
+        # the cell spawner
+        div 'spawn-above', tabindex: '[[= position ]]a'
+
+        # the fold button, tooltip outside to avoid rotating tooltip
+        div 'fold-control tooltip', tooltip: 'foo', ->
+          div 'fold-button', -> '>'
+
+        # the input in a container we use to control sizing
         div 'ace-container', ->
           div class: "cell-input", style: "top:0;bottom:0;left:0;right:0;", id: "input-[[= id ]]", ->
       
@@ -53,9 +60,12 @@ html ->
         div 'cell-output', tabindex: "[[= position ]]c", ->
           '[[= output ]]'
 
+        # status controls in left margin
         div 'status-bar', -> 
-          img 'evaluate', src: '/img/play.png'
-          img 'interrupt', src: '/img/ajax-loader.gif'
+          div 'tooltip', tooltip: 'Evaluate', -> 
+            img 'evaluate', src: '/img/play.png'
+          div 'tooltip', tooltip: 'Interrupt', ->
+            img 'interrupt tooltip', src: '/img/ajax-loader.gif', tooltip: 'Interrupt'
 
 
 

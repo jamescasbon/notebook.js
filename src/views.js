@@ -1,5 +1,5 @@
 (function() {
-  var CellView, NotebookView, root,
+  var CellView, NAVBAR_HEIGHT, NotebookView, isScrolledIntoView, root,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
@@ -10,6 +10,17 @@
   };
 
   root = typeof exports !== "undefined" && exports !== null ? exports : this;
+
+  NAVBAR_HEIGHT = 30;
+
+  isScrolledIntoView = function(elem) {
+    var docViewBottom, docViewTop, elemBottom, elemTop;
+    docViewTop = $(window).scrollTop() + (2 * NAVBAR_HEIGHT);
+    docViewBottom = docViewTop + $(window).height() - (2 * NAVBAR_HEIGHT);
+    elemTop = elem.offset().top;
+    elemBottom = elemTop + elem.height();
+    return (elemBottom <= docViewBottom) && (elemTop >= docViewTop);
+  };
 
   NotebookView = (function(_super) {
 
@@ -144,7 +155,7 @@
         "click .toggle": 'toggle',
         "click .type": 'toggle',
         "click .cell-output": 'switchIoViews',
-        "click .marker-input": 'toggleInputFold',
+        "click .fold-button": 'toggleInputFold',
         "dblclick .cell-output": 'toggleInputFold',
         "evaluate": "evaluate",
         "toggle": "toggle",
@@ -275,7 +286,12 @@
           sender: 'editor'
         },
         exec: function(ed, args) {
-          var row;
+          var cursor, row;
+          cursor = _this.$('.ace_cursor');
+          console.log('lineup,inview?', isScrolledIntoView(cursor));
+          if (!isScrolledIntoView(cursor)) {
+            $('body').scrollTop(cursor.offset().top - 4 * NAVBAR_HEIGHT);
+          }
           row = ed.getSession().getSelection().getCursor().row;
           if (row === 0) {
             _this.spawn.focus();
@@ -293,7 +309,11 @@
           sender: 'editor'
         },
         exec: function(ed, args) {
-          var last, row;
+          var cursor, last, row;
+          cursor = _this.$('.ace_cursor');
+          if (!isScrolledIntoView(cursor)) {
+            $('body').scrollTop(cursor.offset().top - $(window).height() + 3 * NAVBAR_HEIGHT);
+          }
           row = ed.getSession().getSelection().getCursor().row;
           last = _this.editor.getSession().getDocument().getLength() - 1;
           if (row === last) {
@@ -378,7 +398,7 @@
 
     CellView.prototype.changeInputFold = function() {
       this.inputContainer.toggleClass('input-fold');
-      this.$('.marker-input').toggleClass('input-fold');
+      this.$('.fold-button').toggleClass('input-fold');
       return this.$('hr').toggleClass('input-fold');
     };
 
