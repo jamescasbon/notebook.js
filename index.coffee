@@ -14,9 +14,10 @@ html ->
     script src: "/src/notebook.js" 
     script src: "/src/views.js" 
     
-    link href: 'http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700', rel: 'stylesheet', type: 'text/css'
 
-    if true
+
+    if false
+      link href: 'http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700', rel: 'stylesheet', type: 'text/css'
       script type: 'text/x-mathjax-config'
         "MathJax.Hub.Config({messageStyle: 'none', skipStartupTypeset: true, tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});"
       script src: "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
@@ -29,16 +30,11 @@ html ->
   body ->
     
     div '.container', ->
-      div '#notebook', ->
-        div '#navbar', ->
-          div '#logo', -> 'notebook.js'
-          div '#title', -> ''
-        ul id: "cells"
-        div id: 'spawner', tabindex: "1000000000"
-        
-          
-
-    script type: "text/template", id: "cell-template", ->
+      div '#navbar', ->
+        div '#logo', -> 'notebook.js'
+        div '#title', -> ''
+      
+    script type: "text/template", id: "cell-edit-template", ->
       div '.cell', id: "[[= id ]]", ->
 
         # the cell type indicator
@@ -69,5 +65,12 @@ html ->
           div 'tooltip', tooltip: 'Interrupt', ->
             img 'interrupt tooltip', src: '/img/ajax-loader.gif', tooltip: 'Interrupt'
 
+    script type: "text/template", id: "index-template", ->
+      div id: "notebook", class: "sixteen-columns", -> 
+        h1 -> "Oh hai from notebook.js"
 
+    script type: "text/template", id: "notebook-edit-template", ->
+      div id: 'notebook', ->
+        ul class: "cells"
+        div id: 'spawner', tabindex: "1000000000"
 

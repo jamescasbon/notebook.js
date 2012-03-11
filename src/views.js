@@ -1,5 +1,5 @@
 (function() {
-  var CellView, NAVBAR_HEIGHT, NotebookView, isScrolledIntoView, root,
+  var CellView, EditNotebookView, IndexView, NAVBAR_HEIGHT, NotebookRouter, isScrolledIntoView, root,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
@@ -22,11 +22,11 @@
     return (elemBottom <= docViewBottom) && (elemTop >= docViewTop);
   };
 
-  NotebookView = (function(_super) {
+  EditNotebookView = (function(_super) {
 
-    __extends(NotebookView, _super);
+    __extends(EditNotebookView, _super);
 
-    function NotebookView() {
+    function EditNotebookView() {
       this.mathjaxReady = __bind(this.mathjaxReady, this);
       this.spawnKeypress = __bind(this.spawnKeypress, this);
       this.spawnCellAtEnd = __bind(this.spawnCellAtEnd, this);
@@ -35,22 +35,20 @@
       this.render = __bind(this.render, this);
       this.initialize = __bind(this.initialize, this);
       this.events = __bind(this.events, this);
-      NotebookView.__super__.constructor.apply(this, arguments);
+      EditNotebookView.__super__.constructor.apply(this, arguments);
     }
 
-    NotebookView.prototype.el = "#notebook";
-
-    NotebookView.prototype.events = function() {
+    EditNotebookView.prototype.events = function() {
       return {
         "dblclick #spawner": 'spawnCellAtEnd',
         "keyup #spawner": 'spawnKeypress'
       };
     };
 
-    NotebookView.prototype.initialize = function() {
-      this.title = this.$('#title');
-      this.cells = this.$('#cells');
-      this.render();
+    EditNotebookView.prototype.initialize = function() {
+      this.template = _.template($('#notebook-edit-template').html());
+      $('.container').append(this.render());
+      this.cells = this.$('.cells');
       this.model.cells.bind('add', this.addOne);
       this.model.cells.bind('refresh', this.addAll);
       return this.model.cells.fetch({
@@ -58,39 +56,45 @@
       });
     };
 
-    NotebookView.prototype.render = function() {
-      console.log('rendering notebook' + this.model.get('title'));
-      return this.title.html(this.model.get("title"));
+    EditNotebookView.prototype.render = function() {
+      $(this.el).html(this.template());
+      return this.el;
     };
 
-    NotebookView.prototype.addOne = function(cell) {
+    EditNotebookView.prototype.addOne = function(cell) {
       var index, newEl, previous, previousView, view;
-      console.log('adding cell', cell);
+      console.log('adding cell', this.cells);
+      root.c = cell;
+      console.log('creating view');
       view = new CellView({
         model: cell
       });
+      console.log('render view');
       newEl = view.render();
+      console.log('insert view', newEl, this.cells);
       index = this.model.cells.indexOf(cell);
       if (index === 0) {
+        console.log('prepend');
         this.cells.prepend(newEl);
       } else {
         previous = this.model.cells.at(index - 1);
         previousView = previous.view;
         $(previousView.el).after(newEl);
       }
+      console.log('acivate editor', this.cells);
       view.afterDomInsert();
       return view.focusInput();
     };
 
-    NotebookView.prototype.addAll = function(cells) {
+    EditNotebookView.prototype.addAll = function(cells) {
       return cells.each(this.addOne);
     };
 
-    NotebookView.prototype.spawnCellAtEnd = function() {
+    EditNotebookView.prototype.spawnCellAtEnd = function() {
       return this.model.cells.createAtEnd();
     };
 
-    NotebookView.prototype.spawnKeypress = function(e) {
+    EditNotebookView.prototype.spawnKeypress = function(e) {
       var ncells;
       if (e.keyCode === 13) {
         return this.model.cells.createAtEnd();
@@ -100,13 +104,13 @@
       }
     };
 
-    NotebookView.prototype.mathjaxReady = function() {
+    EditNotebookView.prototype.mathjaxReady = function() {
       return _.each(this.$('.cell-output'), function(el) {
         return MathJax.Hub.Typeset(el);
       });
     };
 
-    return NotebookView;
+    return EditNotebookView;
 
   })(Backbone.View);
 
@@ -115,7 +119,6 @@
     __extends(CellView, _super);
 
     function CellView() {
-      this.switchIoViews = __bind(this.switchIoViews, this);
       this.inputChange = __bind(this.inputChange, this);
       this.toggle = __bind(this.toggle, this);
       this.spawnAbove = __bind(this.spawnAbove, this);
@@ -132,7 +135,6 @@
       this.changeInputFold = __bind(this.changeInputFold, this);
       this.toggleInputFold = __bind(this.toggleInputFold, this);
       this.handleKeypress = __bind(this.handleKeypress, this);
-      this.editorChange = __bind(this.editorChange, this);
       this.afterDomInsert = __bind(this.afterDomInsert, this);
       this.changeState = __bind(this.changeState, this);
       this.changeOutput = __bind(this.changeOutput, this);
@@ -154,7 +156,6 @@
         "click .delete": "destroy",
         "click .toggle": 'toggle',
         "click .type": 'toggle',
-        "click .cell-output": 'switchIoViews',
         "click .fold-button": 'toggleInputFold',
         "dblclick .cell-output": 'toggleInputFold',
         "evaluate": "evaluate",
@@ -167,7 +168,7 @@
     };
 
     CellView.prototype.initialize = function() {
-      this.template = _.template($('#cell-template').html());
+      this.template = _.template($('#cell-edit-template').html());
       this.model.bind('change:state', this.changeState);
       this.model.bind('change:type', this.changeType);
       this.model.bind('change:output', this.changeOutput);
@@ -182,6 +183,7 @@
     };
 
     CellView.prototype.render = function(ev) {
+      console.log('model', this.model.toJSON());
       if (!(this.editor != null)) {
         $(this.el).html(this.template(this.model.toJSON()));
         this.spawn = this.$('.spawn-above');
@@ -223,13 +225,13 @@
 
     CellView.prototype.afterDomInsert = function() {
       var _this = this;
+      console.log('binding', this.model.id);
       this.editor = ace.edit('input-' + this.model.id);
       this.editor.resize();
       this.editor.getSession().setValue(this.model.get('input'));
       this.model.set({
         state: null
       });
-      this.editor.getSession().on('change', this.editorChange);
       this.editor.getSession().setUseWrapMode(true);
       this.editor.renderer.setShowGutter(false);
       this.editor.renderer.setHScrollBarAlwaysVisible(false);
@@ -241,7 +243,6 @@
       this.editor.getSession().on('change', this.inputChange);
       this.setEditorHighlightMode();
       this.inputChange();
-      this.switchIoViews();
       if (this.model.get('inputFold')) this.changeInputFold();
       this.editor.commands.addCommand({
         name: 'evaluate',
@@ -338,12 +339,6 @@
             return _this.editor.remove("left");
           }
         }
-      });
-    };
-
-    CellView.prototype.editorChange = function() {
-      return this.model.set({
-        state: 'dirty'
       });
     };
 
@@ -459,8 +454,7 @@
       this.model.set({
         input: this.editor.getSession().getValue()
       });
-      this.model.evaluate();
-      return this.switchIoViews();
+      return this.model.evaluate();
     };
 
     CellView.prototype.destroy = function() {
@@ -487,41 +481,93 @@
 
     CellView.prototype.inputChange = function() {
       var line_height, lines;
+      this.model.set({
+        dirty: true
+      });
       line_height = this.editor.renderer.$textLayer.getLineHeight();
       lines = this.editor.getSession().getDocument().getLength();
       this.$('.ace-container').height(20 + (18 * lines));
       return this.editor.resize();
     };
 
-    CellView.prototype.switchIoViews = function() {
-      return 0;
-      if (this.model.get('type') === 'markdown') {
-        if (this.$('.ace-container').is(":hidden")) {
-          this.inputContainer.show();
-          this.output.hide();
-          this.editor.resize();
-          return this.editor.focus();
-        } else {
-          this.output.show();
-          return this.inputContainer.hide();
-        }
-      }
-    };
-
     return CellView;
 
   })(Backbone.View);
 
+  IndexView = (function(_super) {
+
+    __extends(IndexView, _super);
+
+    function IndexView() {
+      this.render = __bind(this.render, this);
+      this.initialize = __bind(this.initialize, this);
+      IndexView.__super__.constructor.apply(this, arguments);
+    }
+
+    IndexView.prototype.tagName = 'div';
+
+    IndexView.prototype.initialize = function() {
+      this.template = _.template($('#index-template').html());
+      return $('.container').append(this.render());
+    };
+
+    IndexView.prototype.render = function() {
+      $(this.el).html(this.template());
+      console.log(this.template());
+      console.log(this.el);
+      return this.el;
+    };
+
+    return IndexView;
+
+  })(Backbone.View);
+
+  NotebookRouter = (function(_super) {
+
+    __extends(NotebookRouter, _super);
+
+    function NotebookRouter() {
+      this.index = __bind(this.index, this);
+      this.view = __bind(this.view, this);
+      this.edit = __bind(this.edit, this);
+      NotebookRouter.__super__.constructor.apply(this, arguments);
+    }
+
+    NotebookRouter.prototype.routes = {
+      "edit": "edit",
+      "*all": "index"
+    };
+
+    NotebookRouter.prototype.edit = function() {
+      var notebook, notebooks;
+      if (root.app) root.app.remove();
+      console.log('activated edit route');
+      notebooks = new Notebooks();
+      notebook = notebooks.create();
+      root.app = new EditNotebookView({
+        model: notebook
+      });
+      return console.log('created enbv');
+    };
+
+    NotebookRouter.prototype.view = function() {
+      return console.log('activated view route');
+    };
+
+    NotebookRouter.prototype.index = function() {
+      if (root.app) root.app.remove();
+      console.log('index view');
+      return root.app = new IndexView();
+    };
+
+    return NotebookRouter;
+
+  })(Backbone.Router);
+
   $(document).ready(function() {
-    var notebook, notebooks;
     console.log('creating app');
-    notebooks = new Notebooks();
-    notebook = notebooks.create();
-    root.app = new NotebookView({
-      model: notebook
-    });
-    MathJax.Hub.Register.StartupHook('End', root.app.mathjaxReady);
-    return root.n = notebook;
+    root.router = new NotebookRouter();
+    return Backbone.history.start();
   });
 
 }).call(this);

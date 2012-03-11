@@ -15,10 +15,9 @@ isScrolledIntoView = (elem) ->
   return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop))
 
 
-# NotebookView is the main app view and manages a list of cells
-class NotebookView extends Backbone.View
-  el: "#notebook"
- 
+# EditNotebookView is the main app view and manages a list of cells
+class EditNotebookView extends Backbone.View
+
   events: => (
     # there is a lone spawner at the bottom of the page
     "dblclick #spawner": 'spawnCellAtEnd'
@@ -27,33 +26,38 @@ class NotebookView extends Backbone.View
 
   # bind to dom and model events, fetch cells
   initialize: =>
-    @title = @$('#title')
-    @cells = @$('#cells')
-    @render()
-    
+    @template = _.template($('#notebook-edit-template').html())
+    $('.container').append(@render()) 
+
+    @cells = @$('.cells')
     @model.cells.bind 'add', @addOne
     @model.cells.bind 'refresh', @addAll
     @model.cells.fetch(success: @addAll)
 
   # render by setting up title and meta elements
   render: =>
-    console.log 'rendering notebook' + @model.get('title')
-    @title.html(@model.get("title"))
+    $(@el).html(@template())
+    @el
     
   # add a cell by finding the correct order from the collection and inserting
   addOne: (cell) =>
-    console.log('adding cell', cell)
+    console.log('adding cell', @cells)
+    root.c = cell
+    console.log('creating view')
     view = new CellView(model: cell)
+    console.log('render view')
     newEl = view.render()
-    
+    console.log('insert view', newEl, @cells) 
     index = @model.cells.indexOf(cell)
     if index == 0
+      console.log 'prepend'
       @cells.prepend(newEl)
     else 
       previous = @model.cells.at(index - 1)
       previousView = previous.view
       $(previousView.el).after(newEl)
    
+    console.log 'acivate editor', @cells
     # provide a hook for the view after insertion of the el into the DOM
     view.afterDomInsert()
     view.focusInput()
@@ -116,7 +120,6 @@ class CellView extends Backbone.View
     "click .toggle": 'toggle',
     "click .type": 'toggle',
     
-    "click .cell-output":  'switchIoViews',
     "click .fold-button":  'toggleInputFold',
     "dblclick .cell-output":  'toggleInputFold',
 
@@ -130,7 +133,7 @@ class CellView extends Backbone.View
  
   # get template and bind to events
   initialize: => 
-    @template = _.template($('#cell-template').html())
+    @template = _.template($('#cell-edit-template').html())
     @model.bind 'change:state', @changeState
     @model.bind 'change:type', @changeType
     @model.bind 'change:output', @changeOutput
@@ -138,12 +141,13 @@ class CellView extends Backbone.View
     @model.bind 'destroy', @remove
     @model.view = @
     @editor = null
-    #@model.bind 'all', @logev
 
   logev: (ev) =>
     console.log('in ev', ev)
 
   render: (ev) =>
+    console.log('model', @model.toJSON())
+    
     if not @editor? # if the editor exists we do not want to clobber it
       $(@el).html(@template(@model.toJSON()))
       @spawn = @$('.spawn-above')
@@ -187,13 +191,13 @@ class CellView extends Backbone.View
   # Ace initialization and configuration happens after DOM insertion
   afterDomInsert: =>
     # create the editor 
+    console.log 'binding', @model.id
     @editor = ace.edit('input-' + @model.id)
     
     @editor.resize()
     # set the content now, not in the template because HTML is lost in the template
     @editor.getSession().setValue(@model.get('input'))
     @model.set state: null 
-    @editor.getSession().on('change', @editorChange)
 
     @editor.getSession().setUseWrapMode true
     @editor.renderer.setShowGutter false
@@ -208,8 +212,6 @@ class CellView extends Backbone.View
     @setEditorHighlightMode()
     # there is a race condition here looking up the line height
     @inputChange()
-    
-    @switchIoViews()
 
     if @model.get('inputFold') 
       @changeInputFold()
@@ -278,9 +280,6 @@ class CellView extends Backbone.View
           @destroy()
         else
           @editor.remove("left")
-
-  editorChange: => 
-    @model.set( state: 'dirty' )
 
   # intercept keypresses to enable focus model on output and spawner
   handleKeypress: (e) => 
@@ -385,7 +384,6 @@ class CellView extends Backbone.View
   evaluate: =>
     @model.set(input: @editor.getSession().getValue()) 
     @model.evaluate()
-    @switchIoViews()
 
   destroy: =>
     @model.destroy()
@@ -400,11 +398,12 @@ class CellView extends Backbone.View
   spawnAbove: =>
     console.log 'sa'
     @model.collection.createBefore @model
-  
+
   toggle: =>
     @model.toggleType()
-   
-  inputChange: => 
+
+  inputChange: =>
+    @model.set(dirty: true)
     # resize the editor container
     # TODO: implement real renderer for ace
     line_height = @editor.renderer.$textLayer.getLineHeight()
@@ -412,31 +411,53 @@ class CellView extends Backbone.View
     # Add 20 here to allow scroll while wrap is broken
     @$('.ace-container').height(20 + (18 * lines))
     @editor.resize()
-    # TODO get real line height 
-  
+    # TODO get real line height
 
-  # manage hiding ace editor for text cells
-  # TODO: logic is wrong here, when press evaluate button
-  switchIoViews: => 
-    return 0
-    if @model.get('type') == 'markdown'
+
+class IndexView extends Backbone.View
+  tagName: 'div'
   
-      if @$('.ace-container').is(":hidden")
-        @inputContainer.show()
-        @output.hide()
-        @editor.resize()
-        # TODO: guess the target of the click ?
-        @editor.focus()
-      else
-        @output.show()
-        @inputContainer.hide()
+  initialize: =>
+    @template = _.template($('#index-template').html())
+    $('.container').append(@render())
+  
+  render: =>
+    $(@el).html(@template())
+    console.log(@template())
+    console.log(@el)
+    @el
+
+
+
+class NotebookRouter extends Backbone.Router
+  routes: 
+    "edit" : "edit",
+    "*all": "index"
+
+  edit: => 
+    if root.app
+      root.app.remove()
+    console.log 'activated edit route'
+    notebooks = new Notebooks()
+    notebook = notebooks.create()
+    root.app = new EditNotebookView(model: notebook)
+    console.log 'created enbv'
+
+  view: => 
+    console.log 'activated view route'
+
+
+  index: => 
+    if root.app
+      root.app.remove()
+    console.log 'index view'
+    root.app = new IndexView()
 
 
 $(document).ready ->
   console.log 'creating app'
-  notebooks = new Notebooks()
-  notebook = notebooks.create()
-  root.app = new NotebookView(model: notebook)
-  MathJax.Hub.Register.StartupHook('End', root.app.mathjaxReady)
+  root.router = new NotebookRouter() 
+  Backbone.history.start()
+  #MathJax.Hub.Register.StartupHook('End', root.app.mathjaxReady)
+  
 
-  root.n = notebook
