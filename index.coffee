@@ -48,12 +48,12 @@ html ->
 
         div 'ace-container', ->
           div class: "cell-input", style: "top:0;bottom:0;left:0;right:0;", id: "input-[[= id ]]", ->
-        div 'status-bar', -> 
-          img 'evaluate', src: '/img/play.png'
 
         div 'cell-output', tabindex: "[[= position ]]c", ->
           '[[= output ]]'
         div 'status-bar', -> 
+          img 'evaluate', src: '/img/play.png'
           img 'interrupt', src: '/img/ajax-loader.gif'
+
 
 

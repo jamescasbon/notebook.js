@@ -48,6 +48,7 @@ Now:
 * Skip null output
 * Null output indicator?
 * Set inital focus
+* Turn off underline on type (and focus)
 
 Someday: 
 * Document name
@@ -59,6 +60,9 @@ Someday:
 * CTRL-fold
 * toolbar jump to print indicator
 * toolbar rerun engine
+* Startup indicator
+* Tooltips
+* Proper mouse icons
 
 CSS stuff http://css-tricks.com/different-transitions-for-hover-on-hover-off/
 
