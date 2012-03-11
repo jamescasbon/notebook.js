@@ -48,6 +48,7 @@ new loaded notebook
 * Better isScrolled logic
 * View mode
 * Doesn't reflow when browser small
+* Full height notebook
 
 Someday: 
 * Table of contents filter  http://www.jankoatwarpspeed.com/examples/table-of-contents/demo2.html

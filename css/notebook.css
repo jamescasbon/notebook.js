@@ -1,6 +1,10 @@
 body {
   background-image: url("/img/stripe.png");
   margin: 0;
+  height: 100%;
+}
+.container {
+  height: 100%;
 }
 #navbar {
   height: 30px;
@@ -35,6 +39,7 @@ body {
   background-color: #fff;
   -webkit-box-shadow: rgba(0,0,0,0.50) 0 0 8px;
   -moz-box-shadow: rgba(0,0,0,0.50) 0 0 8px;
+  height: 100%;
 }
 #cells {
   list-style-type: none;

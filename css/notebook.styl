@@ -1,12 +1,17 @@
 line-highlight = rgba(0, 0, 0, 0.07)
 cell-padding = 50px
 navbar-height = 30px
+notebook-width = 760px
 
 
 body
     background-image: url('/img/stripe.png' )
 
     margin: 0
+    height: 100%
+
+.container 
+    height: 100%
 
 #navbar
     height: navbar-height
@@ -34,7 +39,7 @@ body
 
 
 #notebook
-    width: 760px
+    width: notebook-width
     padding-top: navbar-height + 20
     margin-left: auto
     margin-right: auto    
@@ -42,7 +47,7 @@ body
     background-color: #FFFFFF
     -webkit-box-shadow: rgba(0, 0, 0, 0.496094) 0 0 8px
     -moz-box-shadow: rgba(0, 0, 0, 0.496094) 0 0 8px
-
+    height: 100%
 
 #cells 
     list-style-type: none
