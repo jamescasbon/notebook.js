@@ -304,6 +304,7 @@ class CellView extends Backbone.View
   changeInputFold: =>
     @inputContainer.toggleClass('input-fold')
     @$('.marker-input').toggleClass('input-fold')
+    @$('hr').toggleClass('input-fold')
     # TODO: need to check if input focus and then refocus
 
   # TODO: method is unclear, called both when focused and to focus
@@ -360,7 +361,6 @@ class CellView extends Backbone.View
       @editor.getSession().setMode(new mode())
 
   evaluate: =>
-    console.log 'in cellview evaluate handler'
     @model.set(input: @editor.getSession().getValue()) 
     @model.evaluate()
     @switchIoViews()

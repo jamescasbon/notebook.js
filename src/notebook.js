@@ -114,11 +114,12 @@
 
     Cell.prototype.interrupt = function() {
       if (this.handler != null) {
-        this.onPrint('Interrupted', 'raw');
+        this.onPrint('Interrupted', 'error');
         this.handler.interrupt();
-        return this.set({
+        this.set({
           state: null
         });
+        return this.save();
       }
     };
 
@@ -132,7 +133,6 @@
 
     Cell.prototype.evaluateError = function(error) {
       this.set({
-        output: null,
         error: error
       });
       return this.save;
@@ -146,7 +146,7 @@
           });
           return this.save();
         case 'error':
-          return this.onPrint(data.data);
+          return this.onPrint(data.data, 'error');
         case 'print':
           return this.onPrint(data.data, 'print');
         case 'result':

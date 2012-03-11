@@ -48,6 +48,8 @@ html ->
 
         div 'ace-container', ->
           div class: "cell-input", style: "top:0;bottom:0;left:0;right:0;", id: "input-[[= id ]]", ->
+      
+        hr -> ''
 
         div 'cell-output', tabindex: "[[= position ]]c", ->
           '[[= output ]]'

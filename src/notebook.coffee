@@ -56,16 +56,17 @@ class Cell extends Backbone.Model
   interrupt: => 
     if @handler?
 
-      @onPrint('Interrupted', 'raw')
+      @onPrint('Interrupted', 'error')
       @handler.interrupt()
       @set state: null
+      @save()
 
   evaluateSuccess: (output) => 
     @set output: output, error: null
     @save()
 
   evaluateError: (error) => 
-    @set output: null, error: error
+    @set error: error
     @save
 
   handleMessage: (data) => 
@@ -73,7 +74,7 @@ class Cell extends Backbone.Model
       when 'evalEnd' 
         @set(state: null)
         @save()
-      when 'error' then @onPrint(data.data)
+      when 'error' then @onPrint(data.data, 'error')
       when 'print' then @onPrint(data.data, 'print')
       when 'result' then @onPrint(data.data, 'print')
       when 'raw' then @onPrint(data.data, 'raw')

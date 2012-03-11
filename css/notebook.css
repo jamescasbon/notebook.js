@@ -64,6 +64,13 @@ body {
   padding-left: 50px;
   padding-right: 50px;
 }
+.cell hr {
+  margin: 0px 80px 10px 80px;
+  opacity: 0.6;
+}
+.cell hr.input-fold {
+  display: none;
+}
 .ace-container {
   position: relative;
   height: 100px;
@@ -71,8 +78,13 @@ body {
 .cell-output {
   -webkit-transition: background 0s ease, height 2s ease;
 }
-.cell-output .print {
+.cell-output .print,
+.cell-output .error {
   font-family: "Courier New", "monospace";
+  font-weight: 650;
+}
+.cell-output .error {
+  color: #f00;
 }
 .cell-output ul {
   list-style-type: disc;

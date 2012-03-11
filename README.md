@@ -51,6 +51,8 @@ Now:
 * Turn off underline on type (and focus)
 
 Someday: 
+* Same shortcuts on output as input (ctrl-c ctrl-fold ctrl-m)
+* Page Down
 * Document name
 * Insert cell scroll
 * Focus ace line where clicked

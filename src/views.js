@@ -378,7 +378,8 @@
 
     CellView.prototype.changeInputFold = function() {
       this.inputContainer.toggleClass('input-fold');
-      return this.$('.marker-input').toggleClass('input-fold');
+      this.$('.marker-input').toggleClass('input-fold');
+      return this.$('hr').toggleClass('input-fold');
     };
 
     CellView.prototype.focusInput = function(where) {
@@ -437,7 +438,6 @@
     };
 
     CellView.prototype.evaluate = function() {
-      console.log('in cellview evaluate handler');
       this.model.set({
         input: this.editor.getSession().getValue()
       });

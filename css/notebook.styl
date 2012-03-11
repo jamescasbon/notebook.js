@@ -77,14 +77,22 @@ body
     padding-left: cell-padding
     padding-right: cell-padding
 
+    hr
+        margin: 0px 80px 10px 80px
+        opacity: 0.6 
+    hr.input-fold
+        display: none
 
 .ace-container
     position: relative 
     height: 100px
 
 .cell-output 
-    .print
+    .print, .error
         font-family: "Courier New", "monospace"
+        font-weight: 650
+    .error     
+        color: red
     
     ul
         list-style-type: disc    
