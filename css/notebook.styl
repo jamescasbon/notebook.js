@@ -26,6 +26,11 @@ body
     -webkit-box-shadow: rgba(0, 0, 0, 0.496094) 0 0 8px
     -moz-box-shadow: rgba(0, 0, 0, 0.496094) 0 0 8px
 
+pre
+    font-family:  'Droid Sans Mono', sans-serif
+    font-size: 12px
+    margin-bottom: 18px
+
 #logo
     margin-right: 10px
     margin-top: 5px
@@ -69,7 +74,7 @@ body
     position: relative 
     height: 100px
 
-.cell-output 
+.cell-output
     word-wrap: break-word
     .print, .error
         font-family: 'Anonymous Pro', sans-serif; 
@@ -159,12 +164,16 @@ a
     color: #AAA
     -webkit-transform-origin: center   
     -webkit-transform: rotate(90deg) 
+    -moz-transform-origin: center   
+    -moz-transform: rotate(90deg) 
     cursor: pointer
 
 // we rotate the indicator to show active fold
 .fold-button.input-fold
     -webkit-transform-origin: center   
     -webkit-transform: rotate(0deg) 
+    -moz-transform-origin: center   
+    -moz-transform: rotate(0deg) 
 
 
 // hide the input text when active

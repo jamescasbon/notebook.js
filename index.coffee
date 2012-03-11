@@ -63,12 +63,25 @@ html ->
           div 'tooltip', tooltip: 'Interrupt', ->
             img 'interrupt tooltip', src: '/img/ajax-loader.gif', tooltip: 'Interrupt'
 
+    script type: "text/template", id: 'cell-view-template', -> 
+      div '.cell', id: "[[= id ]]", ->
+        # FIXME: mixing of underscore logic in this coffeekup template is not pretty
+        # we need two fake divs here to get the text output
+        # must be better way
+        div "[[ if (type != 'markdown') { ]]" 
+        pre class: "cell-input", -> "[[= input ]]"
+        hr -> ''
+        div "[[ } ]]"
+
+        div class: "cell-output", -> "[[= output ]]"
+        div class: 'spawn-above'
+
     script type: "text/template", id: "index-template", ->
-      div id: "notebook", class: "sixteen-columns", -> 
+      div id: "notebook", class: "sixteen columns", -> 
         h1 -> "Oh hai from notebook.js"
 
-    script type: "text/template", id: "notebook-edit-template", ->
-      div id: 'notebook', ->
+    script type: "text/template", id: "notebook-template", ->
+      div id: 'notebook', class: "twelve columns", ->
         ul class: "cells"
         div id: 'spawner', tabindex: "1000000000"
 

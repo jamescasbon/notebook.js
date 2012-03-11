@@ -1,5 +1,5 @@
 (function() {
-  var CellView, EditNotebookView, IndexView, NAVBAR_HEIGHT, NotebookRouter, isScrolledIntoView, root,
+  var CellEditView, EditNotebookView, IndexView, NAVBAR_HEIGHT, NotebookRouter, ViewNotebookView, isScrolledIntoView, root,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
@@ -21,6 +21,56 @@
     elemBottom = elemTop + elem.height();
     return (elemBottom <= docViewBottom) && (elemTop >= docViewTop);
   };
+
+  ViewNotebookView = (function(_super) {
+
+    __extends(ViewNotebookView, _super);
+
+    function ViewNotebookView() {
+      this.renderCell = __bind(this.renderCell, this);
+      this.addAll = __bind(this.addAll, this);
+      this.addOne = __bind(this.addOne, this);
+      this.render = __bind(this.render, this);
+      this.initialize = __bind(this.initialize, this);
+      ViewNotebookView.__super__.constructor.apply(this, arguments);
+    }
+
+    ViewNotebookView.prototype.initialize = function() {
+      console.log('init vnv');
+      this.template = _.template($('#notebook-template').html());
+      this.cellTemplate = _.template($('#cell-view-template').html());
+      $('.container').append(this.render());
+      this.cells = this.$('.cells');
+      console.log(this.cells);
+      return this.model.cells.fetch({
+        success: this.addAll
+      });
+    };
+
+    ViewNotebookView.prototype.render = function() {
+      console.log('render vnv');
+      $(this.el).html(this.template());
+      return this.el;
+    };
+
+    ViewNotebookView.prototype.addOne = function(cell) {
+      var newEl;
+      console.log('addone');
+      newEl = this.renderCell(cell);
+      return this.cells.append(newEl);
+    };
+
+    ViewNotebookView.prototype.addAll = function(cells) {
+      return cells.each(this.addOne);
+    };
+
+    ViewNotebookView.prototype.renderCell = function(cell) {
+      return this.cellTemplate(cell.toJSON());
+    };
+
+    return ViewNotebookView;
+
+  })(Backbone.View);
 
   EditNotebookView = (function(_super) {
 
@@ -46,7 +96,7 @@
     };
 
     EditNotebookView.prototype.initialize = function() {
-      this.template = _.template($('#notebook-edit-template').html());
+      this.template = _.template($('#notebook-template').html());
       $('.container').append(this.render());
       this.cells = this.$('.cells');
       this.model.cells.bind('add', this.addOne);
@@ -66,7 +116,7 @@
       console.log('adding cell', this.cells);
       root.c = cell;
       console.log('creating view');
-      view = new CellView({
+      view = new CellEditView({
         model: cell
       });
       console.log('render view');
@@ -114,11 +164,11 @@
 
   })(Backbone.View);
 
-  CellView = (function(_super) {
+  CellEditView = (function(_super) {
 
-    __extends(CellView, _super);
+    __extends(CellEditView, _super);
 
-    function CellView() {
+    function CellEditView() {
       this.inputChange = __bind(this.inputChange, this);
       this.toggle = __bind(this.toggle, this);
       this.spawnAbove = __bind(this.spawnAbove, this);
@@ -143,12 +193,12 @@
       this.logev = __bind(this.logev, this);
       this.initialize = __bind(this.initialize, this);
       this.events = __bind(this.events, this);
-      CellView.__super__.constructor.apply(this, arguments);
+      CellEditView.__super__.constructor.apply(this, arguments);
     }
 
-    CellView.prototype.tagName = 'li';
+    CellEditView.prototype.tagName = 'li';
 
-    CellView.prototype.events = function() {
+    CellEditView.prototype.events = function() {
       return {
         "keyup .spawn-above": 'handleKeypress',
         "dblclick .spawn-above": "spawnAbove",
@@ -167,7 +217,7 @@
       };
     };
 
-    CellView.prototype.initialize = function() {
+    CellEditView.prototype.initialize = function() {
       this.template = _.template($('#cell-edit-template').html());
       this.model.bind('change:state', this.changeState);
       this.model.bind('change:type', this.changeType);
@@ -178,11 +228,11 @@
       return this.editor = null;
     };
 
-    CellView.prototype.logev = function(ev) {
+    CellEditView.prototype.logev = function(ev) {
       return console.log('in ev', ev);
     };
 
-    CellView.prototype.render = function(ev) {
+    CellEditView.prototype.render = function(ev) {
       console.log('model', this.model.toJSON());
       if (!(this.editor != null)) {
         $(this.el).html(this.template(this.model.toJSON()));
@@ -197,18 +247,18 @@
       return this.el;
     };
 
-    CellView.prototype.changeType = function() {
+    CellEditView.prototype.changeType = function() {
       this.setEditorHighlightMode();
       return this.type.html(this.model.get('type'));
     };
 
-    CellView.prototype.changeOutput = function() {
+    CellEditView.prototype.changeOutput = function() {
       console.log('updatting output to', this.model.get('output'));
       this.output.html(this.model.get('output'));
       return MathJax.Hub.Typeset(this.output[0]);
     };
 
-    CellView.prototype.changeState = function() {
+    CellEditView.prototype.changeState = function() {
       console.log('view changing state to', this.model.get('state'));
       switch (this.model.get('state')) {
         case 'evaluating':
@@ -223,7 +273,7 @@
       }
     };
 
-    CellView.prototype.afterDomInsert = function() {
+    CellEditView.prototype.afterDomInsert = function() {
       var _this = this;
       console.log('binding', this.model.id);
       this.editor = ace.edit('input-' + this.model.id);
@@ -342,7 +392,7 @@
       });
     };
 
-    CellView.prototype.handleKeypress = function(e) {
+    CellEditView.prototype.handleKeypress = function(e) {
       var inFold, target;
       if (this.rogueKeyup === true) {
         this.rogueKeyup = false;
@@ -384,18 +434,18 @@
       }
     };
 
-    CellView.prototype.toggleInputFold = function() {
+    CellEditView.prototype.toggleInputFold = function() {
       console.log('tif');
       return this.model.toggleInputFold();
     };
 
-    CellView.prototype.changeInputFold = function() {
+    CellEditView.prototype.changeInputFold = function() {
       this.inputContainer.toggleClass('input-fold');
       this.$('.fold-button').toggleClass('input-fold');
       return this.$('hr').toggleClass('input-fold');
     };
 
-    CellView.prototype.focusInput = function(where) {
+    CellEditView.prototype.focusInput = function(where) {
       if (where === 'top') {
         this.editor.gotoLine(1);
         this.editor.focus();
@@ -409,21 +459,21 @@
       }
     };
 
-    CellView.prototype.blurInput = function() {
+    CellEditView.prototype.blurInput = function() {
       if (this.editor != null) {
         this.editor.setHighlightActiveLine(false);
         return this.$('.ace_cursor-layer').hide();
       }
     };
 
-    CellView.prototype.focusCellAbove = function() {
+    CellEditView.prototype.focusCellAbove = function() {
       var index, next;
       index = this.model.collection.indexOf(this.model);
       next = this.model.collection.at(index - 1);
       if (next != null) return next.view.output.focus();
     };
 
-    CellView.prototype.focusCellBelow = function() {
+    CellEditView.prototype.focusCellBelow = function() {
       var index, next;
       index = this.model.collection.indexOf(this.model);
       next = this.model.collection.at(index + 1);
@@ -436,11 +486,11 @@
       }
     };
 
-    CellView.prototype.focus = function() {
+    CellEditView.prototype.focus = function() {
       return console.log('focus');
     };
 
-    CellView.prototype.setEditorHighlightMode = function() {
+    CellEditView.prototype.setEditorHighlightMode = function() {
       var mode;
       if (this.model.get('type') === 'javascript') {
         mode = require("ace/mode/javascript").Mode;
@@ -450,37 +500,37 @@
       if (mode != null) return this.editor.getSession().setMode(new mode());
     };
 
-    CellView.prototype.evaluate = function() {
+    CellEditView.prototype.evaluate = function() {
       this.model.set({
         input: this.editor.getSession().getValue()
       });
       return this.model.evaluate();
     };
 
-    CellView.prototype.destroy = function() {
+    CellEditView.prototype.destroy = function() {
       return this.model.destroy();
     };
 
-    CellView.prototype.interrupt = function() {
+    CellEditView.prototype.interrupt = function() {
       console.log('int');
       return this.model.interrupt();
     };
 
-    CellView.prototype.remove = function() {
+    CellEditView.prototype.remove = function() {
       return $(this.el).fadeOut('fast', $(this.el).remove);
     };
 
-    CellView.prototype.spawnAbove = function() {
+    CellEditView.prototype.spawnAbove = function() {
       console.log('sa');
       return this.model.collection.createBefore(this.model);
     };
 
-    CellView.prototype.toggle = function() {
+    CellEditView.prototype.toggle = function() {
       console.log('tog');
       return this.model.toggleType();
     };
 
-    CellView.prototype.inputChange = function() {
+    CellEditView.prototype.inputChange = function() {
       var line_height, lines;
       this.model.set({
         dirty: true
@@ -491,7 +541,7 @@
       return this.editor.resize();
     };
 
-    return CellView;
+    return CellEditView;
 
   })(Backbone.View);
 
@@ -536,6 +586,7 @@
 
     NotebookRouter.prototype.routes = {
       "edit": "edit",
+      "view": "view",
       "*all": "index"
     };
 
@@ -552,7 +603,14 @@
     };
 
     NotebookRouter.prototype.view = function() {
-      return console.log('activated view route');
+      var notebook, notebooks;
+      if (root.app) root.app.remove();
+      console.log('activated view route');
+      notebooks = new Notebooks();
+      notebook = notebooks.create();
+      return root.app = new ViewNotebookView({
+        model: notebook
+      });
     };
 
     NotebookRouter.prototype.index = function() {

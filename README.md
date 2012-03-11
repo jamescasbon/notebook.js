@@ -49,6 +49,10 @@ new loaded notebook
 * View mode
 * Doesn't reflow when browser small
 * Full height notebook
+* Mathjax ready management 
+* Highlighter for view mode
+* Center notepad
+
 
 Someday: 
 * Table of contents filter  http://www.jankoatwarpspeed.com/examples/table-of-contents/demo2.html

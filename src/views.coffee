@@ -15,6 +15,39 @@ isScrolledIntoView = (elem) ->
   return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop))
 
 
+
+class ViewNotebookView extends Backbone.View
+
+  initialize: =>
+    console.log 'init vnv'
+    @template = _.template($('#notebook-template').html())
+    @cellTemplate = _.template($('#cell-view-template').html())
+    $('.container').append(@render()) 
+
+    @cells = @$('.cells')
+    console.log @cells
+    @model.cells.fetch(success: @addAll)
+
+  render: =>
+    console.log 'render vnv'
+    $(@el).html(@template())
+    @el
+
+  addOne: (cell) =>
+    console.log 'addone'
+    newEl = @renderCell(cell)
+    @cells.append(newEl)
+    
+
+  addAll: (cells) =>
+    cells.each @addOne
+
+  renderCell: (cell) =>
+    @cellTemplate(cell.toJSON())
+   
+
+
+
 # EditNotebookView is the main app view and manages a list of cells
 class EditNotebookView extends Backbone.View
 
@@ -26,7 +59,7 @@ class EditNotebookView extends Backbone.View
 
   # bind to dom and model events, fetch cells
   initialize: =>
-    @template = _.template($('#notebook-edit-template').html())
+    @template = _.template($('#notebook-template').html())
     $('.container').append(@render()) 
 
     @cells = @$('.cells')
@@ -44,7 +77,7 @@ class EditNotebookView extends Backbone.View
     console.log('adding cell', @cells)
     root.c = cell
     console.log('creating view')
-    view = new CellView(model: cell)
+    view = new CellEditView(model: cell)
     console.log('render view')
     newEl = view.render()
     console.log('insert view', newEl, @cells) 
@@ -108,7 +141,7 @@ class EditNotebookView extends Backbone.View
 # TODO: escape text for Ace
 # TODO: how to respond to print statements 
 #
-class CellView extends Backbone.View
+class CellEditView extends Backbone.View
   tagName: 'li'
 
   events: => (
@@ -432,7 +465,8 @@ class IndexView extends Backbone.View
 
 class NotebookRouter extends Backbone.Router
   routes: 
-    "edit" : "edit",
+    "edit" : "edit"
+    "view" : "view"
     "*all": "index"
 
   edit: => 
@@ -445,8 +479,13 @@ class NotebookRouter extends Backbone.Router
     console.log 'created enbv'
 
   view: => 
-    console.log 'activated view route'
+    if root.app 
+      root.app.remove()
+    console.log 'activated view route'    
+    notebooks = new Notebooks()
 
+    notebook = notebooks.create()
+    root.app = new ViewNotebookView(model: notebook)
 
   index: => 
     if root.app
