@@ -46,10 +46,8 @@ new loaded notebook
 * Null output indicator?
 * Set inital focus
 * Better isScrolled logic
-* View mode
-* Doesn't reflow when browser small
 * Full height notebook
-* Mathjax ready management 
+* Mathjax ready global 
 * Highlighter for view mode
 * Center notepad
 

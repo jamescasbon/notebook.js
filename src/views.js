@@ -27,6 +27,7 @@
     __extends(ViewNotebookView, _super);
 
     function ViewNotebookView() {
+      this.mathjaxReady = __bind(this.mathjaxReady, this);
       this.renderCell = __bind(this.renderCell, this);
       this.addAll = __bind(this.addAll, this);
       this.addOne = __bind(this.addOne, this);
@@ -34,6 +35,8 @@
       this.initialize = __bind(this.initialize, this);
       ViewNotebookView.__super__.constructor.apply(this, arguments);
     }
+
+    ViewNotebookView.prototype.className = "app";
 
     ViewNotebookView.prototype.initialize = function() {
       console.log('init vnv');
@@ -68,6 +71,12 @@
       return this.cellTemplate(cell.toJSON());
     };
 
+    ViewNotebookView.prototype.mathjaxReady = function() {
+      return _.each(this.$('.cell-output'), function(el) {
+        return MathJax.Hub.Typeset(el);
+      });
+    };
+
     return ViewNotebookView;
 
   })(Backbone.View);
@@ -87,6 +96,8 @@
       this.events = __bind(this.events, this);
       EditNotebookView.__super__.constructor.apply(this, arguments);
     }
+
+    EditNotebookView.prototype.className = "app";
 
     EditNotebookView.prototype.events = function() {
       return {
@@ -557,6 +568,8 @@
 
     IndexView.prototype.tagName = 'div';
 
+    IndexView.prototype.className = 'app';
+
     IndexView.prototype.initialize = function() {
       this.template = _.template($('#index-template').html());
       return $('.container').append(this.render());
@@ -564,8 +577,6 @@
 
     IndexView.prototype.render = function() {
       $(this.el).html(this.template());
-      console.log(this.template());
-      console.log(this.el);
       return this.el;
     };
 
@@ -626,7 +637,8 @@
   $(document).ready(function() {
     console.log('creating app');
     root.router = new NotebookRouter();
-    return Backbone.history.start();
+    Backbone.history.start();
+    return MathJax.Hub.Register.StartupHook('End', root.app.mathjaxReady);
   });
 
 }).call(this);

@@ -17,6 +17,7 @@ isScrolledIntoView = (elem) ->
 
 
 class ViewNotebookView extends Backbone.View
+  className: "app"
 
   initialize: =>
     console.log 'init vnv'
@@ -45,11 +46,14 @@ class ViewNotebookView extends Backbone.View
   renderCell: (cell) =>
     @cellTemplate(cell.toJSON())
    
-
+  mathjaxReady: => 
+    # perform initial typeset of output elements
+    _.each(@$('.cell-output'), (el) -> MathJax.Hub.Typeset(el) )
 
 
 # EditNotebookView is the main app view and manages a list of cells
 class EditNotebookView extends Backbone.View
+  className: "app" 
 
   events: => (
     # there is a lone spawner at the bottom of the page
@@ -450,6 +454,7 @@ class CellEditView extends Backbone.View
 
 class IndexView extends Backbone.View
   tagName: 'div'
+  className: 'app'
   
   initialize: =>
     @template = _.template($('#index-template').html())
@@ -457,8 +462,6 @@ class IndexView extends Backbone.View
   
   render: =>
     $(@el).html(@template())
-    console.log(@template())
-    console.log(@el)
     @el
 
 
@@ -498,6 +501,6 @@ $(document).ready ->
   console.log 'creating app'
   root.router = new NotebookRouter() 
   Backbone.history.start()
-  #MathJax.Hub.Register.StartupHook('End', root.app.mathjaxReady)
+  MathJax.Hub.Register.StartupHook('End', root.app.mathjaxReady)
   
 
