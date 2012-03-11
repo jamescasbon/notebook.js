@@ -86,7 +86,7 @@ body {
 }
 .type {
   position: absolute;
-  left: 103px;
+  left: 5px;
   -webkit-transform-origin: top left;
   -webkit-transform: rotate(90deg);
   -moz-transform-origin: top left;

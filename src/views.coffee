@@ -227,7 +227,7 @@ class CellView extends Backbone.View
       exec: (env, args, request) => @toggle()
 
     @editor.commands.addCommand
-      name: 'toggleMode', 
+      name: 'interrupt', 
       bindKey: { win: 'Ctrl-C', mac: 'Ctrl-C', sender: 'editor' },
       exec: (env, args, request) => @interrupt()
     
@@ -400,6 +400,7 @@ class CellView extends Backbone.View
     @model.collection.createBefore @model
 
   toggle: =>
+    console.log 'tog'
     @model.toggleType()
 
   inputChange: =>

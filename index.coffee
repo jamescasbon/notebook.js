@@ -14,9 +14,7 @@ html ->
     script src: "/src/notebook.js" 
     script src: "/src/views.js" 
     
-
-
-    if false
+    if true
       link href: 'http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700', rel: 'stylesheet', type: 'text/css'
       script type: 'text/x-mathjax-config'
         "MathJax.Hub.Config({messageStyle: 'none', skipStartupTypeset: true, tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});"

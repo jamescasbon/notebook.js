@@ -267,7 +267,7 @@
         }
       });
       this.editor.commands.addCommand({
-        name: 'toggleMode',
+        name: 'interrupt',
         bindKey: {
           win: 'Ctrl-C',
           mac: 'Ctrl-C',
@@ -476,6 +476,7 @@
     };
 
     CellView.prototype.toggle = function() {
+      console.log('tog');
       return this.model.toggleType();
     };
 
