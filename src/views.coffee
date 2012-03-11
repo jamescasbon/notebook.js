@@ -212,8 +212,13 @@ class CellView extends Backbone.View
       name: 'toggleMode', 
       bindKey: { win: 'Ctrl-M', mac: 'Command-M', sender: 'editor' },
       exec: (env, args, request) => @toggle()
-  
-    # if we line up on the first line, we need to focus up 
+
+    @editor.commands.addCommand
+      name: 'toggleMode', 
+      bindKey: { win: 'Ctrl-C', mac: 'Ctrl-C', sender: 'editor' },
+      exec: (env, args, request) => @interrupt()
+    
+      # if we line up on the first line, we need to focus up 
     @editor.commands.addCommand
       name: "golineup",
       bindKey: {win: "Up", mac: "Up|Ctrl-P", sender: 'editor'},

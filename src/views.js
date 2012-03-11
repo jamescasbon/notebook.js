@@ -257,6 +257,17 @@
         }
       });
       this.editor.commands.addCommand({
+        name: 'toggleMode',
+        bindKey: {
+          win: 'Ctrl-C',
+          mac: 'Ctrl-C',
+          sender: 'editor'
+        },
+        exec: function(env, args, request) {
+          return _this.interrupt();
+        }
+      });
+      this.editor.commands.addCommand({
         name: "golineup",
         bindKey: {
           win: "Up",

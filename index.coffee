@@ -51,6 +51,7 @@ html ->
 
         div 'cell-output', tabindex: "[[= position ]]c", ->
           '[[= output ]]'
+
         div 'status-bar', -> 
           img 'evaluate', src: '/img/play.png'
           img 'interrupt', src: '/img/ajax-loader.gif'
