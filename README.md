@@ -40,17 +40,15 @@ Frontend
 
 Now:
 
-* Error styling
-* Move buttons
 * keyup in ace out of screen detection
 * detect whether content changed when evaluating (short circuit)
 * Overflows on output
 * Skip null output
 * Null output indicator?
 * Set inital focus
-* Turn off underline on type (and focus)
 
 Someday: 
+* Table of contents filter  http://www.jankoatwarpspeed.com/examples/table-of-contents/demo2.html
 * Same shortcuts on output as input (ctrl-c ctrl-fold ctrl-m)
 * Page Down
 * Document name

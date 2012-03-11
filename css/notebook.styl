@@ -88,6 +88,7 @@ body
     height: 100px
 
 .cell-output 
+    word-wrap: break-word
     .print, .error
         font-family: "Courier New", "monospace"
         font-weight: 650
@@ -105,7 +106,6 @@ body
 
 .type 
     // The mode is absolute position wrt to the cell's relative position */
-    //    border: 1px solid red*/
     position: absolute
     left: 103px
     -webkit-transform-origin: top left   
@@ -123,7 +123,11 @@ body
     border-radius: 5px
     margin-top: 5px
     font-size: 80%
-
+    
+a
+    text-decoration: none
+    &:hover
+        color: white
 
 
 .spawn-above, #spawner

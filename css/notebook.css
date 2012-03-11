@@ -76,6 +76,7 @@ body {
   height: 100px;
 }
 .cell-output {
+  word-wrap: break-word;
   -webkit-transition: background 0s ease, height 2s ease;
 }
 .cell-output .print,
@@ -111,6 +112,12 @@ body {
   border-radius: 5px;
   margin-top: 5px;
   font-size: 80%;
+}
+a {
+  text-decoration: none;
+}
+a:hover {
+  color: #fff;
 }
 .spawn-above,
 #spawner {

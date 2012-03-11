@@ -42,7 +42,6 @@ html ->
         div 'spawn-above', tabindex: '[[= position ]]a'
         div 'controls', ->
           button 'full-width delete', -> 'delete'
-          button 'full-width toggle', -> 'toggle'
         # we can control the container size, but not the editor
         div 'marker-input', -> '>'
 
