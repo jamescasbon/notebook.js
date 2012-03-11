@@ -40,8 +40,9 @@ Frontend
 
 Now:
 
-* detect whether content changed when evaluating (short circuit)
-* Skip null output
+* detect whether content changed when evaluating (short circuit) - could do on isDirty except when
+new loaded notebook 
+* Skip null output/ show null output placeholder
 * Null output indicator?
 * Set inital focus
 * Better isScrolled logic
@@ -59,11 +60,11 @@ Someday:
 * ace/virtual_renderer.js without scrollbar layers
 * Holding keydown focus properly 
 * CTRL-fold
-* toolbar jump to print indicator
-* toolbar rerun engine
+* toolbar jump to running indicator
+* toolbar rerun all cells
 * Startup indicator
-* Tooltips
-* Proper mouse icons
+* Tooltip styling
+
 
 CSS stuff http://css-tricks.com/different-transitions-for-hover-on-hover-off/
 

@@ -20,9 +20,9 @@ body {
   margin-top: 5px;
   font-size: 20px;
   float: right;
-  color: #807b77;
+  color: #908b87;
   letter-spacing: 5px;
-  font-family: sans-serif;
+  font-family: 'Anonymous Pro', sans-serif;
   text-transform: uppercase;
   font-weight: bold;
 }
@@ -65,11 +65,13 @@ body {
 }
 .cell-output .print,
 .cell-output .error {
-  font-family: "Courier New", "monospace";
-  font-weight: 650;
+  font-family: 'Anonymous Pro', sans-serif;
+  font-weight: 400;
+  line-height: 170%;
 }
 .cell-output .error {
   color: #f00;
+  font-weight: 700;
 }
 .cell-output ul {
   list-style-type: disc;
