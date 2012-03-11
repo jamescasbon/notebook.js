@@ -164,9 +164,11 @@ class CellView extends Backbone.View
         console.log('add active to', @intButton)
         @output.html('...')
         @intButton.addClass('active')
+        @evalButton.removeClass('active')
 
       when 'dirty'
         console.log 'vd'
+        @evalButton.addClass('active')
 
       when null
         @intButton.removeClass('active')

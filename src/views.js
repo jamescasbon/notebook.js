@@ -202,9 +202,11 @@
         case 'evaluating':
           console.log('add active to', this.intButton);
           this.output.html('...');
-          return this.intButton.addClass('active');
+          this.intButton.addClass('active');
+          return this.evalButton.removeClass('active');
         case 'dirty':
-          return console.log('vd');
+          console.log('vd');
+          return this.evalButton.addClass('active');
         case null:
           return this.intButton.removeClass('active');
       }

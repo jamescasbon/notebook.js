@@ -40,22 +40,14 @@ Frontend
 
 Now:
 
-* cant go back to top line on overflow
-* Errors styling
+* Error styling
 * Move buttons
-* html stripped from javascript input 
 * keyup in ace out of screen detection
 * detect whether content changed when evaluating (short circuit)
 * Overflows on output
-* Detect when to show last line
-* Enable new line on new cell
 * Skip null output
-* Dirty cell status
 * Null output indicator?
-* CSS fold indicator 
 * Set inital focus
-* Hit enter on
-* double click on output/ace fold
 
 Someday: 
 * Document name
@@ -65,8 +57,6 @@ Someday:
 * ace/virtual_renderer.js without scrollbar layers
 * Holding keydown focus properly 
 * CTRL-fold
-* print indicator (running engine)
-* interupt on print indicator
 * toolbar jump to print indicator
 * toolbar rerun engine
 

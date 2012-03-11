@@ -79,14 +79,17 @@
 
     Cell.prototype.toggleType = function() {
       if (this.get('type') === 'javascript') {
-        return this.set({
+        this.set({
           type: 'markdown'
         });
       } else {
-        return this.set({
+        this.set({
           type: 'javascript'
         });
       }
+      return this.set({
+        state: 'dirty'
+      });
     };
 
     Cell.prototype.toggleInputFold = function() {
