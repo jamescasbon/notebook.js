@@ -48,7 +48,7 @@ html ->
         div 'spawn-above', tabindex: '[[= position ]]a'
 
         # the fold button, tooltip outside to avoid rotating tooltip
-        div 'fold-control tooltip', tooltip: 'foo', ->
+        div 'fold-control tooltip', tooltip: 'Click to fold input', ->
           div 'fold-button', -> '>'
 
         # the input in a container we use to control sizing

@@ -174,8 +174,7 @@
       this.model.bind('change:inputFold', this.changeInputFold);
       this.model.bind('destroy', this.remove);
       this.model.view = this;
-      this.editor = null;
-      return this.model.bind('all', this.logev);
+      return this.editor = null;
     };
 
     CellView.prototype.logev = function(ev) {
@@ -202,7 +201,7 @@
     };
 
     CellView.prototype.changeOutput = function() {
-      console.log('changeOputput');
+      console.log('updatting output to', this.model.get('output'));
       this.output.html(this.model.get('output'));
       return MathJax.Hub.Typeset(this.output[0]);
     };
@@ -211,7 +210,6 @@
       console.log('view changing state to', this.model.get('state'));
       switch (this.model.get('state')) {
         case 'evaluating':
-          console.log('add active to', this.intButton);
           this.output.html('...');
           this.intButton.addClass('active');
           return this.evalButton.removeClass('active');

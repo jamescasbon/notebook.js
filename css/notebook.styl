@@ -150,52 +150,52 @@ a
     left: -20px
     float: left
     color: #AAA
-    -webkit-transition: rotate 0.25s linear
     -webkit-transform-origin: center   
     -webkit-transform: rotate(90deg) 
     cursor: pointer
 
+// we rotate the indicator to show active fold
 .fold-button.input-fold
     -webkit-transform-origin: center   
     -webkit-transform: rotate(0deg) 
-
-
-.tooltip 
-    &:before 
-        content:attr(tooltip)
-        display:none
-        position: absolute
-        float: left
-        z-index: 10
-    &:hover::before 
-        display: block 
-        width:200px
-        background:yellow
-        border:1px solid black
-        padding:8px
-        margin:25px 0 0 10px
-
-
-
-
-.fold-button.input-fold
-    -webkit-transform-origin: center   
-    -webkit-transform: rotate(0deg) 
-
-
 
 
 // hide the input text when active
 .ace-container.input-fold
     display: none
 
+
+
+// tooltips are created by placing the tooltip attr before the element 
+// and displaying when hovered
+.tooltip 
+    &:before 
+        content:attr(tooltip)
+        position: absolute
+        float: left
+        z-index: 10
+        border-radius: 10px
+        width:200px
+        background:yellow
+        border:1px solid black
+        padding:8px
+        margin:10px 0 0 10px
+        display: none
+
+    &:hover::before 
+        -webkit-transition: opacity 0.5s linear
+        display: block
+        
+
+// evaluate and interrupt controls are in the left margin
 .status-bar
     position: relative
     img
         cursor: pointer
         display: none
     
-    left: -25px
+    left: -35px
+    top: -10px
 
     img.active 
         display: block

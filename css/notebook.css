@@ -134,7 +134,6 @@ a:hover {
   left: -20px;
   float: left;
   color: #aaa;
-  -webkit-transition: rotate 0.25s linear;
   -webkit-transform-origin: center;
   -webkit-transform: rotate(90deg);
   cursor: pointer;
@@ -143,31 +142,30 @@ a:hover {
   -webkit-transform-origin: center;
   -webkit-transform: rotate(0deg);
 }
+.ace-container.input-fold {
+  display: none;
+}
 .tooltip:before {
   content: attr(tooltip);
-  display: none;
   position: absolute;
   float: left;
   z-index: 10;
-}
-.tooltip:hover::before {
-  display: block;
+  border-radius: 10px;
   width: 200px;
   background: #ff0;
   border: 1px solid #000;
   padding: 8px;
-  margin: 25px 0 0 10px;
-}
-.fold-button.input-fold {
-  -webkit-transform-origin: center;
-  -webkit-transform: rotate(0deg);
-}
-.ace-container.input-fold {
+  margin: 10px 0 0 10px;
   display: none;
+}
+.tooltip:hover::before {
+  -webkit-transition: opacity 0.5s linear;
+  display: block;
 }
 .status-bar {
   position: relative;
-  left: -25px;
+  left: -35px;
+  top: -10px;
 }
 .status-bar img {
   cursor: pointer;

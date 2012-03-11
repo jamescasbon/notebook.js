@@ -139,6 +139,7 @@
     };
 
     Cell.prototype.handleMessage = function(data) {
+      console.log('cell handling message from engine', data);
       switch (data.msg) {
         case 'evalEnd':
           this.set({
@@ -163,14 +164,12 @@
     };
 
     Cell.prototype.onPrint = function(data, elName) {
-      var current, el;
-      el = document.createElement('div');
-      el.className = elName;
-      el.innerHTML = data;
+      var current;
       current = this.get('output') || "";
-      return this.set({
-        output: current.concat(el.outerHTML)
+      this.set({
+        output: current.concat('<div class="' + elName + '">' + data + '</div>')
       });
+      return console.log('current output', this.get('output'));
     };
 
     return Cell;

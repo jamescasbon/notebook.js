@@ -138,7 +138,7 @@ class CellView extends Backbone.View
     @model.bind 'destroy', @remove
     @model.view = @
     @editor = null
-    @model.bind 'all', @logev
+    #@model.bind 'all', @logev
 
   logev: (ev) =>
     console.log('in ev', ev)
@@ -161,9 +161,10 @@ class CellView extends Backbone.View
     @type.html @model.get('type')
 
   changeOutput: => 
-    console.log 'changeOputput'
+    console.log 'updatting output to', @model.get('output')
     @output.html(@model.get('output'))
     MathJax.Hub.Typeset(@output[0])
+    
 
   # handle state changes 
   changeState: => 
@@ -172,7 +173,6 @@ class CellView extends Backbone.View
     
     switch @model.get('state')
       when 'evaluating'
-        console.log('add active to', @intButton)
         @output.html('...')
         @intButton.addClass('active')
         @evalButton.removeClass('active')

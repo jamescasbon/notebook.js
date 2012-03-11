@@ -70,6 +70,7 @@ class Cell extends Backbone.Model
     @save
 
   handleMessage: (data) => 
+    console.log 'cell handling message from engine', data
     switch data.msg
       when 'evalEnd' 
         @set(state: null)
@@ -83,11 +84,9 @@ class Cell extends Backbone.Model
     @set(error: error)
 
   onPrint: (data, elName) ->
-    el = document.createElement('div')
-    el.className = elName
-    el.innerHTML = data 
     current = @get('output') or ""
-    @set(output: current.concat(el.outerHTML))
+    @set(output: current.concat('<div class="' + elName + '">' + data + '</div>'))
+    console.log 'current output', @get('output')
     
     
 
