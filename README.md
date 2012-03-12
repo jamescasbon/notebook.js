@@ -43,13 +43,14 @@ Now:
 * detect whether content changed when evaluating (short circuit) - could do on isDirty except when
 new loaded notebook 
 * Skip null output/ show null output placeholder
-* Null output indicator?
 * Set inital focus
 * Better isScrolled logic
-* Full height notebook
 * Mathjax ready global 
 * Highlighter for view mode
 * Center notepad
+* Defocus ajax should empty selection
+* consistent selection color input and output
+* firefox postMessage print
 
 
 Someday: 

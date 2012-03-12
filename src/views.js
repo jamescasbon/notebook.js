@@ -124,25 +124,19 @@
 
     EditNotebookView.prototype.addOne = function(cell) {
       var index, newEl, previous, previousView, view;
-      console.log('adding cell', this.cells);
       root.c = cell;
-      console.log('creating view');
       view = new CellEditView({
         model: cell
       });
-      console.log('render view');
       newEl = view.render();
-      console.log('insert view', newEl, this.cells);
       index = this.model.cells.indexOf(cell);
       if (index === 0) {
-        console.log('prepend');
         this.cells.prepend(newEl);
       } else {
         previous = this.model.cells.at(index - 1);
         previousView = previous.view;
         $(previousView.el).after(newEl);
       }
-      console.log('acivate editor', this.cells);
       view.afterDomInsert();
       return view.focusInput();
     };
@@ -161,6 +155,7 @@
         return this.model.cells.createAtEnd();
       } else if (e.keyCode === 38) {
         ncells = this.model.cells.length;
+        console.log(ncells);
         return this.model.cells.at(ncells - 1).view.output.focus();
       }
     };
@@ -244,9 +239,12 @@
     };
 
     CellEditView.prototype.render = function(ev) {
-      console.log('model', this.model.toJSON());
+      var dat;
+      console.log('model', this.model.cid, this.model.id, this.model.toJSON());
       if (!(this.editor != null)) {
-        $(this.el).html(this.template(this.model.toJSON()));
+        dat = this.model.toJSON();
+        if (!(this.model.id != null)) dat.id = this.model.cid;
+        $(this.el).html(this.template(dat));
         this.spawn = this.$('.spawn-above');
         this.input = this.$('.cell-input');
         this.output = this.$('.cell-output');
@@ -285,9 +283,16 @@
     };
 
     CellEditView.prototype.afterDomInsert = function() {
-      var _this = this;
+      var ace_id,
+        _this = this;
       console.log('binding', this.model.id);
-      this.editor = ace.edit('input-' + this.model.id);
+      console.log(this.model.id);
+      if (this.model.id != null) {
+        ace_id = this.model.id;
+      } else {
+        ace_id = this.model.cid;
+      }
+      this.editor = ace.edit('input-' + ace_id);
       this.editor.resize();
       this.editor.getSession().setValue(this.model.get('input'));
       this.model.set({
@@ -592,6 +597,7 @@
       this.index = __bind(this.index, this);
       this.view = __bind(this.view, this);
       this.edit = __bind(this.edit, this);
+      this.getNotebook = __bind(this.getNotebook, this);
       NotebookRouter.__super__.constructor.apply(this, arguments);
     }
 
@@ -601,24 +607,34 @@
       "*all": "index"
     };
 
-    NotebookRouter.prototype.edit = function() {
-      var notebook, notebooks;
+    NotebookRouter.prototype.getNotebook = function(nb) {
+      var notebook;
+      console.log('finding notebook', nb);
+      notebook = root.notebooks.create();
+      notebook.cells = new Cells();
+      notebook.cells.localStorage = new Store('cells-');
+      root.nb = notebook;
+      console.log('notebook created; id=' + notebook.get('id'));
+      notebook.readyCells();
+      return notebook;
+    };
+
+    NotebookRouter.prototype.edit = function(nb) {
+      var notebook;
       if (root.app) root.app.remove();
       console.log('activated edit route');
-      notebooks = new Notebooks();
-      notebook = notebooks.create();
+      notebook = this.getNotebook();
       root.app = new EditNotebookView({
         model: notebook
       });
       return console.log('created enbv');
     };
 
-    NotebookRouter.prototype.view = function() {
-      var notebook, notebooks;
+    NotebookRouter.prototype.view = function(nb) {
+      var notebook;
       if (root.app) root.app.remove();
       console.log('activated view route');
-      notebooks = new Notebooks();
-      notebook = notebooks.create();
+      notebook = this.getNotebook(nb);
       return root.app = new ViewNotebookView({
         model: notebook
       });
@@ -636,6 +652,7 @@
 
   $(document).ready(function() {
     console.log('creating app');
+    root.notebooks = new Notebooks();
     root.router = new NotebookRouter();
     Backbone.history.start();
     return MathJax.Hub.Register.StartupHook('End', root.app.mathjaxReady);

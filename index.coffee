@@ -78,7 +78,8 @@ html ->
 
     script type: "text/template", id: "index-template", ->
       div id: "notebook", class: "sixteen columns", -> 
-        h1 -> "Oh hai from notebook.js"
+        div 'cell', ->
+          h1 -> "Welcome to notebook.js"
 
     script type: "text/template", id: "notebook-template", ->
       div id: 'notebook', class: "twelve columns", ->

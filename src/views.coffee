@@ -78,23 +78,17 @@ class EditNotebookView extends Backbone.View
     
   # add a cell by finding the correct order from the collection and inserting
   addOne: (cell) =>
-    console.log('adding cell', @cells)
     root.c = cell
-    console.log('creating view')
     view = new CellEditView(model: cell)
-    console.log('render view')
     newEl = view.render()
-    console.log('insert view', newEl, @cells) 
     index = @model.cells.indexOf(cell)
     if index == 0
-      console.log 'prepend'
       @cells.prepend(newEl)
     else 
       previous = @model.cells.at(index - 1)
       previousView = previous.view
       $(previousView.el).after(newEl)
    
-    console.log 'acivate editor', @cells
     # provide a hook for the view after insertion of the el into the DOM
     view.afterDomInsert()
     view.focusInput()
@@ -110,6 +104,7 @@ class EditNotebookView extends Backbone.View
       @model.cells.createAtEnd()
     else if e.keyCode == 38
       ncells = @model.cells.length
+      console.log(ncells)
       @model.cells.at(ncells - 1).view.output.focus()
 
   mathjaxReady: => 
@@ -183,10 +178,16 @@ class CellEditView extends Backbone.View
     console.log('in ev', ev)
 
   render: (ev) =>
-    console.log('model', @model.toJSON())
-    
+    console.log 'model', @model.cid, @model.id, @model.toJSON()
     if not @editor? # if the editor exists we do not want to clobber it
-      $(@el).html(@template(@model.toJSON()))
+      
+      dat = @model.toJSON()
+
+      if not @model.id? # happens when not yet saved
+        dat.id = @model.cid
+
+      $(@el).html(@template(dat))
+
       @spawn = @$('.spawn-above')
       @input = @$('.cell-input')
       @output = @$('.cell-output')
@@ -229,7 +230,12 @@ class CellEditView extends Backbone.View
   afterDomInsert: =>
     # create the editor 
     console.log 'binding', @model.id
-    @editor = ace.edit('input-' + @model.id)
+    console.log(@model.id)
+    if @model.id?
+      ace_id = @model.id
+    else
+      ace_id = @model.cid
+    @editor = ace.edit('input-' + ace_id)
     
     @editor.resize()
     # set the content now, not in the template because HTML is lost in the template
@@ -472,22 +478,29 @@ class NotebookRouter extends Backbone.Router
     "view" : "view"
     "*all": "index"
 
-  edit: => 
+  getNotebook: (nb) => 
+    console.log('finding notebook', nb)
+    notebook = root.notebooks.create()
+    notebook.cells = new Cells()
+    notebook.cells.localStorage = new Store('cells-')
+    root.nb = notebook
+    console.log('notebook created; id=' +  notebook.get('id'))
+    notebook.readyCells()
+    notebook
+
+  edit: (nb) => 
     if root.app
       root.app.remove()
     console.log 'activated edit route'
-    notebooks = new Notebooks()
-    notebook = notebooks.create()
+    notebook = @getNotebook()
     root.app = new EditNotebookView(model: notebook)
     console.log 'created enbv'
 
-  view: => 
+  view: (nb) => 
     if root.app 
       root.app.remove()
     console.log 'activated view route'    
-    notebooks = new Notebooks()
-
-    notebook = notebooks.create()
+    notebook = @getNotebook(nb)
     root.app = new ViewNotebookView(model: notebook)
 
   index: => 
@@ -499,6 +512,7 @@ class NotebookRouter extends Backbone.Router
 
 $(document).ready ->
   console.log 'creating app'
+  root.notebooks = new Notebooks()
   root.router = new NotebookRouter() 
   Backbone.history.start()
   MathJax.Hub.Register.StartupHook('End', root.app.mathjaxReady)

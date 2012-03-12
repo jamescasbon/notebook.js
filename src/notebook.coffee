@@ -6,7 +6,13 @@ class Notebook extends Backbone.Model
 
   initialize: =>
     @cells = new Cells()
-    @cells.localStorage = new Store('Cells')
+    @cells.localStorage = new Store('cells-')
+
+
+  # we need this hook for localStorage because the id is not available at init
+  readyCells: => 
+    console.log('creating store for nb id', @get('id'))
+    #@cells.localStorage = new Store('cells-' + @get('id'))
 
 
 class Notebooks extends Backbone.Collection
@@ -96,8 +102,15 @@ class Cells extends Backbone.Collection
   
   # sort by position and put large jumps in the position to allow insertion
   posJump: Math.pow(2, 16)
-  comparator: (cell) => cell.get('position') 
-  
+  comparator: (l,r) => 
+    l = l.get('position')
+    r = r.get('position')
+    if l > r 
+      return 1
+    if l < r 
+      return -1
+    return 0
+
   # creation methods that preserve the ordering of the notebook
   createAtEnd: ->
     if @length 

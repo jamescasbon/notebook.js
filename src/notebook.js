@@ -11,6 +11,7 @@
     __extends(Notebook, _super);
 
     function Notebook() {
+      this.readyCells = __bind(this.readyCells, this);
       this.initialize = __bind(this.initialize, this);
       this.defaults = __bind(this.defaults, this);
       Notebook.__super__.constructor.apply(this, arguments);
@@ -24,7 +25,11 @@
 
     Notebook.prototype.initialize = function() {
       this.cells = new Cells();
-      return this.cells.localStorage = new Store('Cells');
+      return this.cells.localStorage = new Store('cells-');
+    };
+
+    Notebook.prototype.readyCells = function() {
+      return console.log('creating store for nb id', this.get('id'));
     };
 
     return Notebook;
@@ -189,8 +194,12 @@
 
     Cells.prototype.posJump = Math.pow(2, 16);
 
-    Cells.prototype.comparator = function(cell) {
-      return cell.get('position');
+    Cells.prototype.comparator = function(l, r) {
+      l = l.get('position');
+      r = r.get('position');
+      if (l > r) return 1;
+      if (l < r) return -1;
+      return 0;
     };
 
     Cells.prototype.createAtEnd = function() {
