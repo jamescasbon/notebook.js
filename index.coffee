@@ -83,21 +83,23 @@ html ->
         # TODO: columns here
         div 'cell', ->
           h1 -> "Welcome to notebook.js"
-          div '#right-index', -> 
+          div class: " eight columns", ->
+            h3 'My notebooks'
+            ul id: 'notebooks'
+          div '#right-index', class: "four columns", -> 
+            h3 'other stuff'
             button '#new-notebook-button', ->  'New notebook'
             label for: "files", -> 'Load notebook'
             input type:"file", id: "load-file", name:"file", -> 'hi'
-          ul id: 'notebooks'
 
     script type: "text/template", id: "notebook-index-template", ->
-      li id: "list-notebook", class: "sixteen columns", -> 
+      li class: "list-notebook", -> 
         a href: "#[[= id ]]/view/", ->
           "[[= title ]]"
-        'hi'
-        a href: "#[[= id ]]/edit/", ->
-          "Edit"
-        a href: "#[[= id ]]/delete/", ->
-          "Delete"
+
+        div '.right', -> 
+          a class: 'right', href: "#[[= id ]]/edit/", -> "Edit"
+          a class: 'right', href: "#[[= id ]]/delete/", -> "Delete"
 
 
     script type: "text/template", id: "notebook-template", ->

@@ -40,9 +40,6 @@ pre {
   right: 0;
   z-index: 100;
 }
-#right-index {
-  float: right;
-}
 #title {
   color: #fff;
   font-weight: bold;
@@ -207,4 +204,23 @@ pre {
 .status-bar img.active {
   opacity: 1;
   display: block;
+}
+.list-notebook:nth-child(odd) {
+  background: rgba(50,50,50,0.05);
+}
+.list-notebook:nth-child(odd):hover {
+  background: rgba(50,50,50,0.30);
+}
+.list-notebook:nth-child(even) {
+  background: rgba(50,50,50,0.05);
+}
+.list-notebook:nth-child(even):hover {
+  background: rgba(50,50,50,0.30);
+}
+.list-notebook > .right {
+  float: right;
+  margin-left: 20px;
+}
+.list-notebook > .right > a {
+  margin-left: 20px;
 }

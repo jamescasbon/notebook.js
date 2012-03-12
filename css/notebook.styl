@@ -49,8 +49,6 @@ pre
     z-index: 100
 
 
-#right-index 
-    float: right
 
 #title 
     color: white
@@ -233,4 +231,29 @@ pre
     img.active 
         opacity: 1
         display: block
+
+
+
+
+.list-notebook 
+
+    &:nth-child(odd) 
+        background: rgba(50,50,50,0.05)
+
+    &:nth-child(odd):hover 
+    	background: rgba(50,50,50,0.3)	
+
+ 
+    &:nth-child(even) 
+	    background: rgba(50,50,50,0.05)
+
+    &:nth-child(even):hover 
+        background: rgba(50,50,50,0.3)
+    
+    & > .right
+        float: right
+        margin-left: 20px
+            
+        & > a
+            margin-left: 20px
 
