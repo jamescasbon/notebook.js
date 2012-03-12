@@ -1,5 +1,5 @@
 (function() {
-  var CellEditView, EditNotebookView, IndexView, NAVBAR_HEIGHT, NotebookRouter, ViewNotebookView, isScrolledIntoView, root,
+  var CellEditView, EditNotebookView, IndexView, NAVBAR_HEIGHT, NewView, NotebookRouter, ViewNotebookView, isScrolledIntoView, root,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
@@ -568,6 +568,7 @@
     __extends(IndexView, _super);
 
     function IndexView() {
+      this["new"] = __bind(this["new"], this);
       this.addNbs = __bind(this.addNbs, this);
       this.addNb = __bind(this.addNb, this);
       this.render = __bind(this.render, this);
@@ -575,9 +576,11 @@
       IndexView.__super__.constructor.apply(this, arguments);
     }
 
-    IndexView.prototype.tagName = 'div';
-
     IndexView.prototype.className = 'app';
+
+    IndexView.prototype.events = {
+      'click button': 'new'
+    };
 
     IndexView.prototype.initialize = function() {
       this.template = _.template($('#index-template').html());
@@ -600,7 +603,55 @@
       return root.notebooks.each(this.addNb);
     };
 
+    IndexView.prototype["new"] = function() {
+      return root.router.navigate('new/', {
+        trigger: true
+      });
+    };
+
     return IndexView;
+
+  })(Backbone.View);
+
+  NewView = (function(_super) {
+
+    __extends(NewView, _super);
+
+    function NewView() {
+      this.create = __bind(this.create, this);
+      this.render = __bind(this.render, this);
+      this.initialize = __bind(this.initialize, this);
+      NewView.__super__.constructor.apply(this, arguments);
+    }
+
+    NewView.prototype.className = 'app';
+
+    NewView.prototype.events = {
+      'click button': 'create'
+    };
+
+    NewView.prototype.initialize = function() {
+      this.template = _.template($('#new-notebook-form').html());
+      return $('.container').append(this.render());
+    };
+
+    NewView.prototype.render = function() {
+      $(this.el).html(this.template());
+      return this.el;
+    };
+
+    NewView.prototype.create = function() {
+      var nb;
+      console.log('creating');
+      nb = root.notebooks.create({
+        title: this.$('input').val()
+      });
+      return root.router.navigate(nb.id + '/edit/', {
+        trigger: true
+      });
+    };
+
+    return NewView;
 
   })(Backbone.View);
 
@@ -610,6 +661,7 @@
 
     function NotebookRouter() {
       this.index = __bind(this.index, this);
+      this["new"] = __bind(this["new"], this);
       this["delete"] = __bind(this["delete"], this);
       this.view = __bind(this.view, this);
       this.edit = __bind(this.edit, this);
@@ -621,7 +673,8 @@
       ":nb/edit/": "edit",
       ":nb/view/": "view",
       ":nb/delete/": "delete",
-      "*all": "index"
+      "new/": "new",
+      "": "index"
     };
 
     NotebookRouter.prototype.getNotebook = function(nb) {
@@ -667,6 +720,12 @@
       return root.router.navigate('', {
         trigger: true
       });
+    };
+
+    NotebookRouter.prototype["new"] = function(nb) {
+      console.log('new view');
+      if (root.app) root.app.remove();
+      return root.app = new NewView();
     };
 
     NotebookRouter.prototype.index = function() {

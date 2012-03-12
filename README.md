@@ -40,6 +40,12 @@ Frontend
 
 Now:
 
+* new notebook
+* Notebook title
+* save notebook
+* import notebook
+
+
 * detect whether content changed when evaluating (short circuit) - could do on isDirty except when
 new loaded notebook 
 * Skip null output/ show null output placeholder
@@ -50,9 +56,7 @@ new loaded notebook
 * Center notepad
 * Defocus ajax should empty selection
 * consistent selection color input and output
-* firefox postMessage print
 * Better list of notebooks
-* return to front page button
 * edit/view toggle
 
 

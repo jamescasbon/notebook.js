@@ -80,6 +80,7 @@ html ->
       div id: "notebook", class: "sixteen columns", -> 
         div 'cell', ->
           h1 -> "Welcome to notebook.js"
+          button id='new-notebook-button', ->  'New notebook'
           ul id: 'notebooks'
 
     script type: "text/template", id: "notebook-index-template", ->
@@ -97,3 +98,13 @@ html ->
         ul class: "cells"
         div id: 'spawner', tabindex: "1000000000"
 
+
+
+    script type: "text/template", id: "new-notebook-form", ->
+      div id: "notebook", class: "sixteen columns", -> 
+        div 'cell', ->
+          h1 -> "Create new notebook"
+          form ->
+            label for: 'name', -> 'Name'
+            input type: 'text', id: 'name'
+            button type: 'submit', 'Create'

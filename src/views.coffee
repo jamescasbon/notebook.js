@@ -460,8 +460,10 @@ class CellEditView extends Backbone.View
 
 
 class IndexView extends Backbone.View
-  tagName: 'div'
   className: 'app'
+
+  events: 
+    'click button': 'new'
   
   initialize: =>
     @template = _.template($('#index-template').html())
@@ -480,13 +482,37 @@ class IndexView extends Backbone.View
     @nbtemplate = _.template($('#notebook-index-template').html())
     root.notebooks.each(@addNb)
 
+  new: => 
+    root.router.navigate ('new/'), trigger: true
+
+
+class NewView extends Backbone.View
+  className: 'app'
+  
+  events: 
+    'click button' : 'create'
+
+  initialize: => 
+    @template = _.template($('#new-notebook-form').html())
+    $('.container').append(@render())
+
+  render: =>
+    $(@el).html(@template())
+    @el
+
+  create: => 
+    console.log 'creating'
+    nb = root.notebooks.create(title: @$('input').val())
+    root.router.navigate (nb.id + '/edit/'), trigger: true
+
 
 class NotebookRouter extends Backbone.Router
   routes: 
     ":nb/edit/" : "edit"
     ":nb/view/" : "view"
     ":nb/delete/" : "delete"
-    "*all": "index"
+    "new/": "new"
+    "": "index"
 
   getNotebook: (nb) => 
     console.log('finding notebook', nb)
@@ -522,6 +548,11 @@ class NotebookRouter extends Backbone.Router
     console.log('deleted')
     root.router.navigate('', trigger: true) 
 
+  new: (nb) => 
+    console.log 'new view'
+    if root.app
+      root.app.remove()
+    root.app = new NewView()
   
   index: => 
     if root.app
