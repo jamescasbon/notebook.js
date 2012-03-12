@@ -566,6 +566,8 @@
     __extends(IndexView, _super);
 
     function IndexView() {
+      this.addNbs = __bind(this.addNbs, this);
+      this.addNb = __bind(this.addNb, this);
       this.render = __bind(this.render, this);
       this.initialize = __bind(this.initialize, this);
       IndexView.__super__.constructor.apply(this, arguments);
@@ -577,12 +579,24 @@
 
     IndexView.prototype.initialize = function() {
       this.template = _.template($('#index-template').html());
-      return $('.container').append(this.render());
+      $('.container').append(this.render());
+      return this.addNbs();
     };
 
     IndexView.prototype.render = function() {
       $(this.el).html(this.template());
       return this.el;
+    };
+
+    IndexView.prototype.addNb = function(nb) {
+      console.log('addNb', nb.toJSON());
+      return $('#notebooks').append(this.nbtemplate(nb.toJSON()));
+    };
+
+    IndexView.prototype.addNbs = function() {
+      console.log('addNbs');
+      this.nbtemplate = _.template($('#notebook-index-template').html());
+      return root.notebooks.each(this.addNb);
     };
 
     return IndexView;
@@ -602,8 +616,8 @@
     }
 
     NotebookRouter.prototype.routes = {
-      "edit/:nb": "edit",
-      "view": "view",
+      ":nb/edit/": "edit",
+      ":nb/view/": "view",
       "*all": "index"
     };
 
@@ -614,7 +628,7 @@
       console.log('got', notebook);
       notebook.readyCells();
       root.nb = notebook;
-      console.log('notebook created; id=' + notebook.get('id'));
+      console.log('notebook loaded; id=' + notebook.get('id'));
       notebook.readyCells();
       return notebook;
     };

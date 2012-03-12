@@ -80,7 +80,14 @@ html ->
       div id: "notebook", class: "sixteen columns", -> 
         div 'cell', ->
           h1 -> "Welcome to notebook.js"
+          ul id: 'notebooks'
 
+    script type: "text/template", id: "notebook-index-template", ->
+      div id: "list-notebook", class: "sixteen columns", -> 
+        a href: "#[[= id ]]/view/", ->
+          "[[= title ]]"
+        a href: "#[[= id ]]/edit/", ->
+          "Edit"
     script type: "text/template", id: "notebook-template", ->
       div id: 'notebook', class: "twelve columns", ->
         ul class: "cells"

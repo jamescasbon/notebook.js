@@ -465,17 +465,26 @@ class IndexView extends Backbone.View
   initialize: =>
     @template = _.template($('#index-template').html())
     $('.container').append(@render())
-  
+    @addNbs()
+
   render: =>
     $(@el).html(@template())
     @el
 
+  addNb: (nb) =>
+    console.log 'addNb', nb.toJSON()
+    $('#notebooks').append(@nbtemplate(nb.toJSON()))
+
+  addNbs: => 
+    console.log 'addNbs'
+    @nbtemplate = _.template($('#notebook-index-template').html())
+    root.notebooks.each(@addNb)
 
 
 class NotebookRouter extends Backbone.Router
   routes: 
-    "edit/:nb" : "edit"
-    "view" : "view"
+    ":nb/edit/" : "edit"
+    ":nb/view/" : "view"
     "*all": "index"
 
   getNotebook: (nb) => 
@@ -484,9 +493,10 @@ class NotebookRouter extends Backbone.Router
     console.log 'got', notebook
     #if notebook? # just create one for the minute!
     #  notebook = root.notebooks.create()
+    # TODO: could wait for a sync signal to have the id
     notebook.readyCells()
     root.nb = notebook
-    console.log('notebook created; id=' +  notebook.get('id'))
+    console.log('notebook loaded; id=' +  notebook.get('id'))
     notebook.readyCells()
     notebook
 
