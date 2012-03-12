@@ -29,7 +29,7 @@ html ->
     
     div '.container', ->
       div '#navbar', ->
-        div '#logo', -> 'notebook.js'
+        a '#logo', href: "#", -> 'notebook.js'
         div '#title', -> ''
       
     script type: "text/template", id: "cell-edit-template", ->

@@ -30,6 +30,10 @@ pre {
   font-family: 'Anonymous Pro', sans-serif;
   text-transform: uppercase;
   font-weight: bold;
+  text-decoration: none;
+}
+#logo:hover {
+  color: #c0aba7;
 }
 #notebook {
   padding-top: 50px;
@@ -104,11 +108,9 @@ pre {
   margin-top: 5px;
   font-size: 80%;
   cursor: pointer;
-}
-a {
   text-decoration: none;
 }
-a:hover {
+.type:hover {
   color: #fff;
 }
 .spawn-above,
