@@ -171,6 +171,7 @@ class CellEditView extends Backbone.View
     @model.bind 'change:output', @changeOutput
     @model.bind 'change:inputFold', @changeInputFold
     @model.bind 'destroy', @remove
+    @model.bind 'all', @logev
     @model.view = @
     @editor = null
 
@@ -254,7 +255,8 @@ class CellEditView extends Backbone.View
     @editor.getSession().on('change', this.inputChange)
     @setEditorHighlightMode()
     # there is a race condition here looking up the line height
-    @inputChange()
+    @resizeEditor()
+
 
     if @model.get('inputFold') 
       @changeInputFold()
@@ -432,22 +434,22 @@ class CellEditView extends Backbone.View
     @model.destroy()
 
   interrupt: => 
-    console.log 'int'
     @model.interrupt()
 
   remove: => 
     $(@el).fadeOut('fast', $(@el).remove)
 
   spawnAbove: =>
-    console.log 'sa'
     @model.collection.createBefore @model
 
   toggle: =>
-    console.log 'tog'
     @model.toggleType()
 
   inputChange: =>
-    @model.set(dirty: true)
+    @model.set(state: 'dirty')
+    @resizeEditor()
+
+  resizeEditor: => 
     # resize the editor container
     # TODO: implement real renderer for ace
     line_height = @editor.renderer.$textLayer.getLineHeight()

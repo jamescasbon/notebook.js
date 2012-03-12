@@ -175,13 +175,15 @@ a:hover {
 }
 .status-bar {
   position: relative;
-  left: -35px;
-  top: -10px;
+  float: right;
+  top: -25px;
+  right: -30px;
 }
 .status-bar img {
   cursor: pointer;
   display: none;
 }
 .status-bar img.active {
+  opacity: 1;
   display: block;
 }

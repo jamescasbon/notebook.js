@@ -175,6 +175,7 @@
     __extends(CellEditView, _super);
 
     function CellEditView() {
+      this.resizeEditor = __bind(this.resizeEditor, this);
       this.inputChange = __bind(this.inputChange, this);
       this.toggle = __bind(this.toggle, this);
       this.spawnAbove = __bind(this.spawnAbove, this);
@@ -230,6 +231,7 @@
       this.model.bind('change:output', this.changeOutput);
       this.model.bind('change:inputFold', this.changeInputFold);
       this.model.bind('destroy', this.remove);
+      this.model.bind('all', this.logev);
       this.model.view = this;
       return this.editor = null;
     };
@@ -308,7 +310,7 @@
       });
       this.editor.getSession().on('change', this.inputChange);
       this.setEditorHighlightMode();
-      this.inputChange();
+      this.resizeEditor();
       if (this.model.get('inputFold')) this.changeInputFold();
       this.editor.commands.addCommand({
         name: 'evaluate',
@@ -528,7 +530,6 @@
     };
 
     CellEditView.prototype.interrupt = function() {
-      console.log('int');
       return this.model.interrupt();
     };
 
@@ -537,20 +538,22 @@
     };
 
     CellEditView.prototype.spawnAbove = function() {
-      console.log('sa');
       return this.model.collection.createBefore(this.model);
     };
 
     CellEditView.prototype.toggle = function() {
-      console.log('tog');
       return this.model.toggleType();
     };
 
     CellEditView.prototype.inputChange = function() {
-      var line_height, lines;
       this.model.set({
-        dirty: true
+        state: 'dirty'
       });
+      return this.resizeEditor();
+    };
+
+    CellEditView.prototype.resizeEditor = function() {
+      var line_height, lines;
       line_height = this.editor.renderer.$textLayer.getLineHeight();
       lines = this.editor.getSession().getDocument().getLength();
       this.$('.ace-container').height(20 + (18 * lines));
