@@ -1,5 +1,4 @@
-
-evals = {}
+importScripts('/lib/underscore.js')
 
 self.onmessage = (ev) =>
 
@@ -17,8 +16,16 @@ self.onmessage = (ev) =>
     
     result = eval(src)
 
-    if result?
-      self.postMessage(inputId: inputId, msg: 'result', data: result.toString())
+
+    if not result? 
+      result = '-'
+
+    # we do not generally want to print the result of a 
+    if _.isFunction(result)
+      result = '-'
+    
+    self.postMessage(inputId: inputId, msg: 'isFunction', data: _.isFunction(result))
+    self.postMessage(inputId: inputId, msg: 'result', data: result.toString())
   
   catch error 
     self.postMessage(inputId: inputId, msg: 'error', data: error.toString()) 

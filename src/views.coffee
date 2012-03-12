@@ -410,7 +410,6 @@ class CellEditView extends Backbone.View
   focusCellBelow: => 
     index = @model.collection.indexOf(@model)
     next = @model.collection.at(index+1)
-    console.log 'fcb', next
     if next?
      next.view.spawn.focus()
     else
@@ -474,7 +473,6 @@ class IndexView extends Backbone.View
     @el
 
   addNb: (nb) =>
-    console.log 'addNb', nb.toJSON()
     $('#notebooks').append(@nbtemplate(nb.toJSON()))
 
   addNbs: => 
@@ -487,12 +485,12 @@ class NotebookRouter extends Backbone.Router
   routes: 
     ":nb/edit/" : "edit"
     ":nb/view/" : "view"
+    ":nb/delete/" : "delete"
     "*all": "index"
 
   getNotebook: (nb) => 
     console.log('finding notebook', nb)
     notebook = root.notebooks.get(nb)
-    console.log 'got', notebook
     #if notebook? # just create one for the minute!
     #  notebook = root.notebooks.create()
     # TODO: could wait for a sync signal to have the id
@@ -508,7 +506,6 @@ class NotebookRouter extends Backbone.Router
     console.log 'activated edit route', nb
     notebook = @getNotebook(nb)
     root.app = new EditNotebookView(model: notebook)
-    console.log 'created enbv'
 
   view: (nb) => 
     if root.app 
@@ -517,6 +514,15 @@ class NotebookRouter extends Backbone.Router
     notebook = @getNotebook(nb)
     root.app = new ViewNotebookView(model: notebook)
 
+  delete: (nb) => 
+    console.log 'deleting nb', nb
+    notebook = @getNotebook(nb)
+    notebook.cells.each( (x) -> x.destroy() )
+    notebook.destroy()
+    console.log('deleted')
+    root.router.navigate('', trigger: true) 
+
+  
   index: => 
     if root.app
       root.app.remove()

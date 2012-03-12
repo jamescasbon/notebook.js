@@ -83,11 +83,15 @@ html ->
           ul id: 'notebooks'
 
     script type: "text/template", id: "notebook-index-template", ->
-      div id: "list-notebook", class: "sixteen columns", -> 
+      li id: "list-notebook", class: "sixteen columns", -> 
         a href: "#[[= id ]]/view/", ->
           "[[= title ]]"
         a href: "#[[= id ]]/edit/", ->
           "Edit"
+        a href: "#[[= id ]]/delete/", ->
+          "Delete"
+
+
     script type: "text/template", id: "notebook-template", ->
       div id: 'notebook', class: "twelve columns", ->
         ul class: "cells"

@@ -495,7 +495,6 @@
       var index, next;
       index = this.model.collection.indexOf(this.model);
       next = this.model.collection.at(index + 1);
-      console.log('fcb', next);
       if (next != null) {
         return next.view.spawn.focus();
       } else {
@@ -592,7 +591,6 @@
     };
 
     IndexView.prototype.addNb = function(nb) {
-      console.log('addNb', nb.toJSON());
       return $('#notebooks').append(this.nbtemplate(nb.toJSON()));
     };
 
@@ -612,6 +610,7 @@
 
     function NotebookRouter() {
       this.index = __bind(this.index, this);
+      this["delete"] = __bind(this["delete"], this);
       this.view = __bind(this.view, this);
       this.edit = __bind(this.edit, this);
       this.getNotebook = __bind(this.getNotebook, this);
@@ -621,6 +620,7 @@
     NotebookRouter.prototype.routes = {
       ":nb/edit/": "edit",
       ":nb/view/": "view",
+      ":nb/delete/": "delete",
       "*all": "index"
     };
 
@@ -628,7 +628,6 @@
       var notebook;
       console.log('finding notebook', nb);
       notebook = root.notebooks.get(nb);
-      console.log('got', notebook);
       notebook.readyCells();
       root.nb = notebook;
       console.log('notebook loaded; id=' + notebook.get('id'));
@@ -641,10 +640,9 @@
       if (root.app) root.app.remove();
       console.log('activated edit route', nb);
       notebook = this.getNotebook(nb);
-      root.app = new EditNotebookView({
+      return root.app = new EditNotebookView({
         model: notebook
       });
-      return console.log('created enbv');
     };
 
     NotebookRouter.prototype.view = function(nb) {
@@ -654,6 +652,20 @@
       notebook = this.getNotebook(nb);
       return root.app = new ViewNotebookView({
         model: notebook
+      });
+    };
+
+    NotebookRouter.prototype["delete"] = function(nb) {
+      var notebook;
+      console.log('deleting nb', nb);
+      notebook = this.getNotebook(nb);
+      notebook.cells.each(function(x) {
+        return x.destroy();
+      });
+      notebook.destroy();
+      console.log('deleted');
+      return root.router.navigate('', {
+        trigger: true
       });
     };
 

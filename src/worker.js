@@ -1,8 +1,7 @@
 (function() {
-  var evals,
-    _this = this;
+  var _this = this;
 
-  evals = {};
+  importScripts('/lib/underscore.js');
 
   self.onmessage = function(ev) {
     var inputId, print, result, src;
@@ -25,13 +24,18 @@
         msg: 'evalBegin'
       });
       result = eval(src);
-      if (result != null) {
-        return self.postMessage({
-          inputId: inputId,
-          msg: 'result',
-          data: result.toString()
-        });
-      }
+      if (!(result != null)) result = '-';
+      if (_.isFunction(result)) result = '-';
+      self.postMessage({
+        inputId: inputId,
+        msg: 'isFunction',
+        data: _.isFunction(result)
+      });
+      return self.postMessage({
+        inputId: inputId,
+        msg: 'result',
+        data: result.toString()
+      });
     } catch (error) {
       return self.postMessage({
         inputId: inputId,
