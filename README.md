@@ -40,8 +40,6 @@ Frontend
 
 Now:
 
-* new notebook
-* Notebook title
 * save notebook
 * import notebook
 
@@ -58,6 +56,7 @@ new loaded notebook
 * consistent selection color input and output
 * Better list of notebooks
 * edit/view toggle
+* disable box on matched character in ace onblur
 
 
 Someday: 

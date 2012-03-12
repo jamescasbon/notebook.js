@@ -1,8 +1,9 @@
 (function() {
-  var CellEditView, EditNotebookView, IndexView, NAVBAR_HEIGHT, NewView, NotebookRouter, ViewNotebookView, isScrolledIntoView, root,
+  var CellEditView, EditNotebookView, IndexView, NAVBAR_HEIGHT, NewView, NotebookRouter, ViewNotebookView, isScrolledIntoView, root, setTitle,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
+    _this = this;
 
   _.templateSettings = {
     interpolate: /\[\[=(.+?)\]\]/g,
@@ -33,10 +34,21 @@
       this.addOne = __bind(this.addOne, this);
       this.render = __bind(this.render, this);
       this.initialize = __bind(this.initialize, this);
+      this.toggleEdit = __bind(this.toggleEdit, this);
       ViewNotebookView.__super__.constructor.apply(this, arguments);
     }
 
     ViewNotebookView.prototype.className = "app";
+
+    ViewNotebookView.prototype.events = {
+      "click #toggle-edit": "toggleEdit"
+    };
+
+    ViewNotebookView.prototype.toggleEdit = function() {
+      return root.router.navigate(this.model.get('id') + '/edit/', {
+        trigger: true
+      });
+    };
 
     ViewNotebookView.prototype.initialize = function() {
       console.log('init vnv');
@@ -86,6 +98,7 @@
     __extends(EditNotebookView, _super);
 
     function EditNotebookView() {
+      this.toggleEdit = __bind(this.toggleEdit, this);
       this.mathjaxReady = __bind(this.mathjaxReady, this);
       this.spawnKeypress = __bind(this.spawnKeypress, this);
       this.spawnCellAtEnd = __bind(this.spawnCellAtEnd, this);
@@ -102,7 +115,8 @@
     EditNotebookView.prototype.events = function() {
       return {
         "dblclick #spawner": 'spawnCellAtEnd',
-        "keyup #spawner": 'spawnKeypress'
+        "keyup #spawner": 'spawnKeypress',
+        "click #toggle-edit": "toggleEdit"
       };
     };
 
@@ -163,6 +177,12 @@
     EditNotebookView.prototype.mathjaxReady = function() {
       return _.each(this.$('.cell-output'), function(el) {
         return MathJax.Hub.Typeset(el);
+      });
+    };
+
+    EditNotebookView.prototype.toggleEdit = function() {
+      return root.router.navigate(this.model.get('id') + '/view/', {
+        trigger: true
       });
     };
 
@@ -646,6 +666,8 @@
       nb = root.notebooks.create({
         title: this.$('input').val()
       });
+      nb.readyCells();
+      nb.cells.create();
       return root.router.navigate(nb.id + '/edit/', {
         trigger: true
       });
@@ -693,9 +715,10 @@
       if (root.app) root.app.remove();
       console.log('activated edit route', nb);
       notebook = this.getNotebook(nb);
-      return root.app = new EditNotebookView({
+      root.app = new EditNotebookView({
         model: notebook
       });
+      return setTitle(notebook.get('title') + ' (Editing)');
     };
 
     NotebookRouter.prototype.view = function(nb) {
@@ -703,20 +726,24 @@
       if (root.app) root.app.remove();
       console.log('activated view route');
       notebook = this.getNotebook(nb);
+      setTitle(notebook.get('title') + ' (Viewing)');
       return root.app = new ViewNotebookView({
         model: notebook
       });
     };
 
     NotebookRouter.prototype["delete"] = function(nb) {
-      var notebook;
+      var confirmed, notebook;
       console.log('deleting nb', nb);
-      notebook = this.getNotebook(nb);
-      notebook.cells.each(function(x) {
-        return x.destroy();
-      });
-      notebook.destroy();
-      console.log('deleted');
+      confirmed = confirm('You really want to delete that?');
+      if (confirmed) {
+        notebook = this.getNotebook(nb);
+        notebook.cells.each(function(x) {
+          return x.destroy();
+        });
+        notebook.destroy();
+        console.log('deleted');
+      }
       return root.router.navigate('', {
         trigger: true
       });
@@ -737,6 +764,11 @@
     return NotebookRouter;
 
   })(Backbone.Router);
+
+  setTitle = function(title) {
+    console.log('set title', title);
+    return $('#title').html(title);
+  };
 
   $(document).ready(function() {
     console.log('creating app');

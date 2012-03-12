@@ -29,8 +29,10 @@ html ->
     
     div '.container', ->
       div '#navbar', ->
+
         a '#logo', href: "#", -> 'notebook.js'
         div '#title', -> ''
+
       
     script type: "text/template", id: "cell-edit-template", ->
       div '.cell', id: "[[= id ]]", ->
@@ -97,7 +99,9 @@ html ->
       div id: 'notebook', class: "twelve columns", ->
         ul class: "cells"
         div id: 'spawner', tabindex: "1000000000"
-
+        div '#menu', -> 
+          button '#toggle-edit', -> 'toggle edit/view'
+          button '#save-to-file', -> 'save to file'
 
 
     script type: "text/template", id: "new-notebook-form", ->

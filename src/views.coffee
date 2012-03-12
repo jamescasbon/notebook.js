@@ -19,6 +19,12 @@ isScrolledIntoView = (elem) ->
 class ViewNotebookView extends Backbone.View
   className: "app"
 
+  events: 
+    "click #toggle-edit" : "toggleEdit"
+
+  toggleEdit: => 
+    root.router.navigate(@model.get('id') + '/edit/', trigger: true)
+
   initialize: =>
     console.log 'init vnv'
     @template = _.template($('#notebook-template').html())
@@ -59,6 +65,7 @@ class EditNotebookView extends Backbone.View
     # there is a lone spawner at the bottom of the page
     "dblclick #spawner": 'spawnCellAtEnd'
     "keyup #spawner": 'spawnKeypress'
+    "click #toggle-edit" : "toggleEdit" 
   )
 
   # bind to dom and model events, fetch cells
@@ -111,6 +118,9 @@ class EditNotebookView extends Backbone.View
     # perform initial typeset of output elements
     _.each(@$('.cell-output'), (el) -> MathJax.Hub.Typeset(el) )
 
+  toggleEdit: => 
+    root.router.navigate(@model.get('id') + '/view/', trigger: true)
+
 # CellView manages the Dom elements associated with a cell 
 #
 # A cell view has several dom elements (see the template in index.coffee): 
@@ -145,7 +155,7 @@ class CellEditView extends Backbone.View
 
   events: => (
     "keyup .spawn-above": 'handleKeypress',
-    "dblclick .spawn-above" : "spawnAbove"
+    "dblclick .spawn-above" : "spawnAbove",
 
     "click .evaluate": "evaluate",
     "click .delete": "destroy",
@@ -503,6 +513,8 @@ class NewView extends Backbone.View
   create: => 
     console.log 'creating'
     nb = root.notebooks.create(title: @$('input').val())
+    nb.readyCells()
+    nb.cells.create()
     root.router.navigate (nb.id + '/edit/'), trigger: true
 
 
@@ -532,20 +544,26 @@ class NotebookRouter extends Backbone.Router
     console.log 'activated edit route', nb
     notebook = @getNotebook(nb)
     root.app = new EditNotebookView(model: notebook)
+    setTitle(notebook.get('title') + ' (Editing)')
 
   view: (nb) => 
     if root.app 
       root.app.remove()
     console.log 'activated view route'    
     notebook = @getNotebook(nb)
+    setTitle(notebook.get('title') + ' (Viewing)')
+
     root.app = new ViewNotebookView(model: notebook)
+
 
   delete: (nb) => 
     console.log 'deleting nb', nb
-    notebook = @getNotebook(nb)
-    notebook.cells.each( (x) -> x.destroy() )
-    notebook.destroy()
-    console.log('deleted')
+    confirmed = confirm('You really want to delete that?')
+    if confirmed
+      notebook = @getNotebook(nb)
+      notebook.cells.each( (x) -> x.destroy() )
+      notebook.destroy()
+      console.log('deleted')
     root.router.navigate('', trigger: true) 
 
   new: (nb) => 
@@ -559,6 +577,11 @@ class NotebookRouter extends Backbone.Router
       root.app.remove()
     console.log 'index view'
     root.app = new IndexView()
+
+# crazy global method
+setTitle = (title) =>
+  console.log('set title', title)
+  $('#title').html(title)
 
 
 $(document).ready ->

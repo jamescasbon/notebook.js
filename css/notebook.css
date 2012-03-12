@@ -21,10 +21,9 @@ pre {
   margin-bottom: 18px;
 }
 #logo {
-  margin-right: 10px;
-  margin-top: 5px;
-  font-size: 20px;
-  float: right;
+  margin-left: 20px;
+  margin-right: 20px;
+  float: left;
   color: #908b87;
   letter-spacing: 5px;
   font-family: 'Anonymous Pro', sans-serif;
@@ -34,6 +33,23 @@ pre {
 }
 #logo:hover {
   color: #c0aba7;
+}
+#menu {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 100;
+}
+#title {
+  color: #fff;
+  font-weight: bold;
+  letter-spacing: 2px;
+  float: left;
+}
+#logo,
+#title {
+  font-size: 20px;
+  margin-top: 5px;
 }
 #notebook {
   padding-top: 50px;
