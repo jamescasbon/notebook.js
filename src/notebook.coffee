@@ -13,6 +13,10 @@ class Notebook extends Backbone.Model
     @cells = new Cells()
     @cells.localStorage = new Store('cells-' + @get('id'))
 
+  serialize: => 
+    data = @toJSON()
+    data.cells = @cells.toJSON() 
+    return JSON.stringify(data)
 
 class Notebooks extends Backbone.Collection
   model: Notebook
@@ -95,8 +99,7 @@ class Cell extends Backbone.Model
     current = @get('output') or ""
     @set(output: current.concat('<div class="' + elName + '">' + data + '</div>'))
     console.log 'current output', @get('output')
-    
-    
+
 
 
 class Cells extends Backbone.Collection

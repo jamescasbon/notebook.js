@@ -11,6 +11,7 @@
     __extends(Notebook, _super);
 
     function Notebook() {
+      this.serialize = __bind(this.serialize, this);
       this.readyCells = __bind(this.readyCells, this);
       this.initialize = __bind(this.initialize, this);
       this.defaults = __bind(this.defaults, this);
@@ -29,6 +30,13 @@
       console.log('creating store for nb id', this.get('id'));
       this.cells = new Cells();
       return this.cells.localStorage = new Store('cells-' + this.get('id'));
+    };
+
+    Notebook.prototype.serialize = function() {
+      var data;
+      data = this.toJSON();
+      data.cells = this.cells.toJSON();
+      return JSON.stringify(data);
     };
 
     return Notebook;

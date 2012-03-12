@@ -21,6 +21,7 @@ class ViewNotebookView extends Backbone.View
 
   events: 
     "click #toggle-edit" : "toggleEdit"
+    "click #save-to-file": "saveToFile"
 
   toggleEdit: => 
     root.router.navigate(@model.get('id') + '/edit/', trigger: true)
@@ -56,6 +57,8 @@ class ViewNotebookView extends Backbone.View
     # perform initial typeset of output elements
     _.each(@$('.cell-output'), (el) -> MathJax.Hub.Typeset(el) )
 
+  saveToFile: => 
+    saveFile(@model.serialize())
 
 # EditNotebookView is the main app view and manages a list of cells
 class EditNotebookView extends Backbone.View
@@ -66,6 +69,7 @@ class EditNotebookView extends Backbone.View
     "dblclick #spawner": 'spawnCellAtEnd'
     "keyup #spawner": 'spawnKeypress'
     "click #toggle-edit" : "toggleEdit" 
+    "click #save-to-file": "saveToFile"
   )
 
   # bind to dom and model events, fetch cells
@@ -120,6 +124,10 @@ class EditNotebookView extends Backbone.View
 
   toggleEdit: => 
     root.router.navigate(@model.get('id') + '/view/', trigger: true)
+
+  saveToFile: => 
+    saveFile(@model.serialize())
+
 
 # CellView manages the Dom elements associated with a cell 
 #
@@ -578,10 +586,15 @@ class NotebookRouter extends Backbone.Router
     console.log 'index view'
     root.app = new IndexView()
 
+
 # crazy global method
 setTitle = (title) =>
   console.log('set title', title)
   $('#title').html(title)
+
+
+saveFile = (data) => 
+  window.open( "data:text/json;filename=data.json;charset=utf-8," + data)
 
 
 $(document).ready ->

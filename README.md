@@ -55,7 +55,6 @@ new loaded notebook
 * Defocus ajax should empty selection
 * consistent selection color input and output
 * Better list of notebooks
-* edit/view toggle
 * disable box on matched character in ace onblur
 
 
@@ -74,6 +73,8 @@ Someday:
 * toolbar rerun all cells
 * Startup indicator
 * Tooltip styling
+* Base class for notebook views
+* Do not destroy notebook views on toggle
 
 
 CSS stuff http://css-tricks.com/different-transitions-for-hover-on-hover-off/

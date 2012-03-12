@@ -1,5 +1,5 @@
 (function() {
-  var CellEditView, EditNotebookView, IndexView, NAVBAR_HEIGHT, NewView, NotebookRouter, ViewNotebookView, isScrolledIntoView, root, setTitle,
+  var CellEditView, EditNotebookView, IndexView, NAVBAR_HEIGHT, NewView, NotebookRouter, ViewNotebookView, isScrolledIntoView, root, saveFile, setTitle,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
@@ -28,6 +28,7 @@
     __extends(ViewNotebookView, _super);
 
     function ViewNotebookView() {
+      this.saveToFile = __bind(this.saveToFile, this);
       this.mathjaxReady = __bind(this.mathjaxReady, this);
       this.renderCell = __bind(this.renderCell, this);
       this.addAll = __bind(this.addAll, this);
@@ -41,7 +42,8 @@
     ViewNotebookView.prototype.className = "app";
 
     ViewNotebookView.prototype.events = {
-      "click #toggle-edit": "toggleEdit"
+      "click #toggle-edit": "toggleEdit",
+      "click #save-to-file": "saveToFile"
     };
 
     ViewNotebookView.prototype.toggleEdit = function() {
@@ -89,6 +91,10 @@
       });
     };
 
+    ViewNotebookView.prototype.saveToFile = function() {
+      return saveFile(this.model.serialize());
+    };
+
     return ViewNotebookView;
 
   })(Backbone.View);
@@ -98,6 +104,7 @@
     __extends(EditNotebookView, _super);
 
     function EditNotebookView() {
+      this.saveToFile = __bind(this.saveToFile, this);
       this.toggleEdit = __bind(this.toggleEdit, this);
       this.mathjaxReady = __bind(this.mathjaxReady, this);
       this.spawnKeypress = __bind(this.spawnKeypress, this);
@@ -116,7 +123,8 @@
       return {
         "dblclick #spawner": 'spawnCellAtEnd',
         "keyup #spawner": 'spawnKeypress',
-        "click #toggle-edit": "toggleEdit"
+        "click #toggle-edit": "toggleEdit",
+        "click #save-to-file": "saveToFile"
       };
     };
 
@@ -184,6 +192,10 @@
       return root.router.navigate(this.model.get('id') + '/view/', {
         trigger: true
       });
+    };
+
+    EditNotebookView.prototype.saveToFile = function() {
+      return saveFile(this.model.serialize());
     };
 
     return EditNotebookView;
@@ -768,6 +780,10 @@
   setTitle = function(title) {
     console.log('set title', title);
     return $('#title').html(title);
+  };
+
+  saveFile = function(data) {
+    return window.open("data:text/json;filename=data.json;charset=utf-8," + data);
   };
 
   $(document).ready(function() {
