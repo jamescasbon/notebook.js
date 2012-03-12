@@ -9,7 +9,7 @@ class Notebook extends Backbone.Model
 
   # we need this hook for localStorage because the id is not available at init
   readyCells: => 
-    console.log('creating store for nb id', @get('id'))
+    #console.log('creating store for nb id', @get('id'))
     @cells = new Cells()
     @cells.localStorage = new Store('cells-' + @get('id'))
 
@@ -82,7 +82,7 @@ class Cell extends Backbone.Model
     @save
 
   handleMessage: (data) => 
-    console.log 'cell handling message from engine', data
+    #console.log 'cell handling message from engine', data
     switch data.msg
       when 'evalEnd' 
         @set(state: null)

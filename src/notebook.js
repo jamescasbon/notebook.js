@@ -27,7 +27,6 @@
     Notebook.prototype.initialize = function() {};
 
     Notebook.prototype.readyCells = function() {
-      console.log('creating store for nb id', this.get('id'));
       this.cells = new Cells();
       return this.cells.localStorage = new Store('cells-' + this.get('id'));
     };
@@ -151,7 +150,6 @@
     };
 
     Cell.prototype.handleMessage = function(data) {
-      console.log('cell handling message from engine', data);
       switch (data.msg) {
         case 'evalEnd':
           this.set({

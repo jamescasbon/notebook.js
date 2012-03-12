@@ -93,6 +93,7 @@ html ->
       li id: "list-notebook", class: "sixteen columns", -> 
         a href: "#[[= id ]]/view/", ->
           "[[= title ]]"
+        'hi'
         a href: "#[[= id ]]/edit/", ->
           "Edit"
         a href: "#[[= id ]]/delete/", ->

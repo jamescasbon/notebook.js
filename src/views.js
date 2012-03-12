@@ -263,7 +263,6 @@
       this.model.bind('change:output', this.changeOutput);
       this.model.bind('change:inputFold', this.changeInputFold);
       this.model.bind('destroy', this.remove);
-      this.model.bind('all', this.logev);
       this.model.view = this;
       return this.editor = null;
     };
@@ -296,7 +295,6 @@
     };
 
     CellEditView.prototype.changeOutput = function() {
-      console.log('updatting output to', this.model.get('output'));
       this.output.html(this.model.get('output'));
       return MathJax.Hub.Typeset(this.output[0]);
     };
@@ -309,7 +307,6 @@
           this.intButton.addClass('active');
           return this.evalButton.removeClass('active');
         case 'dirty':
-          console.log('vd');
           return this.evalButton.addClass('active');
         case null:
           return this.intButton.removeClass('active');
@@ -319,8 +316,6 @@
     CellEditView.prototype.afterDomInsert = function() {
       var ace_id,
         _this = this;
-      console.log('binding', this.model.id);
-      console.log(this.model.id);
       if (this.model.id != null) {
         ace_id = this.model.id;
       } else {
@@ -387,7 +382,6 @@
         exec: function(ed, args) {
           var cursor, row;
           cursor = _this.$('.ace_cursor');
-          console.log('lineup,inview?', isScrolledIntoView(cursor));
           if (!isScrolledIntoView(cursor)) {
             $('body').scrollTop(cursor.offset().top - 4 * NAVBAR_HEIGHT);
           }
@@ -732,7 +726,6 @@
 
     NotebookRouter.prototype.getNotebook = function(nb) {
       var notebook;
-      console.log('finding notebook', nb);
       notebook = root.notebooks.get(nb);
       notebook.readyCells();
       root.nb = notebook;

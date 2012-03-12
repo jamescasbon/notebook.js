@@ -189,7 +189,6 @@ class CellEditView extends Backbone.View
     @model.bind 'change:output', @changeOutput
     @model.bind 'change:inputFold', @changeInputFold
     @model.bind 'destroy', @remove
-    @model.bind 'all', @logev
     @model.view = @
     @editor = null
 
@@ -222,7 +221,7 @@ class CellEditView extends Backbone.View
     @type.html @model.get('type')
 
   changeOutput: => 
-    console.log 'updatting output to', @model.get('output')
+    #console.log 'updatting output to', @model.get('output')
     @output.html(@model.get('output'))
     MathJax.Hub.Typeset(@output[0])
     
@@ -239,7 +238,6 @@ class CellEditView extends Backbone.View
         @evalButton.removeClass('active')
 
       when 'dirty'
-        console.log 'vd'
         @evalButton.addClass('active')
 
       when null
@@ -248,8 +246,6 @@ class CellEditView extends Backbone.View
   # Ace initialization and configuration happens after DOM insertion
   afterDomInsert: =>
     # create the editor 
-    console.log 'binding', @model.id
-    console.log(@model.id)
     if @model.id?
       ace_id = @model.id
     else
@@ -300,7 +296,7 @@ class CellEditView extends Backbone.View
       bindKey: {win: "Up", mac: "Up|Ctrl-P", sender: 'editor'},
       exec: (ed, args) => 
         cursor = @$('.ace_cursor')
-        console.log 'lineup,inview?', isScrolledIntoView(cursor)
+        #console.log 'lineup,inview?', isScrolledIntoView(cursor)
         if not isScrolledIntoView(cursor)
           # FIXME: make this code explici3t
           $('body').scrollTop(cursor.offset().top - 4 * NAVBAR_HEIGHT)
@@ -547,7 +543,6 @@ class NotebookRouter extends Backbone.Router
     "": "index"
 
   getNotebook: (nb) => 
-    console.log('finding notebook', nb)
     notebook = root.notebooks.get(nb)
     #if notebook? # just create one for the minute!
     #  notebook = root.notebooks.create()
