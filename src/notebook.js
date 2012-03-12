@@ -23,13 +23,12 @@
       };
     };
 
-    Notebook.prototype.initialize = function() {
-      this.cells = new Cells();
-      return this.cells.localStorage = new Store('cells-');
-    };
+    Notebook.prototype.initialize = function() {};
 
     Notebook.prototype.readyCells = function() {
-      return console.log('creating store for nb id', this.get('id'));
+      console.log('creating store for nb id', this.get('id'));
+      this.cells = new Cells();
+      return this.cells.localStorage = new Store('cells-' + this.get('id'));
     };
 
     return Notebook;
@@ -46,7 +45,7 @@
 
     Notebooks.prototype.model = Notebook;
 
-    Notebooks.prototype.localStorage = new Store('Notebooks');
+    Notebooks.prototype.localStorage = new Store('Notebooks1');
 
     return Notebooks;
 

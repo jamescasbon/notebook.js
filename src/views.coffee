@@ -474,15 +474,17 @@ class IndexView extends Backbone.View
 
 class NotebookRouter extends Backbone.Router
   routes: 
-    "edit" : "edit"
+    "edit/:nb" : "edit"
     "view" : "view"
     "*all": "index"
 
   getNotebook: (nb) => 
     console.log('finding notebook', nb)
-    notebook = root.notebooks.create()
-    notebook.cells = new Cells()
-    notebook.cells.localStorage = new Store('cells-')
+    notebook = root.notebooks.get(nb)
+    console.log 'got', notebook
+    #if notebook? # just create one for the minute!
+    #  notebook = root.notebooks.create()
+    notebook.readyCells()
     root.nb = notebook
     console.log('notebook created; id=' +  notebook.get('id'))
     notebook.readyCells()
@@ -491,8 +493,8 @@ class NotebookRouter extends Backbone.Router
   edit: (nb) => 
     if root.app
       root.app.remove()
-    console.log 'activated edit route'
-    notebook = @getNotebook()
+    console.log 'activated edit route', nb
+    notebook = @getNotebook(nb)
     root.app = new EditNotebookView(model: notebook)
     console.log 'created enbv'
 
@@ -513,6 +515,9 @@ class NotebookRouter extends Backbone.Router
 $(document).ready ->
   console.log 'creating app'
   root.notebooks = new Notebooks()
+  root.notebooks.fetch()
+
+
   root.router = new NotebookRouter() 
   Backbone.history.start()
   MathJax.Hub.Register.StartupHook('End', root.app.mathjaxReady)

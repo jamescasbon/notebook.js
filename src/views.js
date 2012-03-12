@@ -602,7 +602,7 @@
     }
 
     NotebookRouter.prototype.routes = {
-      "edit": "edit",
+      "edit/:nb": "edit",
       "view": "view",
       "*all": "index"
     };
@@ -610,9 +610,9 @@
     NotebookRouter.prototype.getNotebook = function(nb) {
       var notebook;
       console.log('finding notebook', nb);
-      notebook = root.notebooks.create();
-      notebook.cells = new Cells();
-      notebook.cells.localStorage = new Store('cells-');
+      notebook = root.notebooks.get(nb);
+      console.log('got', notebook);
+      notebook.readyCells();
       root.nb = notebook;
       console.log('notebook created; id=' + notebook.get('id'));
       notebook.readyCells();
@@ -622,8 +622,8 @@
     NotebookRouter.prototype.edit = function(nb) {
       var notebook;
       if (root.app) root.app.remove();
-      console.log('activated edit route');
-      notebook = this.getNotebook();
+      console.log('activated edit route', nb);
+      notebook = this.getNotebook(nb);
       root.app = new EditNotebookView({
         model: notebook
       });
@@ -653,6 +653,7 @@
   $(document).ready(function() {
     console.log('creating app');
     root.notebooks = new Notebooks();
+    root.notebooks.fetch();
     root.router = new NotebookRouter();
     Backbone.history.start();
     return MathJax.Hub.Register.StartupHook('End', root.app.mathjaxReady);

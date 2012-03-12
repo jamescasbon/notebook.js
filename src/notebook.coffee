@@ -5,19 +5,21 @@ class Notebook extends Backbone.Model
   defaults: => (title: "untitled")
 
   initialize: =>
-    @cells = new Cells()
-    @cells.localStorage = new Store('cells-')
-
+    return
 
   # we need this hook for localStorage because the id is not available at init
   readyCells: => 
     console.log('creating store for nb id', @get('id'))
-    #@cells.localStorage = new Store('cells-' + @get('id'))
+    @cells = new Cells()
+    @cells.localStorage = new Store('cells-' + @get('id'))
 
 
 class Notebooks extends Backbone.Collection
   model: Notebook
-  localStorage: new Store('Notebooks') 
+  localStorage: new Store('Notebooks1') 
+
+
+
 
 
 # Cell has state and dispatches evaluations to handler
