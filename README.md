@@ -51,6 +51,9 @@ new loaded notebook
 * Defocus ajax should empty selection
 * consistent selection color input and output
 * firefox postMessage print
+* Better list of notebooks
+* return to front page button
+* edit/view toggle
 
 
 Someday: 
