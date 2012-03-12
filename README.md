@@ -40,7 +40,6 @@ Frontend
 
 Now:
 
-* save notebook
 * import notebook
 
 
@@ -56,6 +55,8 @@ new loaded notebook
 * consistent selection color input and output
 * Better list of notebooks
 * disable box on matched character in ace onblur
+* url methods on notebook?
+* engine lifecycle with notebook
 
 
 Someday: 

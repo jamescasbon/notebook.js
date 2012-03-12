@@ -481,8 +481,9 @@ class IndexView extends Backbone.View
   className: 'app'
 
   events: 
-    'click button': 'new'
-  
+    'click #new-notebook-button': 'new'
+    'change #load-file' : 'load'
+
   initialize: =>
     @template = _.template($('#index-template').html())
     $('.container').append(@render())
@@ -503,6 +504,17 @@ class IndexView extends Backbone.View
   new: => 
     root.router.navigate ('new/'), trigger: true
 
+  load: (ev) => 
+    file = ev.target.files[0]
+    console.log 'loading notebook', file.name
+    reader = new FileReader()
+    reader.onload = (e) => 
+      console.log('got data', unescape(e.target.result))
+      notebook = loadNotebook(e.target.result) 
+      root.router.navigate(notebook.get('id') + '/view/', trigger: true)
+      
+    reader.readAsText(file) 
+    # TODO: set loading status
 
 class NewView extends Backbone.View
   className: 'app'
@@ -584,6 +596,7 @@ class NotebookRouter extends Backbone.Router
     if root.app
       root.app.remove()
     console.log 'index view'
+    setTitle('')
     root.app = new IndexView()
 
 
@@ -594,8 +607,21 @@ setTitle = (title) =>
 
 
 saveFile = (data) => 
-  window.open( "data:text/json;filename=data.json;charset=utf-8," + data)
+  window.open( "data:text/json;filename=data.json;charset=utf-8," + escape(data))
 
+
+loadNotebook = (data) => 
+  console.log('loading', data)
+  nbdata = JSON.parse(data)
+  celldata = nbdata.cells
+  delete nbdata.cells
+
+  nbdata.title = nbdata.title + ' import'
+  notebook = root.notebooks.create(nbdata) 
+  notebook.readyCells()
+  _.each( nbdata.cells, notebook.cells.create )
+  return notebook
+  
 
 $(document).ready ->
   console.log 'creating app'

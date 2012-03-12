@@ -40,6 +40,9 @@ pre {
   right: 0;
   z-index: 100;
 }
+#right-index {
+  float: right;
+}
 #title {
   color: #fff;
   font-weight: bold;

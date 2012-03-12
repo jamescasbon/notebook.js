@@ -1,5 +1,5 @@
 (function() {
-  var CellEditView, EditNotebookView, IndexView, NAVBAR_HEIGHT, NewView, NotebookRouter, ViewNotebookView, isScrolledIntoView, root, saveFile, setTitle,
+  var CellEditView, EditNotebookView, IndexView, NAVBAR_HEIGHT, NewView, NotebookRouter, ViewNotebookView, isScrolledIntoView, loadNotebook, root, saveFile, setTitle,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
@@ -600,6 +600,7 @@
     __extends(IndexView, _super);
 
     function IndexView() {
+      this.load = __bind(this.load, this);
       this["new"] = __bind(this["new"], this);
       this.addNbs = __bind(this.addNbs, this);
       this.addNb = __bind(this.addNb, this);
@@ -611,7 +612,8 @@
     IndexView.prototype.className = 'app';
 
     IndexView.prototype.events = {
-      'click button': 'new'
+      'click #new-notebook-button': 'new',
+      'change #load-file': 'load'
     };
 
     IndexView.prototype.initialize = function() {
@@ -639,6 +641,23 @@
       return root.router.navigate('new/', {
         trigger: true
       });
+    };
+
+    IndexView.prototype.load = function(ev) {
+      var file, reader,
+        _this = this;
+      file = ev.target.files[0];
+      console.log('loading notebook', file.name);
+      reader = new FileReader();
+      reader.onload = function(e) {
+        var notebook;
+        console.log('got data', unescape(e.target.result));
+        notebook = loadNotebook(e.target.result);
+        return root.router.navigate(notebook.get('id') + '/view/', {
+          trigger: true
+        });
+      };
+      return reader.readAsText(file);
     };
 
     return IndexView;
@@ -770,6 +789,7 @@
     NotebookRouter.prototype.index = function() {
       if (root.app) root.app.remove();
       console.log('index view');
+      setTitle('');
       return root.app = new IndexView();
     };
 
@@ -783,7 +803,20 @@
   };
 
   saveFile = function(data) {
-    return window.open("data:text/json;filename=data.json;charset=utf-8," + data);
+    return window.open("data:text/json;filename=data.json;charset=utf-8," + escape(data));
+  };
+
+  loadNotebook = function(data) {
+    var celldata, nbdata, notebook;
+    console.log('loading', data);
+    nbdata = JSON.parse(data);
+    celldata = nbdata.cells;
+    delete nbdata.cells;
+    nbdata.title = nbdata.title + ' import';
+    notebook = root.notebooks.create(nbdata);
+    notebook.readyCells();
+    _.each(nbdata.cells, notebook.cells.create);
+    return notebook;
   };
 
   $(document).ready(function() {

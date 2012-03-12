@@ -6,7 +6,7 @@ html ->
     script src: "/lib/underscore.js" 
     script src: "/lib/backbone.js" 
     script src: "/lib/backbone.localStorage.js"
-    script src: "/lib/showdown.js"
+    script src: "/lib/showdown.js",
     script src: "/ace/build/src/ace.js"
     script src: "/ace/build/src/mode-javascript.js"
     script src: "/ace/build/src/mode-markdown.js"
@@ -80,9 +80,13 @@ html ->
 
     script type: "text/template", id: "index-template", ->
       div id: "notebook", class: "sixteen columns", -> 
+        # TODO: columns here
         div 'cell', ->
           h1 -> "Welcome to notebook.js"
-          button id='new-notebook-button', ->  'New notebook'
+          div '#right-index', -> 
+            button '#new-notebook-button', ->  'New notebook'
+            label for: "files", -> 'Load notebook'
+            input type:"file", id: "load-file", name:"file", -> 'hi'
           ul id: 'notebooks'
 
     script type: "text/template", id: "notebook-index-template", ->
