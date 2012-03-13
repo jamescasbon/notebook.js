@@ -91,7 +91,7 @@ application = tornado.web.Application([
     # TODO: config file
     cookie_secret="61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
     debug=True,
-    db = pymongo.Connection('mongodb://test:test@localhost/'),
+    db = pymongo.Connection('mongodb://test:test@localhost/dev'),
     db_name = 'dev'
 )
 

@@ -800,7 +800,6 @@
       return $.getJSON(url, function(data) {
         var notebook;
         notebook = loadNotebook(data);
-        console.log('created notebook');
         return root.router.navigate(notebook.get('id') + '/view/', {
           trigger: true
         });
@@ -821,18 +820,26 @@
   };
 
   loadNotebook = function(nbdata) {
-    var celldata, notebook;
-    console.log('loading', nbdata);
+    var c, celldata, notebook, _fn, _i, _len;
     celldata = nbdata.cells;
     delete nbdata.cells;
     nbdata.title = nbdata.title + ' import';
     try {
+      console.log('import notebook');
       notebook = root.notebooks.create(nbdata);
       notebook.readyCells();
-      _.each(nbdata.cells, notebook.cells.create);
+      console.log('import cells', notebook.cells.length, celldata);
+      _fn = function(c) {
+        return notebook.cells.create(c);
+      };
+      for (_i = 0, _len = celldata.length; _i < _len; _i++) {
+        c = celldata[_i];
+        _fn(c);
+      }
       return notebook;
     } catch (error) {
-      return alert('Could not import notebook probably because it already exists.  try deleting');
+      alert('Could not import notebook probably because it already exists.  try deleting');
+      return console.log(error);
     }
   };
 

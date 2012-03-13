@@ -1,6 +1,7 @@
 # use [[]] for underscore templates (i.e. client side templating)
 _.templateSettings = {interpolate : /\[\[=(.+?)\]\]/g, evaluate: /\[\[(.+?)\]\]/g}
 
+
 root = exports ? this
  
 NAVBAR_HEIGHT = 30
@@ -603,7 +604,6 @@ class NotebookRouter extends Backbone.Router
     console.log 'loading url'
     $.getJSON url, (data) => 
       notebook = loadNotebook(data)
-      console.log('created notebook')
       root.router.navigate(notebook.get('id') + '/view/', trigger: true)
 
   
@@ -617,20 +617,24 @@ setTitle = (title) =>
 saveFile = (data) => 
   window.open( "data:text/json;filename=data.json;charset=utf-8," + escape(data))
 
-
 loadNotebook = (nbdata) => 
-  console.log('loading', nbdata)
   celldata = nbdata.cells
   delete nbdata.cells
 
   nbdata.title = nbdata.title + ' import'
   try
+    console.log 'import notebook' 
     notebook = root.notebooks.create(nbdata) 
     notebook.readyCells()
-    _.each( nbdata.cells, notebook.cells.create )
+    console.log 'import cells', notebook.cells.length, celldata
+    for c in celldata
+      do (c) -> notebook.cells.create(c)
+
     return notebook
   catch error
     alert 'Could not import notebook probably because it already exists.  try deleting'
+    console.log error
+    
 
 $(document).ready ->
   console.log 'creating app'
