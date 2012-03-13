@@ -92,6 +92,9 @@ html ->
             label for: "files", -> 'Load notebook'
             input type:"file", id: "load-file", name:"file", -> 'hi'
 
+            a href: '/#load/examples/t.notebook', -> 'example'
+            
+
     script type: "text/template", id: "notebook-index-template", ->
       li class: "list-notebook", -> 
         a href: "#[[= id ]]/view/", ->
@@ -101,7 +104,6 @@ html ->
           a class: 'right', href: "#[[= id ]]/edit/", -> "Edit"
           a class: 'right', href: "#[[= id ]]/delete/", -> "Delete"
 
-
     script type: "text/template", id: "notebook-template", ->
       div id: 'notebook', class: "twelve columns", ->
         ul class: "cells"
@@ -109,7 +111,6 @@ html ->
         div '#menu', -> 
           button '#toggle-edit', -> 'toggle edit/view'
           button '#save-to-file', -> 'save to file'
-
 
     script type: "text/template", id: "new-notebook-form", ->
       div id: "notebook", class: "sixteen columns", -> 

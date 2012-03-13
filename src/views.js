@@ -594,7 +594,7 @@
     __extends(IndexView, _super);
 
     function IndexView() {
-      this.load = __bind(this.load, this);
+      this.loadFile = __bind(this.loadFile, this);
       this["new"] = __bind(this["new"], this);
       this.addNbs = __bind(this.addNbs, this);
       this.addNb = __bind(this.addNb, this);
@@ -607,7 +607,7 @@
 
     IndexView.prototype.events = {
       'click #new-notebook-button': 'new',
-      'change #load-file': 'load'
+      'change #load-file': 'loadFile'
     };
 
     IndexView.prototype.initialize = function() {
@@ -637,16 +637,16 @@
       });
     };
 
-    IndexView.prototype.load = function(ev) {
+    IndexView.prototype.loadFile = function(ev) {
       var file, reader,
         _this = this;
       file = ev.target.files[0];
       console.log('loading notebook', file.name);
       reader = new FileReader();
       reader.onload = function(e) {
-        var notebook;
-        console.log('got data', unescape(e.target.result));
-        notebook = loadNotebook(e.target.result);
+        var nbdata, notebook;
+        nbdata = JSON.parse(e.target.result);
+        notebook = loadNotebook(nbdata);
         return root.router.navigate(notebook.get('id') + '/view/', {
           trigger: true
         });
@@ -707,12 +707,14 @@
     __extends(NotebookRouter, _super);
 
     function NotebookRouter() {
+      this.loadUrl = __bind(this.loadUrl, this);
       this.index = __bind(this.index, this);
       this["new"] = __bind(this["new"], this);
       this["delete"] = __bind(this["delete"], this);
       this.view = __bind(this.view, this);
       this.edit = __bind(this.edit, this);
       this.getNotebook = __bind(this.getNotebook, this);
+      this.unmatched = __bind(this.unmatched, this);
       NotebookRouter.__super__.constructor.apply(this, arguments);
     }
 
@@ -720,8 +722,14 @@
       ":nb/edit/": "edit",
       ":nb/view/": "view",
       ":nb/delete/": "delete",
+      'load/*url': 'loadUrl',
       "new/": "new",
-      "": "index"
+      "": "index",
+      "*p": 'unmatched'
+    };
+
+    NotebookRouter.prototype.unmatched = function(p) {
+      return console.log(p);
     };
 
     NotebookRouter.prototype.getNotebook = function(nb) {
@@ -786,6 +794,18 @@
       return root.app = new IndexView();
     };
 
+    NotebookRouter.prototype.loadUrl = function(url) {
+      var _this = this;
+      console.log('loading url');
+      return $.getJSON('/examples/t.notebook', function(data) {
+        var notebook;
+        notebook = loadNotebook(data);
+        return root.router.navigate(notebook.get('id') + '/view/', {
+          trigger: true
+        });
+      });
+    };
+
     return NotebookRouter;
 
   })(Backbone.Router);
@@ -799,10 +819,9 @@
     return window.open("data:text/json;filename=data.json;charset=utf-8," + escape(data));
   };
 
-  loadNotebook = function(data) {
-    var celldata, nbdata, notebook;
-    console.log('loading', data);
-    nbdata = JSON.parse(data);
+  loadNotebook = function(nbdata) {
+    var celldata, notebook;
+    console.log('loading', nbdata);
     celldata = nbdata.cells;
     delete nbdata.cells;
     nbdata.title = nbdata.title + ' import';

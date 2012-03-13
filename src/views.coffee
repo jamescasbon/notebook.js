@@ -478,7 +478,7 @@ class IndexView extends Backbone.View
 
   events: 
     'click #new-notebook-button': 'new'
-    'change #load-file' : 'load'
+    'change #load-file' : 'loadFile'
 
   initialize: =>
     @template = _.template($('#index-template').html())
@@ -500,17 +500,18 @@ class IndexView extends Backbone.View
   new: => 
     root.router.navigate ('new/'), trigger: true
 
-  load: (ev) => 
+  loadFile: (ev) => 
     file = ev.target.files[0]
     console.log 'loading notebook', file.name
     reader = new FileReader()
     reader.onload = (e) => 
-      console.log('got data', unescape(e.target.result))
-      notebook = loadNotebook(e.target.result) 
+      nbdata = JSON.parse(e.target.result)
+      notebook = loadNotebook(nbdata)
       root.router.navigate(notebook.get('id') + '/view/', trigger: true)
       
     reader.readAsText(file) 
     # TODO: set loading status
+
 
 class NewView extends Backbone.View
   className: 'app'
@@ -539,8 +540,12 @@ class NotebookRouter extends Backbone.Router
     ":nb/edit/" : "edit"
     ":nb/view/" : "view"
     ":nb/delete/" : "delete"
+    'load/*url': 'loadUrl'
     "new/": "new"
     "": "index"
+    "*p": 'unmatched'
+
+  unmatched: (p) => console.log p
 
   getNotebook: (nb) => 
     notebook = root.notebooks.get(nb)
@@ -594,8 +599,15 @@ class NotebookRouter extends Backbone.Router
     setTitle('')
     root.app = new IndexView()
 
+  loadUrl: (url) => 
+    console.log 'loading url'
+    $.getJSON '/examples/t.notebook', (data) => 
+      notebook = loadNotebook(data)
+      root.router.navigate(notebook.get('id') + '/view/', trigger: true)
 
-# crazy global method
+  
+
+# crazy global methods? Go in the router?
 setTitle = (title) =>
   console.log('set title', title)
   $('#title').html(title)
@@ -605,9 +617,8 @@ saveFile = (data) =>
   window.open( "data:text/json;filename=data.json;charset=utf-8," + escape(data))
 
 
-loadNotebook = (data) => 
-  console.log('loading', data)
-  nbdata = JSON.parse(data)
+loadNotebook = (nbdata) => 
+  console.log('loading', nbdata)
   celldata = nbdata.cells
   delete nbdata.cells
 
