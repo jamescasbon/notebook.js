@@ -80,19 +80,26 @@ html ->
 
     script type: "text/template", id: "index-template", ->
       div id: "notebook", class: "sixteen columns", -> 
-        # TODO: columns here
         div 'cell', ->
           h1 -> "Welcome to notebook.js"
           div class: " eight columns", ->
             h3 'My notebooks'
+            button '#new-notebook-button', ->  'New notebook'
             ul id: 'notebooks'
+
+
           div '#right-index', class: "four columns", -> 
             h3 'other stuff'
-            button '#new-notebook-button', ->  'New notebook'
-            label for: "files", -> 'Load notebook'
+            
+            ul ->
+              li -> a href: '/#load/examples/tut_first.notebook', -> 'Tutorial: first steps'
+              li -> a href: '/#load/examples/tut_engine.notebook', -> 'Tutorial: engine'
+            
+            
+            label for: "files", -> 'Load notebook from file'
             input type:"file", id: "load-file", name:"file", -> 'hi'
 
-            a href: '/#load/examples/t.notebook', -> 'example'
+
             
 
     script type: "text/template", id: "notebook-index-template", ->

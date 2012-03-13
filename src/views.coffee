@@ -601,8 +601,9 @@ class NotebookRouter extends Backbone.Router
 
   loadUrl: (url) => 
     console.log 'loading url'
-    $.getJSON '/examples/t.notebook', (data) => 
+    $.getJSON url, (data) => 
       notebook = loadNotebook(data)
+      console.log('created notebook')
       root.router.navigate(notebook.get('id') + '/view/', trigger: true)
 
   
@@ -623,11 +624,13 @@ loadNotebook = (nbdata) =>
   delete nbdata.cells
 
   nbdata.title = nbdata.title + ' import'
-  notebook = root.notebooks.create(nbdata) 
-  notebook.readyCells()
-  _.each( nbdata.cells, notebook.cells.create )
-  return notebook
-  
+  try
+    notebook = root.notebooks.create(nbdata) 
+    notebook.readyCells()
+    _.each( nbdata.cells, notebook.cells.create )
+    return notebook
+  catch error
+    alert 'Could not import notebook probably because it already exists.  try deleting'
 
 $(document).ready ->
   console.log 'creating app'

@@ -797,9 +797,10 @@
     NotebookRouter.prototype.loadUrl = function(url) {
       var _this = this;
       console.log('loading url');
-      return $.getJSON('/examples/t.notebook', function(data) {
+      return $.getJSON(url, function(data) {
         var notebook;
         notebook = loadNotebook(data);
+        console.log('created notebook');
         return root.router.navigate(notebook.get('id') + '/view/', {
           trigger: true
         });
@@ -825,10 +826,14 @@
     celldata = nbdata.cells;
     delete nbdata.cells;
     nbdata.title = nbdata.title + ' import';
-    notebook = root.notebooks.create(nbdata);
-    notebook.readyCells();
-    _.each(nbdata.cells, notebook.cells.create);
-    return notebook;
+    try {
+      notebook = root.notebooks.create(nbdata);
+      notebook.readyCells();
+      _.each(nbdata.cells, notebook.cells.create);
+      return notebook;
+    } catch (error) {
+      return alert('Could not import notebook probably because it already exists.  try deleting');
+    }
   };
 
   $(document).ready(function() {

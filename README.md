@@ -40,9 +40,6 @@ Frontend
 
 Now:
 
-* import notebook
-
-
 * detect whether content changed when evaluating (short circuit) - could do on isDirty except when
 new loaded notebook 
 * Skip null output/ show null output placeholder
@@ -57,6 +54,7 @@ new loaded notebook
 * disable box on matched character in ace onblur
 * url methods on notebook?
 * engine lifecycle with notebook
+* Mathjax token compatibility
 
 
 Someday: 
