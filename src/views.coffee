@@ -36,9 +36,10 @@ class ViewNotebookView extends Backbone.View
     @cells = @$('.cells')
     console.log @cells
     @model.cells.fetch(success: @addAll)
+    if root.mathjaxReady
+      @mathjaxReady()
 
   render: =>
-    console.log 'render vnv'
     $(@el).html(@template())
     @el
 
@@ -156,9 +157,6 @@ class EditNotebookView extends Backbone.View
 # 
 # Effects should happen by assigning classes and using CSS3 transitions
 #
-# TODO: escape text for Ace
-# TODO: how to respond to print statements 
-#
 class CellEditView extends Backbone.View
   tagName: 'li'
 
@@ -197,7 +195,6 @@ class CellEditView extends Backbone.View
     console.log('in ev', ev)
 
   render: (ev) =>
-    console.log 'model', @model.cid, @model.id, @model.toJSON()
     if not @editor? # if the editor exists we do not want to clobber it
       
       dat = @model.toJSON()
@@ -224,7 +221,8 @@ class CellEditView extends Backbone.View
   changeOutput: => 
     #console.log 'updatting output to', @model.get('output')
     @output.html(@model.get('output'))
-    MathJax.Hub.Typeset(@output[0])
+    if root.mathjaxReady
+      MathJax.Hub.Typeset(@output[0])
     
 
   # handle state changes 
@@ -621,12 +619,11 @@ loadNotebook = (nbdata) =>
   celldata = nbdata.cells
   delete nbdata.cells
 
-  nbdata.title = nbdata.title + ' import'
+  nbdata.title = nbdata.title 
   try
     console.log 'import notebook' 
     notebook = root.notebooks.create(nbdata) 
     notebook.readyCells()
-    console.log 'import cells', notebook.cells.length, celldata
     for c in celldata
       do (c) -> notebook.cells.create(c)
 
@@ -635,15 +632,18 @@ loadNotebook = (nbdata) =>
     alert 'Could not import notebook probably because it already exists.  try deleting'
     console.log error
     
+mathjaxReady = () ->
+  root.mathjaxReady = true
+  root.app.mathjaxReady()
 
 $(document).ready ->
   console.log 'creating app'
   root.notebooks = new Notebooks()
   root.notebooks.fetch()
-
+  root.mathjaxReady = false
 
   root.router = new NotebookRouter() 
   Backbone.history.start()
-  MathJax.Hub.Register.StartupHook('End', root.app.mathjaxReady)
+  MathJax.Hub.Register.StartupHook('End', mathjaxReady)
   
 

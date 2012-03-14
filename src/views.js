@@ -1,5 +1,5 @@
 (function() {
-  var CellEditView, EditNotebookView, IndexView, NAVBAR_HEIGHT, NewView, NotebookRouter, ViewNotebookView, isScrolledIntoView, loadNotebook, root, saveFile, setTitle,
+  var CellEditView, EditNotebookView, IndexView, NAVBAR_HEIGHT, NewView, NotebookRouter, ViewNotebookView, isScrolledIntoView, loadNotebook, mathjaxReady, root, saveFile, setTitle,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
@@ -59,13 +59,13 @@
       $('.container').append(this.render());
       this.cells = this.$('.cells');
       console.log(this.cells);
-      return this.model.cells.fetch({
+      this.model.cells.fetch({
         success: this.addAll
       });
+      if (root.mathjaxReady) return this.mathjaxReady();
     };
 
     ViewNotebookView.prototype.render = function() {
-      console.log('render vnv');
       $(this.el).html(this.template());
       return this.el;
     };
@@ -273,7 +273,6 @@
 
     CellEditView.prototype.render = function(ev) {
       var dat;
-      console.log('model', this.model.cid, this.model.id, this.model.toJSON());
       if (!(this.editor != null)) {
         dat = this.model.toJSON();
         if (!(this.model.id != null)) dat.id = this.model.cid;
@@ -296,7 +295,7 @@
 
     CellEditView.prototype.changeOutput = function() {
       this.output.html(this.model.get('output'));
-      return MathJax.Hub.Typeset(this.output[0]);
+      if (root.mathjaxReady) return MathJax.Hub.Typeset(this.output[0]);
     };
 
     CellEditView.prototype.changeState = function() {
@@ -823,12 +822,11 @@
     var c, celldata, notebook, _fn, _i, _len;
     celldata = nbdata.cells;
     delete nbdata.cells;
-    nbdata.title = nbdata.title + ' import';
+    nbdata.title = nbdata.title;
     try {
       console.log('import notebook');
       notebook = root.notebooks.create(nbdata);
       notebook.readyCells();
-      console.log('import cells', notebook.cells.length, celldata);
       _fn = function(c) {
         return notebook.cells.create(c);
       };
@@ -843,13 +841,19 @@
     }
   };
 
+  mathjaxReady = function() {
+    root.mathjaxReady = true;
+    return root.app.mathjaxReady();
+  };
+
   $(document).ready(function() {
     console.log('creating app');
     root.notebooks = new Notebooks();
     root.notebooks.fetch();
+    root.mathjaxReady = false;
     root.router = new NotebookRouter();
     Backbone.history.start();
-    return MathJax.Hub.Register.StartupHook('End', root.app.mathjaxReady);
+    return MathJax.Hub.Register.StartupHook('End', mathjaxReady);
   });
 
 }).call(this);

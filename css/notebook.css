@@ -134,20 +134,19 @@ pre {
   font-family: "Courier New", "monospace";
   font-size: 80%;
   height: 5px;
-  opacity: 0.2;
+  opacity: 1;
   border-radius: 0px;
   -webkit-transition: opacity 0 linear, color 0.25s linear;
   text-align: center;
   color: #fff;
   margin-top: 5px;
-  margin: bottom 5px;
+  margin-bottom: 5px;
   background-color: rgba(0,0,0,0.07);
   cursor: pointer;
 }
 .spawn-above:focus,
 #spawner:focus {
   opacity: 1;
-  outline: none;
   color: #555;
 }
 #spawner {
