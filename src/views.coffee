@@ -251,9 +251,9 @@ class CellEditView extends Backbone.View
       ace_id = @model.cid
     @editor = ace.edit('input-' + ace_id)
     
-    @editor.resize()
+
     # set the content now, not in the template because HTML is lost in the template
-    @editor.getSession().setValue(@model.get('input'))
+
     @model.set state: null 
 
     @editor.getSession().setUseWrapMode true
@@ -264,16 +264,18 @@ class CellEditView extends Backbone.View
     
     # TODO: size of line highlight not correct
     @$('.ace_sb').css({display: 'none'})
+
+  
+    @editor.getSession().setValue(@model.get('input'))
     
-    @editor.getSession().on('change', this.inputChange)
+    @editor.getSession().on('change', @inputChange)
     @setEditorHighlightMode()
     # there is a race condition here looking up the line height
     @resizeEditor()
 
-
     if @model.get('inputFold') 
       @changeInputFold()
-    
+
     @editor.commands.addCommand
       name: 'evaluate', 
       bindKey: { win: 'Ctrl-E', mac: 'Command-E', sender: 'editor' },
@@ -377,7 +379,6 @@ class CellEditView extends Backbone.View
 
 
   toggleInputFold: => 
-    console.log 'tif'
     @model.toggleInputFold()
 
   changeInputFold: =>
@@ -465,9 +466,18 @@ class CellEditView extends Backbone.View
     # resize the editor container
     # TODO: implement real renderer for ace
     line_height = @editor.renderer.$textLayer.getLineHeight()
-    lines = @editor.getSession().getDocument().getLength()
+    lines = @editor.getSession().getScreenLength()
+    
+    # we can get called before the renderer has layed out, in which case 
+    # recall later
+    if line_height == 1
+      setTimeout(@resizeEditor, 200)
+      console.log 'defer resize'
+      return 
+
     # Add 20 here to allow scroll while wrap is broken
-    @$('.ace-container').height(20 + (18 * lines))
+    console.log 'height of editor is', line_height, lines
+    @$('.ace-container').height(20 + (line_height * lines))
     @editor.resize()
     # TODO get real line height
 

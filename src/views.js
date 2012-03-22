@@ -321,8 +321,6 @@
         ace_id = this.model.cid;
       }
       this.editor = ace.edit('input-' + ace_id);
-      this.editor.resize();
-      this.editor.getSession().setValue(this.model.get('input'));
       this.model.set({
         state: null
       });
@@ -334,6 +332,7 @@
       this.$('.ace_sb').css({
         display: 'none'
       });
+      this.editor.getSession().setValue(this.model.get('input'));
       this.editor.getSession().on('change', this.inputChange);
       this.setEditorHighlightMode();
       this.resizeEditor();
@@ -478,7 +477,6 @@
     };
 
     CellEditView.prototype.toggleInputFold = function() {
-      console.log('tif');
       return this.model.toggleInputFold();
     };
 
@@ -579,8 +577,14 @@
     CellEditView.prototype.resizeEditor = function() {
       var line_height, lines;
       line_height = this.editor.renderer.$textLayer.getLineHeight();
-      lines = this.editor.getSession().getDocument().getLength();
-      this.$('.ace-container').height(20 + (18 * lines));
+      lines = this.editor.getSession().getScreenLength();
+      if (line_height === 1) {
+        setTimeout(this.resizeEditor, 200);
+        console.log('defer resize');
+        return;
+      }
+      console.log('height of editor is', line_height, lines);
+      this.$('.ace-container').height(20 + (line_height * lines));
       return this.editor.resize();
     };
 
