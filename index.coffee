@@ -84,15 +84,21 @@ html ->
     script type: "text/template", id: "index-template", ->
       div id: "notebook", class: "sixteen columns", -> 
         div 'cell', ->
-          h1 -> "Welcome to notebook.js"
+          div class: "twelve columns", ->
+            h1 -> "Welcome to notebook.js"
+            p -> """ Notebook.js is a literate online code notebook.
+              This version is completely standalone and runs code inside your browser
+              while storing the results locally using HTML5 local storage.
+              """
+            p ->
+              a href: 'https://github.com/jamescasbon/notebook.js', -> 'Development and bug reports.'
           div class: " eight columns", ->
             h3 'My notebooks'
             button '#new-notebook-button', ->  'New notebook'
             ul id: 'notebooks'
 
           div '#right-index', class: "four columns", -> 
-            h3 'other stuff'
-            
+            h3 'Tutorials'
             ul ->
               li -> a href: '/#load/examples/tut_first.notebook', -> 'Tutorial: first steps'
               li -> a href: '/#load/examples/tut_engine.notebook', -> 'Tutorial: engine'
