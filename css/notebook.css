@@ -20,9 +20,9 @@ pre{font-family:'Droid Sans Mono',sans-serif;font-size:12px;margin-bottom:18px}
 .cell-output:focus{background-color:rgba(0,0,0,0.07);outline:none}
 .type{position:absolute;left:5px;-webkit-transform-origin:top left;-webkit-transform:rotate(90deg);-moz-transform-origin:top left;-moz-transform:rotate(90deg);background-color:#8fa7b0;color:#fff;padding:5px;font-weight:bold;font-family:sans-serif;-webkit-box-shadow:rgba(0,0,0,0.50) 2px 4px 8px;-moz-box-shadow:rgba(0,0,0,0.50) 2px 4px 8px;z-index:1;border-radius:5px;margin-top:5px;font-size:80%;cursor:pointer;text-decoration:none;}
 .type:hover{color:#fff}
-.spawn-above,#spawner{font-family:"Courier New","monospace";font-size:80%;height:5px;opacity:1;border-radius:0;-webkit-transition:opacity 0 linear,color .25s linear;text-align:center;color:#fff;margin-top:5px;margin-bottom:5px;background-color:rgba(0,0,0,0.07);cursor:pointer;margin-top:15px;margin-bottom:15px}
+.spawn-above,#spawner{font-family:"Courier New","monospace";font-size:80%;height:4px;opacity:1;border-radius:0;-webkit-transition:opacity 0 linear,color .25s linear;text-align:center;color:#fff;margin-top:5px;margin-bottom:5px;background-color:#ccc;cursor:pointer;margin-top:25px;margin-bottom:25px;margin-left:50px;margin-right:50px}
 .spawn-above:focus,#spawner:focus{opacity:1;color:#555}
-#spawner{margin-left:150px;margin-right:150px}
+#spawner{margin-left:200px;margin-right:200px}
 .fold-button{position:relative;left:-75px;float:left;color:#aaa;-webkit-transform-origin:center;-webkit-transform:rotate(90deg);-moz-transform-origin:center;-moz-transform:rotate(90deg);cursor:pointer}
 .fold-button.input-fold{-webkit-transform-origin:center;-webkit-transform:rotate(0);-moz-transform-origin:center;-moz-transform:rotate(0)}
 .ace-container.input-fold{display:none}

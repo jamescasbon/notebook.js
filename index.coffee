@@ -69,6 +69,7 @@ html ->
 
     script type: "text/template", id: 'cell-view-template', -> 
       div '.cell', id: "[[= id ]]", ->
+        div class: 'spawn-above'
         # FIXME: mixing of underscore logic in this coffeekup template is not pretty
         # we need two fake divs here to get the text output
         # must be better way
@@ -78,36 +79,38 @@ html ->
         div "[[ } ]]"
 
         div class: "cell-output", -> "[[= output ]]"
-        div class: 'spawn-above'
+
 
 
     script type: "text/template", id: "index-template", ->
       div id: "notebook", class: "sixteen columns", -> 
-        div 'cell', ->
-          div class: "twelve columns", ->
-            h1 -> "Welcome to notebook.js"
-            p -> """ Notebook.js is a literate online code notebook.
-              This version is completely standalone and runs code inside your browser
-              while storing the results locally using HTML5 local storage.
-              """
-            p ->
-              a href: 'https://github.com/jamescasbon/notebook.js', -> 'Development and bug reports.'
-          div class: " eight columns", ->
-            button '#new-notebook-button', ->  'New notebook'
-            h3 'My notebooks'
+        div class: "twelve columns offset-by-two", ->
+          h1 -> "Welcome to notebook.js"
+          p -> """ Notebook.js is a literate online code notebook.
+            You can use it to run code inside your browser
+            and store the results locally.  Try the tutorials to learn more.
+            """
+          p ->
+            a href: 'https://github.com/jamescasbon/notebook.js', -> 'Development and bug reports.'
+        hr -> ''
+        div class: "eight columns offset-by-one", ->
+          button '#new-notebook-button', style: 'float: right;', ->  'New notebook'
+          h3 'My notebooks'
+          p -> 
             ul id: 'notebooks'
-
-          div '#right-index', class: "four columns", -> 
-            h3 'Tutorials'
-            ul ->
-              li -> a href: '/#load/examples/tut_first.notebook', -> 'Tutorial: first steps'
-              li -> a href: '/#load/examples/tut_engine.notebook', -> 'Tutorial: the engine'
-              li -> a href: '/#load/examples/tut_web.notebook', -> 'Tutorial: be a web citizen'
-              li -> a href: '/#load/examples/tut_eqn.notebook', -> 'Tutorial: using equations'
-            
+          p -> 
             label for: "files", -> 'Load notebook from file'
             input type:"file", id: "load-file", name:"file", -> 'hi'
-            
+
+        div '#right-index', class: "four columns offset-by-one", -> 
+          h3 'Tutorials'
+          p -> 
+            ul ->
+              li -> a href: '/#load/examples/tut_first.notebook', -> 'First steps'
+              li -> a href: '/#load/examples/tut_engine.notebook', -> 'Using the engine'
+              li -> a href: '/#load/examples/tut_web.notebook', -> 'Be a web citizen'
+              li -> a href: '/#load/examples/tut_eqn.notebook', -> 'Using equations'
+          
 
     script type: "text/template", id: "notebook-index-template", ->
       li class: "list-notebook", -> 

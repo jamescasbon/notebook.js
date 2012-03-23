@@ -516,6 +516,7 @@ class IndexView extends Backbone.View
     root.notebooks.each(@addNb)
 
   new: => 
+    console.log 'new'
     root.router.navigate ('new/'), trigger: true
 
   loadFile: (ev) => 
@@ -640,6 +641,7 @@ setTitle = (title) =>
 saveFile = (data) => 
   window.open( "data:text/json;filename=data.json;charset=utf-8," + escape(data))
 
+
 loadNotebook = (nbdata) => 
   celldata = nbdata.cells
   delete nbdata.cells
@@ -656,10 +658,12 @@ loadNotebook = (nbdata) =>
   catch error
     alert 'Could not import notebook probably because it already exists.  try deleting'
     console.log error
-    
+
+
 mathjaxReady = () ->
   root.mathjaxReady = true
   root.app.mathjaxReady()
+
 
 $(document).ready ->
   console.log 'creating app'

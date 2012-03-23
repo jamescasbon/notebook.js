@@ -644,6 +644,7 @@
     };
 
     IndexView.prototype["new"] = function() {
+      console.log('new');
       return root.router.navigate('new/', {
         trigger: true
       });
