@@ -52,7 +52,7 @@
 
     Notebooks.prototype.model = Notebook;
 
-    Notebooks.prototype.localStorage = new Store('Notebooks1');
+    Notebooks.prototype.localStorage = new Store('notebook.js');
 
     return Notebooks;
 
@@ -176,10 +176,9 @@
     Cell.prototype.onPrint = function(data, elName) {
       var current;
       current = this.get('output') || "";
-      this.set({
+      return this.set({
         output: current.concat('<div class="' + elName + '">' + data + '</div>')
       });
-      return console.log('current output', this.get('output'));
     };
 
     return Cell;

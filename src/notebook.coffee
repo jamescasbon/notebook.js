@@ -21,7 +21,7 @@ class Notebook extends Backbone.Model
 
 class Notebooks extends Backbone.Collection
   model: Notebook
-  localStorage: new Store('Notebooks1') 
+  localStorage: new Store('notebook.js') 
 
 
 # Cell has state and dispatches evaluations to handler
