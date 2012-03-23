@@ -49,6 +49,7 @@
     BaseNotebookView.prototype.typeset = function() {
       var el, _i, _len, _ref, _results;
       console.log('typeset');
+      prettyPrint();
       _ref = this.$('#notebook');
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {

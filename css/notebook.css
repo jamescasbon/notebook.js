@@ -87,6 +87,9 @@ pre {
   position: relative;
   height: 100px;
 }
+pre.prettyprint {
+  border: none !important;
+}
 .cell-output {
   -webkit-transition: background 0s ease, height 2s ease;
   cursor: text;

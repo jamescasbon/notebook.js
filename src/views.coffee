@@ -31,6 +31,7 @@ class BaseNotebookView extends Backbone.View
    
   typeset: => 
     console.log 'typeset'
+    prettyPrint()
     for el in @$('#notebook')
       console.log el
       MathJax.Hub.Typeset(el) 

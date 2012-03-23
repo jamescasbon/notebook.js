@@ -7,6 +7,7 @@ html ->
     script src: "/lib/backbone.js" 
     script src: "/lib/backbone.localStorage.js"
     script src: "/lib/showdown.js",
+    script src: "/lib/google-code-prettify/prettify.js",
     script src: "/ace/build/src/ace.js"
     script src: "/ace/build/src/mode-javascript.js"
     script src: "/ace/build/src/mode-markdown.js"
@@ -24,6 +25,7 @@ html ->
     link rel: 'stylesheet', href: '/css/skeleton.css'
     link rel: 'stylesheet', href: '/css/layout.css'
     link rel: 'stylesheet', href: '/css/notebook.css'
+    link rel: 'stylesheet', href: '/lib/google-code-prettify/prettify.css'
 
     text '''<script type="text/javascript">
       var _gaq = _gaq || [];
@@ -86,7 +88,7 @@ html ->
         # we need two fake divs here to get the text output
         # must be better way
         div "[[ if (type != 'markdown') { ]]" 
-        pre class: "cell-input", -> "[[= input ]]"
+        pre class: "cell-input prettyprint", -> "[[= input ]]"
         hr -> ''
         div "[[ } ]]"
 
