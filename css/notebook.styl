@@ -1,7 +1,6 @@
 line-highlight = rgba(0, 0, 0, 0.07)
-cell-padding = 50px
+cell-padding = 150px
 navbar-height = 30px
-notebook-width = 760px
 
 
 body
@@ -166,6 +165,8 @@ pre
         color: #555
 
     cursor: pointer
+    margin-top: 15px
+    margin-bottom: 15px
 
 // Match the cell padding for the end of notebook spawner
 #spawner
@@ -174,12 +175,10 @@ pre
     margin-right: cell-padding
 
 
-
-
 // Fold control is the '>' in the margin that hides input
 .fold-button
     position: relative
-    left: -20px
+    left: -75px
     float: left
     color: #AAA
     -webkit-transform-origin: center   
@@ -229,7 +228,7 @@ pre
         display: none
 
     top: -25px 
-    right: -30px
+    right: -75px
 
     img.active 
         opacity: 1

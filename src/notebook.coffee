@@ -24,7 +24,6 @@ class Notebooks extends Backbone.Collection
   localStorage: new Store('Notebooks1') 
 
 
-
 # Cell has state and dispatches evaluations to handler
 #
 # States: 
@@ -97,7 +96,6 @@ class Cell extends Backbone.Model
   onPrint: (data, elName) ->
     current = @get('output') or ""
     @set(output: current.concat('<div class="' + elName + '">' + data + '</div>'))
-    console.log 'current output', @get('output')
 
 
 

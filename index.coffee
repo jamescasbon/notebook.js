@@ -93,8 +93,8 @@ html ->
             p ->
               a href: 'https://github.com/jamescasbon/notebook.js', -> 'Development and bug reports.'
           div class: " eight columns", ->
-            h3 'My notebooks'
             button '#new-notebook-button', ->  'New notebook'
+            h3 'My notebooks'
             ul id: 'notebooks'
 
           div '#right-index', class: "four columns", -> 
@@ -103,6 +103,7 @@ html ->
               li -> a href: '/#load/examples/tut_first.notebook', -> 'Tutorial: first steps'
               li -> a href: '/#load/examples/tut_engine.notebook', -> 'Tutorial: the engine'
               li -> a href: '/#load/examples/tut_web.notebook', -> 'Tutorial: be a web citizen'
+              li -> a href: '/#load/examples/tut_eqn.notebook', -> 'Tutorial: using equations'
             
             label for: "files", -> 'Load notebook from file'
             input type:"file", id: "load-file", name:"file", -> 'hi'
@@ -119,7 +120,7 @@ html ->
 
 
     script type: "text/template", id: "notebook-template", ->
-      div id: 'notebook', class: "twelve columns", ->
+      div id: 'notebook', class: "sixteen columns", ->
         ul class: "cells"
 
         div 'tooltip', tooltip: 'Double click to create cell', ->
