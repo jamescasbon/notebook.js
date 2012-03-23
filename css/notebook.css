@@ -72,8 +72,8 @@ pre {
   margin: 0;
 }
 .cell {
-  padding-left: 0px;
-  padding-right: 0px;
+  padding-left: 50px;
+  padding-right: 50px;
   word-wrap: break-word;
 }
 .cell hr {
@@ -127,6 +127,7 @@ pre {
   margin-top: 5px;
   font-size: 80%;
   cursor: pointer;
+  float: left;
   text-decoration: none;
 }
 .type:hover {
@@ -157,12 +158,12 @@ pre {
   color: #555;
 }
 #spawner {
-  margin-left: 50px;
-  margin-right: 50px;
+  margin-left: 100px;
+  margin-right: 100px;
 }
 .fold-button {
   position: relative;
-  left: -75px;
+  left: -20px;
   float: left;
   color: #aaa;
   -webkit-transform-origin: center;
@@ -201,7 +202,7 @@ pre {
   position: relative;
   float: right;
   top: -25px;
-  right: -75px;
+  right: -25px;
 }
 .status-bar img {
   cursor: pointer;
