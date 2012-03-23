@@ -40,6 +40,12 @@ Frontend
 
 Now:
 
+* share urls
+* custom domain heroku 
+*  analytics 
+* double line in view mode
+
+
 * detect whether content changed when evaluating (short circuit) - could do on isDirty except when
 new loaded notebook 
 * Skip null output/ show null output placeholder

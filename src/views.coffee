@@ -17,9 +17,26 @@ isScrolledIntoView = (elem) ->
   return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop))
 
 
-
-class ViewNotebookView extends Backbone.View
+class BaseNotebookView extends Backbone.View
   className: "app"
+
+  mathjaxReady: => 
+    # perform initial typeset of output elements
+    # need to check if still not initialized
+    console.log 'mjr'
+    @typeset()
+
+  saveToFile: => 
+    saveFile(@model.serialize())
+   
+  typeset: => 
+    console.log 'typeset'
+    for el in @$('#notebook')
+      console.log el
+      MathJax.Hub.Typeset(el) 
+
+
+class ViewNotebookView extends BaseNotebookView
 
   events: 
     "click #toggle-edit" : "toggleEdit"
@@ -37,7 +54,8 @@ class ViewNotebookView extends Backbone.View
     console.log @cells
     @model.cells.fetch(success: @addAll)
     if root.mathjaxReady
-      @mathjaxReady()
+      @typeset()
+    console.log
 
   render: =>
     $(@el).html(@template())
@@ -55,17 +73,9 @@ class ViewNotebookView extends Backbone.View
     # we need to escape the input in view mode
     data.input = data.input.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     @cellTemplate(data)
-   
-  mathjaxReady: => 
-    # perform initial typeset of output elements
-    _.each(@$('.cell-output'), (el) -> MathJax.Hub.Typeset(el) )
-
-  saveToFile: => 
-    saveFile(@model.serialize())
 
 # EditNotebookView is the main app view and manages a list of cells
-class EditNotebookView extends Backbone.View
-  className: "app" 
+class EditNotebookView extends BaseNotebookView
 
   events: => (
     # there is a lone spawner at the bottom of the page
@@ -79,6 +89,10 @@ class EditNotebookView extends Backbone.View
   initialize: =>
     @template = _.template($('#notebook-template').html())
     $('.container').append(@render()) 
+
+    if root.mathjaxReady
+      @typeset()
+
 
     @cells = @$('.cells')
     @model.cells.bind 'add', @addOne
@@ -119,10 +133,6 @@ class EditNotebookView extends Backbone.View
     else if e.keyCode == 38
       ncells = @model.cells.length
       @model.cells.at(ncells - 1).view.output.focus()
-
-  mathjaxReady: => 
-    # perform initial typeset of output elements
-    _.each(@$('.cell-output'), (el) -> MathJax.Hub.Typeset(el) )
 
   toggleEdit: => 
     root.router.navigate(@model.get('id') + '/view/', trigger: true)

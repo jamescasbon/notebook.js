@@ -1,5 +1,5 @@
 (function() {
-  var CellEditView, EditNotebookView, IndexView, NAVBAR_HEIGHT, NewView, NotebookRouter, ViewNotebookView, isScrolledIntoView, loadNotebook, mathjaxReady, root, saveFile, setTitle,
+  var BaseNotebookView, CellEditView, EditNotebookView, IndexView, NAVBAR_HEIGHT, NewView, NotebookRouter, ViewNotebookView, isScrolledIntoView, loadNotebook, mathjaxReady, root, saveFile, setTitle,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
@@ -24,13 +24,50 @@
     return (elemBottom <= docViewBottom) && (elemTop >= docViewTop);
   };
 
+  BaseNotebookView = (function(_super) {
+
+    __extends(BaseNotebookView, _super);
+
+    function BaseNotebookView() {
+      this.typeset = __bind(this.typeset, this);
+      this.saveToFile = __bind(this.saveToFile, this);
+      this.mathjaxReady = __bind(this.mathjaxReady, this);
+      BaseNotebookView.__super__.constructor.apply(this, arguments);
+    }
+
+    BaseNotebookView.prototype.className = "app";
+
+    BaseNotebookView.prototype.mathjaxReady = function() {
+      console.log('mjr');
+      return this.typeset();
+    };
+
+    BaseNotebookView.prototype.saveToFile = function() {
+      return saveFile(this.model.serialize());
+    };
+
+    BaseNotebookView.prototype.typeset = function() {
+      var el, _i, _len, _ref, _results;
+      console.log('typeset');
+      _ref = this.$('#notebook');
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        el = _ref[_i];
+        console.log(el);
+        _results.push(MathJax.Hub.Typeset(el));
+      }
+      return _results;
+    };
+
+    return BaseNotebookView;
+
+  })(Backbone.View);
+
   ViewNotebookView = (function(_super) {
 
     __extends(ViewNotebookView, _super);
 
     function ViewNotebookView() {
-      this.saveToFile = __bind(this.saveToFile, this);
-      this.mathjaxReady = __bind(this.mathjaxReady, this);
       this.renderCell = __bind(this.renderCell, this);
       this.addAll = __bind(this.addAll, this);
       this.addOne = __bind(this.addOne, this);
@@ -39,8 +76,6 @@
       this.toggleEdit = __bind(this.toggleEdit, this);
       ViewNotebookView.__super__.constructor.apply(this, arguments);
     }
-
-    ViewNotebookView.prototype.className = "app";
 
     ViewNotebookView.prototype.events = {
       "click #toggle-edit": "toggleEdit",
@@ -62,7 +97,8 @@
       this.model.cells.fetch({
         success: this.addAll
       });
-      if (root.mathjaxReady) return this.mathjaxReady();
+      if (root.mathjaxReady) this.typeset();
+      return console.log;
     };
 
     ViewNotebookView.prototype.render = function() {
@@ -87,19 +123,9 @@
       return this.cellTemplate(data);
     };
 
-    ViewNotebookView.prototype.mathjaxReady = function() {
-      return _.each(this.$('.cell-output'), function(el) {
-        return MathJax.Hub.Typeset(el);
-      });
-    };
-
-    ViewNotebookView.prototype.saveToFile = function() {
-      return saveFile(this.model.serialize());
-    };
-
     return ViewNotebookView;
 
-  })(Backbone.View);
+  })(BaseNotebookView);
 
   EditNotebookView = (function(_super) {
 
@@ -108,7 +134,6 @@
     function EditNotebookView() {
       this.saveToFile = __bind(this.saveToFile, this);
       this.toggleEdit = __bind(this.toggleEdit, this);
-      this.mathjaxReady = __bind(this.mathjaxReady, this);
       this.spawnKeypress = __bind(this.spawnKeypress, this);
       this.spawnCellAtEnd = __bind(this.spawnCellAtEnd, this);
       this.addAll = __bind(this.addAll, this);
@@ -118,8 +143,6 @@
       this.events = __bind(this.events, this);
       EditNotebookView.__super__.constructor.apply(this, arguments);
     }
-
-    EditNotebookView.prototype.className = "app";
 
     EditNotebookView.prototype.events = function() {
       return {
@@ -133,6 +156,7 @@
     EditNotebookView.prototype.initialize = function() {
       this.template = _.template($('#notebook-template').html());
       $('.container').append(this.render());
+      if (root.mathjaxReady) this.typeset();
       this.cells = this.$('.cells');
       this.model.cells.bind('add', this.addOne);
       this.model.cells.bind('refresh', this.addAll);
@@ -183,12 +207,6 @@
       }
     };
 
-    EditNotebookView.prototype.mathjaxReady = function() {
-      return _.each(this.$('.cell-output'), function(el) {
-        return MathJax.Hub.Typeset(el);
-      });
-    };
-
     EditNotebookView.prototype.toggleEdit = function() {
       return root.router.navigate(this.model.get('id') + '/view/', {
         trigger: true
@@ -201,7 +219,7 @@
 
     return EditNotebookView;
 
-  })(Backbone.View);
+  })(BaseNotebookView);
 
   CellEditView = (function(_super) {
 
