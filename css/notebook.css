@@ -165,8 +165,8 @@ pre.prettyprint {
   margin-right: 100px;
 }
 .fold-button {
-  position: relative;
-  left: -20px;
+  position: absolute;
+  left: 25px;
   float: left;
   color: #aaa;
   -webkit-transform-origin: center;
