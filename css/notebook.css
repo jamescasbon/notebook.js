@@ -1,39 +1,232 @@
-body{background-image:url("/img/stripe.png");margin:0}
-#navbar{height:30px;background-color:rgba(0,0,0,0.80);position:fixed;z-index:99;top:0;left:0;width:100%;text-align:left;vertical-align:center;-webkit-box-shadow:rgba(0,0,0,0.50) 0 0 8px;-moz-box-shadow:rgba(0,0,0,0.50) 0 0 8px}
-pre{font-family:'Droid Sans Mono',sans-serif;font-size:12px;margin-bottom:18px}
-#logo{margin-left:20px;margin-right:20px;float:left;color:#908b87;letter-spacing:5px;font-family:'Anonymous Pro',sans-serif;text-transform:uppercase;font-weight:bold;text-decoration:none;}
-#logo:hover{color:#c0aba7}
-#menu{position:fixed;top:0;right:0;z-index:100}
-#title{color:#fff;font-weight:bold;letter-spacing:2px;float:left}
-#logo,#title{font-size:20px;margin-top:5px}
-#notebook{padding-top:50px;margin-left:auto;margin-right:auto;padding-bottom:100px;background-color:#fff;-webkit-box-shadow:rgba(0,0,0,0.50) 0 0 8px;-moz-box-shadow:rgba(0,0,0,0.50) 0 0 8px;height:100%}
-#cells{list-style-type:none;padding:0}
-#cells li{margin:0}
-.cell{padding-left:150px;padding-right:150px;word-wrap:break-word}
-.cell hr{margin:0 80px 10px 80px;opacity:.6}
-.cell hr.input-fold{display:none}
-.ace-container{position:relative;height:100px}
-.cell-output{-webkit-transition:background 0 ease,height 2s ease;cursor:text}
-.cell-output .print,.cell-output .error{font-family:'Anonymous Pro',sans-serif;font-weight:400;line-height:170%}
-.cell-output .error{color:#f00;font-weight:700}
-.cell-output ul{list-style-type:disc}
-.cell-output:focus{background-color:rgba(0,0,0,0.07);outline:none}
-.type{position:absolute;left:5px;-webkit-transform-origin:top left;-webkit-transform:rotate(90deg);-moz-transform-origin:top left;-moz-transform:rotate(90deg);background-color:#8fa7b0;color:#fff;padding:5px;font-weight:bold;font-family:sans-serif;-webkit-box-shadow:rgba(0,0,0,0.50) 2px 4px 8px;-moz-box-shadow:rgba(0,0,0,0.50) 2px 4px 8px;z-index:1;border-radius:5px;margin-top:5px;font-size:80%;cursor:pointer;text-decoration:none;}
-.type:hover{color:#fff}
-.spawn-above,#spawner{font-family:"Courier New","monospace";font-size:80%;height:4px;opacity:1;border-radius:0;-webkit-transition:opacity 0 linear,color .25s linear;text-align:center;color:#fff;margin-top:5px;margin-bottom:5px;background-color:#ccc;cursor:pointer;margin-top:25px;margin-bottom:25px;margin-left:50px;margin-right:50px}
-.spawn-above:focus,#spawner:focus{opacity:1;color:#555}
-#spawner{margin-left:200px;margin-right:200px}
-.fold-button{position:relative;left:-75px;float:left;color:#aaa;-webkit-transform-origin:center;-webkit-transform:rotate(90deg);-moz-transform-origin:center;-moz-transform:rotate(90deg);cursor:pointer}
-.fold-button.input-fold{-webkit-transform-origin:center;-webkit-transform:rotate(0);-moz-transform-origin:center;-moz-transform:rotate(0)}
-.ace-container.input-fold{display:none}
-.tooltip:before{content:attr(tooltip);position:absolute;float:left;z-index:10;border-radius:10px;width:200px;background:#ff0;border:1px solid #000;padding:8px;margin:10px 0 0 10px;display:none}
-.tooltip:hover::before{-webkit-transition:opacity .5s linear;display:block}
-.status-bar{position:relative;float:right;top:-25px;right:-75px;}
-.status-bar img{cursor:pointer;display:none}
-.status-bar img.active{opacity:1;display:block}
-.list-notebook:nth-child(odd){background:rgba(50,50,50,0.05)}
-.list-notebook:nth-child(odd):hover{background:rgba(50,50,50,0.30)}
-.list-notebook:nth-child(even){background:rgba(50,50,50,0.05)}
-.list-notebook:nth-child(even):hover{background:rgba(50,50,50,0.30)}
-.list-notebook > .right{float:right;margin-left:20px;}
-.list-notebook > .right > a{margin-left:20px}
+body {
+  background-image: url("/img/stripe.png");
+  margin: 0;
+}
+#navbar {
+  height: 30px;
+  background-color: rgba(0,0,0,0.80);
+  position: fixed;
+  z-index: 99;
+  top: 0;
+  left: 0;
+  width: 100%;
+  text-align: left;
+  vertical-align: center;
+  -webkit-box-shadow: rgba(0,0,0,0.50) 0 0 8px;
+  -moz-box-shadow: rgba(0,0,0,0.50) 0 0 8px;
+}
+pre {
+  font-family: 'Droid Sans Mono', sans-serif;
+  font-size: 12px;
+  margin-bottom: 18px;
+}
+#logo {
+  margin-left: 20px;
+  margin-right: 20px;
+  float: left;
+  color: #908b87;
+  letter-spacing: 5px;
+  font-family: 'Anonymous Pro', sans-serif;
+  text-transform: uppercase;
+  font-weight: bold;
+  text-decoration: none;
+}
+#logo:hover {
+  color: #c0aba7;
+}
+#menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 100;
+}
+#title {
+  color: #fff;
+  font-weight: bold;
+  letter-spacing: 2px;
+  float: left;
+}
+#logo,
+#title {
+  font-size: 20px;
+  margin-top: 5px;
+}
+#notebook {
+  padding-top: 50px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-bottom: 100px;
+  background-color: #fff;
+  -webkit-box-shadow: rgba(0,0,0,0.50) 0 0 8px;
+  -moz-box-shadow: rgba(0,0,0,0.50) 0 0 8px;
+  height: 100%;
+}
+.cells {
+  list-style-type: none;
+  padding: 0;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+}
+#cells li {
+  margin: 0;
+}
+.cell {
+  padding-left: 0px;
+  padding-right: 0px;
+  word-wrap: break-word;
+}
+.cell hr {
+  margin: 0px 80px 10px 80px;
+  opacity: 0.6;
+}
+.cell hr.input-fold {
+  display: none;
+}
+.ace-container {
+  position: relative;
+  height: 100px;
+}
+.cell-output {
+  -webkit-transition: background 0s ease, height 2s ease;
+  cursor: text;
+}
+.cell-output .print,
+.cell-output .error {
+  font-family: 'Anonymous Pro', sans-serif;
+  font-weight: 400;
+  line-height: 170%;
+}
+.cell-output .error {
+  color: #f00;
+  font-weight: 700;
+}
+.cell-output ul {
+  list-style-type: disc;
+}
+.cell-output:focus {
+  background-color: rgba(0,0,0,0.07);
+  outline: none;
+}
+.type {
+  position: absolute;
+  left: 5px;
+  -webkit-transform-origin: top left;
+  -webkit-transform: rotate(90deg);
+  -moz-transform-origin: top left;
+  -moz-transform: rotate(90deg);
+  background-color: #8fa7b0;
+  color: #fff;
+  padding: 5px;
+  font-weight: bold;
+  font-family: sans-serif;
+  -webkit-box-shadow: rgba(0,0,0,0.50) 2px 4px 8px;
+  -moz-box-shadow: rgba(0,0,0,0.50) 2px 4px 8px;
+  z-index: 1;
+  border-radius: 5px;
+  margin-top: 5px;
+  font-size: 80%;
+  cursor: pointer;
+  text-decoration: none;
+}
+.type:hover {
+  color: #fff;
+}
+.spawn-above,
+#spawner {
+  font-family: "Courier New", "monospace";
+  font-size: 80%;
+  height: 4px;
+  opacity: 1;
+  border-radius: 0px;
+  -webkit-transition: opacity 0 linear, color 0.25s linear;
+  text-align: center;
+  color: #fff;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  background-color: #ccc;
+  cursor: pointer;
+  margin-top: 25px;
+  margin-bottom: 25px;
+  margin-left: 50px;
+  margin-right: 50px;
+}
+.spawn-above:focus,
+#spawner:focus {
+  opacity: 1;
+  color: #555;
+}
+#spawner {
+  margin-left: 50px;
+  margin-right: 50px;
+}
+.fold-button {
+  position: relative;
+  left: -75px;
+  float: left;
+  color: #aaa;
+  -webkit-transform-origin: center;
+  -webkit-transform: rotate(90deg);
+  -moz-transform-origin: center;
+  -moz-transform: rotate(90deg);
+  cursor: pointer;
+}
+.fold-button.input-fold {
+  -webkit-transform-origin: center;
+  -webkit-transform: rotate(0deg);
+  -moz-transform-origin: center;
+  -moz-transform: rotate(0deg);
+}
+.ace-container.input-fold {
+  display: none;
+}
+.tooltip:before {
+  content: attr(tooltip);
+  position: absolute;
+  float: left;
+  z-index: 10;
+  border-radius: 10px;
+  width: 200px;
+  background: #ff0;
+  border: 1px solid #000;
+  padding: 8px;
+  margin: 10px 0 0 10px;
+  display: none;
+}
+.tooltip:hover::before {
+  -webkit-transition: opacity 0.5s linear;
+  display: block;
+}
+.status-bar {
+  position: relative;
+  float: right;
+  top: -25px;
+  right: -75px;
+}
+.status-bar img {
+  cursor: pointer;
+  display: none;
+}
+.status-bar img.active {
+  opacity: 1;
+  display: block;
+}
+.list-notebook:nth-child(odd) {
+  background: rgba(50,50,50,0.05);
+}
+.list-notebook:nth-child(odd):hover {
+  background: rgba(50,50,50,0.30);
+}
+.list-notebook:nth-child(even) {
+  background: rgba(50,50,50,0.05);
+}
+.list-notebook:nth-child(even):hover {
+  background: rgba(50,50,50,0.30);
+}
+.list-notebook > .right {
+  float: right;
+  margin-left: 20px;
+}
+.list-notebook > .right > a {
+  margin-left: 20px;
+}

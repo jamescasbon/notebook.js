@@ -123,7 +123,7 @@ html ->
 
 
     script type: "text/template", id: "notebook-template", ->
-      div id: 'notebook', class: "sixteen columns", ->
+      div id: 'notebook', class: "fourteen columns", ->
         ul class: "cells"
 
         div 'tooltip', tooltip: 'Double click to create cell', ->
