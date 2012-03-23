@@ -41,9 +41,9 @@ Frontend
 Now:
 
 * share urls
-* custom domain heroku 
-*  analytics 
-* double line in view mode
+* chrome bug on web tutorial
+* play all
+* TOC
 
 
 * detect whether content changed when evaluating (short circuit) - could do on isDirty except when

@@ -33,8 +33,29 @@ class BaseNotebookView extends Backbone.View
     console.log 'typeset'
     prettyPrint()
     for el in @$('#notebook')
-      console.log el
+      console.log 'tp', el
       MathJax.Hub.Typeset(el) 
+
+  generateToc: => 
+    # todo
+    toc = $( document.createElement('div') )
+    @$('.cell-output').each (i, cell) => 
+
+      console.log 'tc', i, cell
+      $(cell).find('h1, h2, h3').each(j, heading) -> 
+        $(heading).attr("id", "title" + i + '_' + j)
+        console.log("title" + i + '_' + j)
+        el = $( document.createElement('div') )
+        el.addClass(heading.tagName)
+        el.addClass('toc-entry')
+
+        a = $( document.createElement('a') ).appendTo(el)
+        a.attr('fre')
+
+        el.html($(heading).html())
+
+        toc.append(el)
+    console.log(toc)
 
 
 class ViewNotebookView extends BaseNotebookView
@@ -56,7 +77,6 @@ class ViewNotebookView extends BaseNotebookView
     @model.cells.fetch(success: @addAll)
     if root.mathjaxReady
       @typeset()
-    console.log
 
   render: =>
     $(@el).html(@template())
@@ -69,11 +89,13 @@ class ViewNotebookView extends BaseNotebookView
   addAll: (cells) =>
     cells.each @addOne
 
+
   renderCell: (cell) =>
     data = cell.toJSON() 
     # we need to escape the input in view mode
     data.input = data.input.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     @cellTemplate(data)
+
 
 # EditNotebookView is the main app view and manages a list of cells
 class EditNotebookView extends BaseNotebookView
@@ -91,14 +113,13 @@ class EditNotebookView extends BaseNotebookView
     @template = _.template($('#notebook-template').html())
     $('.container').append(@render()) 
 
-    if root.mathjaxReady
-      @typeset()
-
-
     @cells = @$('.cells')
     @model.cells.bind 'add', @addOne
     @model.cells.bind 'refresh', @addAll
     @model.cells.fetch(success: @addAll)
+    if root.mathjaxReady
+      console.log 'calling typeset at init'
+      @typeset()
 
   # render by setting up title and meta elements
   render: =>

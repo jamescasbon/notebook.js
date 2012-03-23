@@ -29,6 +29,7 @@
     __extends(BaseNotebookView, _super);
 
     function BaseNotebookView() {
+      this.generateToc = __bind(this.generateToc, this);
       this.typeset = __bind(this.typeset, this);
       this.saveToFile = __bind(this.saveToFile, this);
       this.mathjaxReady = __bind(this.mathjaxReady, this);
@@ -54,10 +55,32 @@
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         el = _ref[_i];
-        console.log(el);
+        console.log('tp', el);
         _results.push(MathJax.Hub.Typeset(el));
       }
       return _results;
+    };
+
+    BaseNotebookView.prototype.generateToc = function() {
+      var toc,
+        _this = this;
+      toc = $(document.createElement('div'));
+      this.$('.cell-output').each(function(i, cell) {
+        console.log('tc', i, cell);
+        return $(cell).find('h1, h2, h3').each(j, heading)(function() {
+          var a, el;
+          $(heading).attr("id", "title" + i + '_' + j);
+          console.log("title" + i + '_' + j);
+          el = $(document.createElement('div'));
+          el.addClass(heading.tagName);
+          el.addClass('toc-entry');
+          a = $(document.createElement('a')).appendTo(el);
+          a.attr('fre');
+          el.html($(heading).html());
+          return toc.append(el);
+        });
+      });
+      return console.log(toc);
     };
 
     return BaseNotebookView;
@@ -98,8 +121,7 @@
       this.model.cells.fetch({
         success: this.addAll
       });
-      if (root.mathjaxReady) this.typeset();
-      return console.log;
+      if (root.mathjaxReady) return this.typeset();
     };
 
     ViewNotebookView.prototype.render = function() {
@@ -157,13 +179,16 @@
     EditNotebookView.prototype.initialize = function() {
       this.template = _.template($('#notebook-template').html());
       $('.container').append(this.render());
-      if (root.mathjaxReady) this.typeset();
       this.cells = this.$('.cells');
       this.model.cells.bind('add', this.addOne);
       this.model.cells.bind('refresh', this.addAll);
-      return this.model.cells.fetch({
+      this.model.cells.fetch({
         success: this.addAll
       });
+      if (root.mathjaxReady) {
+        console.log('calling typeset at init');
+        return this.typeset();
+      }
     };
 
     EditNotebookView.prototype.render = function() {

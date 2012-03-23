@@ -73,7 +73,7 @@ html ->
         div 'cell-output', tabindex: "[[= position ]]c", ->
           '[[= output ]]'
 
-        # status controls in left margin
+        # status controls in right margin
         div 'status-bar', -> 
           div 'tooltip', tooltip: 'Evaluate', -> 
             img 'evaluate', src: '/img/play.png'
