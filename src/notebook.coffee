@@ -18,11 +18,10 @@ class Notebook extends Backbone.Model
     data.cells = @cells.toJSON() 
     return JSON.stringify(data)
 
+
 class Notebooks extends Backbone.Collection
   model: Notebook
   localStorage: new Store('Notebooks1') 
-
-
 
 
 

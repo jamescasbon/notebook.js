@@ -7,6 +7,7 @@ root = exports ? this
 NAVBAR_HEIGHT = 30
 
 isScrolledIntoView = (elem) -> 
+  console.log 'checking scroll status'
   docViewTop = $(window).scrollTop() + (2 * NAVBAR_HEIGHT)
   docViewBottom = docViewTop + $(window).height() - (2 * NAVBAR_HEIGHT)
 
@@ -28,7 +29,6 @@ class ViewNotebookView extends Backbone.View
     root.router.navigate(@model.get('id') + '/edit/', trigger: true)
 
   initialize: =>
-    console.log 'init vnv'
     @template = _.template($('#notebook-template').html())
     @cellTemplate = _.template($('#cell-view-template').html())
     $('.container').append(@render()) 
@@ -44,16 +44,17 @@ class ViewNotebookView extends Backbone.View
     @el
 
   addOne: (cell) =>
-    console.log 'addone'
     newEl = @renderCell(cell)
     @cells.append(newEl)
-    
 
   addAll: (cells) =>
     cells.each @addOne
 
   renderCell: (cell) =>
-    @cellTemplate(cell.toJSON())
+    data = cell.toJSON() 
+    # we need to escape the input in view mode
+    data.input = data.input.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    @cellTemplate(data)
    
   mathjaxReady: => 
     # perform initial typeset of output elements
@@ -117,7 +118,6 @@ class EditNotebookView extends Backbone.View
       @model.cells.createAtEnd()
     else if e.keyCode == 38
       ncells = @model.cells.length
-      console.log(ncells)
       @model.cells.at(ncells - 1).view.output.focus()
 
   mathjaxReady: => 
@@ -227,9 +227,7 @@ class CellEditView extends Backbone.View
 
   # handle state changes 
   changeState: => 
-   
-    console.log('view changing state to', @model.get('state'))
-    
+    #console.log('view changing state to', @model.get('state'))
     switch @model.get('state')
       when 'evaluating'
         @output.html('...')
@@ -300,6 +298,7 @@ class CellEditView extends Backbone.View
         #console.log 'lineup,inview?', isScrolledIntoView(cursor)
         if not isScrolledIntoView(cursor)
           # FIXME: make this code explici3t
+          #console.log('scrollup')
           $('body').scrollTop(cursor.offset().top - 4 * NAVBAR_HEIGHT)
 
         row = ed.getSession().getSelection().getCursor().row
@@ -316,6 +315,7 @@ class CellEditView extends Backbone.View
       exec: (ed, args) => 
         cursor = @$('.ace_cursor')
         if not isScrolledIntoView(cursor)
+          #console.log('scrolldown')
           # FIXME: make this code explicit 
           $('body').scrollTop(cursor.offset().top - $(window).height() + 3 *  NAVBAR_HEIGHT)
 
@@ -353,7 +353,8 @@ class CellEditView extends Backbone.View
 
     # 38 up 40 down
     target = e.target.className
-    console.log 'kp', e.keyCode, target
+    #console.log 'kp', e.keyCode, target
+
     if e.keyCode == 38            # UP ARROW
       switch target 
         when 'cell-output'
@@ -427,9 +428,8 @@ class CellEditView extends Backbone.View
     if next?
      next.view.spawn.focus()
     else
-      console.log('focus nb spawn')
+      #console.log('focus nb spawn')
       $('#spawner').focus()
-  focus: => console.log('focus')
 
   setEditorHighlightMode: => 
     if @model.get('type') == 'javascript'
@@ -472,11 +472,11 @@ class CellEditView extends Backbone.View
     # recall later
     if line_height == 1
       setTimeout(@resizeEditor, 200)
-      console.log 'defer resize'
+      #console.log 'defer resize'
       return 
 
     # Add 20 here to allow scroll while wrap is broken
-    console.log 'height of editor is', line_height, lines
+    #console.log 'height of editor is', line_height, lines
     @$('.ace-container').height(20 + (line_height * lines))
     @editor.resize()
     # TODO get real line height
@@ -502,7 +502,6 @@ class IndexView extends Backbone.View
     $('#notebooks').append(@nbtemplate(nb.toJSON()))
 
   addNbs: => 
-    console.log 'addNbs'
     @nbtemplate = _.template($('#notebook-index-template').html())
     root.notebooks.each(@addNb)
 
@@ -511,7 +510,7 @@ class IndexView extends Backbone.View
 
   loadFile: (ev) => 
     file = ev.target.files[0]
-    console.log 'loading notebook', file.name
+    #console.log 'loading notebook', file.name
     reader = new FileReader()
     reader.onload = (e) => 
       nbdata = JSON.parse(e.target.result)
@@ -520,6 +519,9 @@ class IndexView extends Backbone.View
       
     reader.readAsText(file) 
     # TODO: set loading status
+
+  mathjaxReady: => 
+    return
 
 
 class NewView extends Backbone.View
@@ -537,11 +539,15 @@ class NewView extends Backbone.View
     @el
 
   create: => 
-    console.log 'creating'
+    #console.log 'creating'
     nb = root.notebooks.create(title: @$('input').val())
     nb.readyCells()
-    nb.cells.create()
+    nb.cells.create(position: nb.cells.posJump)
     root.router.navigate (nb.id + '/edit/'), trigger: true
+
+  mathjaxReady: => 
+    return
+
 
 
 class NotebookRouter extends Backbone.Router
@@ -618,7 +624,6 @@ class NotebookRouter extends Backbone.Router
 
 # crazy global methods? Go in the router?
 setTitle = (title) =>
-  console.log('set title', title)
   $('#title').html(title)
 
 

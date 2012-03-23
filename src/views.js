@@ -16,6 +16,7 @@
 
   isScrolledIntoView = function(elem) {
     var docViewBottom, docViewTop, elemBottom, elemTop;
+    console.log('checking scroll status');
     docViewTop = $(window).scrollTop() + (2 * NAVBAR_HEIGHT);
     docViewBottom = docViewTop + $(window).height() - (2 * NAVBAR_HEIGHT);
     elemTop = elem.offset().top;
@@ -53,7 +54,6 @@
     };
 
     ViewNotebookView.prototype.initialize = function() {
-      console.log('init vnv');
       this.template = _.template($('#notebook-template').html());
       this.cellTemplate = _.template($('#cell-view-template').html());
       $('.container').append(this.render());
@@ -72,7 +72,6 @@
 
     ViewNotebookView.prototype.addOne = function(cell) {
       var newEl;
-      console.log('addone');
       newEl = this.renderCell(cell);
       return this.cells.append(newEl);
     };
@@ -82,7 +81,10 @@
     };
 
     ViewNotebookView.prototype.renderCell = function(cell) {
-      return this.cellTemplate(cell.toJSON());
+      var data;
+      data = cell.toJSON();
+      data.input = data.input.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return this.cellTemplate(data);
     };
 
     ViewNotebookView.prototype.mathjaxReady = function() {
@@ -177,7 +179,6 @@
         return this.model.cells.createAtEnd();
       } else if (e.keyCode === 38) {
         ncells = this.model.cells.length;
-        console.log(ncells);
         return this.model.cells.at(ncells - 1).view.output.focus();
       }
     };
@@ -216,7 +217,6 @@
       this.destroy = __bind(this.destroy, this);
       this.evaluate = __bind(this.evaluate, this);
       this.setEditorHighlightMode = __bind(this.setEditorHighlightMode, this);
-      this.focus = __bind(this.focus, this);
       this.focusCellBelow = __bind(this.focusCellBelow, this);
       this.focusCellAbove = __bind(this.focusCellAbove, this);
       this.blurInput = __bind(this.blurInput, this);
@@ -299,7 +299,6 @@
     };
 
     CellEditView.prototype.changeState = function() {
-      console.log('view changing state to', this.model.get('state'));
       switch (this.model.get('state')) {
         case 'evaluating':
           this.output.html('...');
@@ -442,7 +441,6 @@
       }
       inFold = this.model.get('inputFold');
       target = e.target.className;
-      console.log('kp', e.keyCode, target);
       if (e.keyCode === 38) {
         switch (target) {
           case 'cell-output':
@@ -521,13 +519,8 @@
       if (next != null) {
         return next.view.spawn.focus();
       } else {
-        console.log('focus nb spawn');
         return $('#spawner').focus();
       }
-    };
-
-    CellEditView.prototype.focus = function() {
-      return console.log('focus');
     };
 
     CellEditView.prototype.setEditorHighlightMode = function() {
@@ -580,10 +573,8 @@
       lines = this.editor.getSession().getScreenLength();
       if (line_height === 1) {
         setTimeout(this.resizeEditor, 200);
-        console.log('defer resize');
         return;
       }
-      console.log('height of editor is', line_height, lines);
       this.$('.ace-container').height(20 + (line_height * lines));
       return this.editor.resize();
     };
@@ -597,6 +588,7 @@
     __extends(IndexView, _super);
 
     function IndexView() {
+      this.mathjaxReady = __bind(this.mathjaxReady, this);
       this.loadFile = __bind(this.loadFile, this);
       this["new"] = __bind(this["new"], this);
       this.addNbs = __bind(this.addNbs, this);
@@ -629,7 +621,6 @@
     };
 
     IndexView.prototype.addNbs = function() {
-      console.log('addNbs');
       this.nbtemplate = _.template($('#notebook-index-template').html());
       return root.notebooks.each(this.addNb);
     };
@@ -644,7 +635,6 @@
       var file, reader,
         _this = this;
       file = ev.target.files[0];
-      console.log('loading notebook', file.name);
       reader = new FileReader();
       reader.onload = function(e) {
         var nbdata, notebook;
@@ -657,6 +647,8 @@
       return reader.readAsText(file);
     };
 
+    IndexView.prototype.mathjaxReady = function() {};
+
     return IndexView;
 
   })(Backbone.View);
@@ -666,6 +658,7 @@
     __extends(NewView, _super);
 
     function NewView() {
+      this.mathjaxReady = __bind(this.mathjaxReady, this);
       this.create = __bind(this.create, this);
       this.render = __bind(this.render, this);
       this.initialize = __bind(this.initialize, this);
@@ -690,16 +683,19 @@
 
     NewView.prototype.create = function() {
       var nb;
-      console.log('creating');
       nb = root.notebooks.create({
         title: this.$('input').val()
       });
       nb.readyCells();
-      nb.cells.create();
+      nb.cells.create({
+        position: nb.cells.posJump
+      });
       return root.router.navigate(nb.id + '/edit/', {
         trigger: true
       });
     };
+
+    NewView.prototype.mathjaxReady = function() {};
 
     return NewView;
 
@@ -814,7 +810,6 @@
   })(Backbone.Router);
 
   setTitle = function(title) {
-    console.log('set title', title);
     return $('#title').html(title);
   };
 

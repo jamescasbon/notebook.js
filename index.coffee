@@ -101,7 +101,8 @@ html ->
             h3 'Tutorials'
             ul ->
               li -> a href: '/#load/examples/tut_first.notebook', -> 'Tutorial: first steps'
-              li -> a href: '/#load/examples/tut_engine.notebook', -> 'Tutorial: engine'
+              li -> a href: '/#load/examples/tut_engine.notebook', -> 'Tutorial: the engine'
+              li -> a href: '/#load/examples/tut_web.notebook', -> 'Tutorial: be a web citizen'
             
             label for: "files", -> 'Load notebook from file'
             input type:"file", id: "load-file", name:"file", -> 'hi'
