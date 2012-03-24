@@ -135,6 +135,7 @@ html ->
               li -> a href: '/#load/examples/tut_engine.notebook', -> 'Using the engine'
               li -> a href: '/#load/examples/tut_web.notebook', -> 'Be a web citizen'
               li -> a href: '/#load/examples/tut_eqn.notebook', -> 'Using equations'
+              li -> a href: '/#load/examples/tut_sharing.notebook', -> 'Sharing notebooks'
           
 
     script type: "text/template", id: "notebook-index-template", ->
