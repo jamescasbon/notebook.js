@@ -4,6 +4,7 @@ html ->
     title 'notebook.js demo'
     script src: "/lib/jquery-1.7.1.js" 
     script src: "/lib/underscore.js" 
+    script src: "/lib/underscore.string.js" 
     script src: "/lib/backbone.js" 
     script src: "/lib/backbone.localStorage.js"
     script src: "/lib/showdown.js",
