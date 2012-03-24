@@ -48,13 +48,13 @@
       this.typeset = __bind(this.typeset, this);
       this.saveToFile = __bind(this.saveToFile, this);
       this.mathjaxReady = __bind(this.mathjaxReady, this);
-      this.goto = __bind(this.goto, this);
+      this.handleTocJump = __bind(this.handleTocJump, this);
       BaseNotebookView.__super__.constructor.apply(this, arguments);
     }
 
     BaseNotebookView.prototype.className = "app";
 
-    BaseNotebookView.prototype.goto = function(e) {
+    BaseNotebookView.prototype.handleTocJump = function(e) {
       var target;
       console.log('gt', e);
       window.e = e;
@@ -131,7 +131,7 @@
     }
 
     ViewNotebookView.prototype.events = {
-      'click #toc': 'goto',
+      'click #toc': 'handleTocJump',
       "click #toggle-edit": "toggleEdit",
       "click #save-to-file": "saveToFile"
     };
@@ -199,7 +199,7 @@
 
     EditNotebookView.prototype.events = function() {
       return {
-        'click #toc': 'goto',
+        'click #toc': 'handleTocJump',
         "dblclick #spawner": 'spawnCellAtEnd',
         "keyup #spawner": 'spawnKeypress',
         "click #toggle-edit": "toggleEdit",

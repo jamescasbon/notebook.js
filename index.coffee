@@ -2,44 +2,54 @@ doctype 5
 html ->
   head ->
     title 'notebook.js demo'
-    script src: "/lib/jquery-1.7.1.js" 
-    script src: "/lib/underscore.js" 
-    script src: "/lib/underscore.string.js" 
-    script src: "/lib/backbone.js" 
-    script src: "/lib/backbone.localStorage.js"
-    script src: "/lib/showdown.js",
-    script src: "/lib/google-code-prettify/prettify.js",
+    if process.env.NJSMODE == 'dev'
+      script src: "/lib/jquery-1.7.2.js" 
+      script src: "/lib/underscore/underscore.js" 
+      script src: "/lib/underscore.string/lib/underscore.string.js" 
+      script src: "/lib/backbone/backbone.js" 
+      script src: "/lib/backbone.localStorage/backbone.localStorage.js"
+      script src: "/lib/showdown/src/showdown.js",
+      script src: "/src/engine.js" 
+      script src: "/src/notebook.js" 
+      script src: "/src/views.js" 
+    else
+      script src: "/lib/jquery-1.7.2.min.js" 
+      script src: "/lib/underscore/underscore-min.js" 
+      script src: "/lib/underscore.string/dist/underscore.string.min.js" 
+      script src: "/lib/backbone/backbone-min.js" 
+      script src: "/lib/backbone.localStorage/backbone.localStorage-min.js"
+      script src: "/lib/showdown/compressed/showdown.js",
+      script src: '/lib/notebook.js'
+
     script src: "/ace/build/src/ace.js"
     script src: "/ace/build/src/mode-javascript.js"
     script src: "/ace/build/src/mode-markdown.js"
-    script src: "/src/engine.js" 
-    script src: "/src/notebook.js" 
-    script src: "/src/views.js" 
-    
-    if true
-      link href: 'http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700', rel: 'stylesheet', type: 'text/css'
-      script type: 'text/x-mathjax-config'
-        "MathJax.Hub.Config({messageStyle: 'none', skipStartupTypeset: true, tex2jax: {inlineMath: [['$','$']]}});"
-      script src: "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+    script src: "/lib/google-code-prettify/prettify.js",
+    link href: 'http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700', rel: 'stylesheet', type: 'text/css'
+    script type: 'text/x-mathjax-config'
+      "MathJax.Hub.Config({messageStyle: 'none', skipStartupTypeset: true, tex2jax: {inlineMath: [['$','$']]}});"
+    script src: "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
 
     link rel: 'stylesheet', href: '/css/base.css'
     link rel: 'stylesheet', href: '/css/skeleton.css'
     link rel: 'stylesheet', href: '/css/layout.css'
     link rel: 'stylesheet', href: '/css/notebook.css'
     link rel: 'stylesheet', href: '/lib/google-code-prettify/prettify.css'
+  
+    if process.env.NJSMODE == 'production'
 
-    text '''<script type="text/javascript">
-      var _gaq = _gaq || [];
-      _gaq.push(['_setAccount', 'UA-30300426-1']);
-      _gaq.push(['_trackPageview']);
+      text '''<script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-30300426-1']);
+        _gaq.push(['_trackPageview']);
 
-      (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-      })();
-      </script>
-      '''
+        (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+        </script>
+        '''
   body ->
     
     div '.container', ->

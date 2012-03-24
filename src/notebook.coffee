@@ -1,6 +1,7 @@
 root = exports ? this
 
 
+
 class Notebook extends Backbone.Model
   defaults: => (title: "untitled")
 

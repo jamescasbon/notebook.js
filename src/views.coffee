@@ -36,7 +36,7 @@ class BaseNotebookView extends Backbone.View
 
   # events: TODO: base set of events 
 
-  goto: (e) => 
+  handleTocJump: (e) => 
     console.log('gt', e)
     window.e = e
     target = $(e.target).attr('href')
@@ -92,7 +92,7 @@ class BaseNotebookView extends Backbone.View
 class ViewNotebookView extends BaseNotebookView
 
   events: 
-    'click #toc': 'goto'
+    'click #toc': 'handleTocJump'
     "click #toggle-edit" : "toggleEdit"
     "click #save-to-file": "saveToFile"
 
@@ -134,7 +134,7 @@ class EditNotebookView extends BaseNotebookView
 
   events: => (
     # there is a lone spawner at the bottom of the page
-    'click #toc': 'goto'
+    'click #toc': 'handleTocJump'
     "dblclick #spawner": 'spawnCellAtEnd'
     "keyup #spawner": 'spawnKeypress'
     "click #toggle-edit" : "toggleEdit" 
