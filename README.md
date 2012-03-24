@@ -41,26 +41,18 @@ Frontend
 Now:
 
 * share urls
-* chrome bug on web tutorial
 * play all
-* TOC
-
+* TOC styling 
+* do not put non idempotent states in history
 
 * detect whether content changed when evaluating (short circuit) - could do on isDirty except when
 new loaded notebook 
 * Skip null output/ show null output placeholder
 * Set inital focus
-* Better isScrolled logic
-* Mathjax ready global 
-* Highlighter for view mode
-* Center notepad
 * Defocus ajax should empty selection
-* consistent selection color input and output
-* Better list of notebooks
 * disable box on matched character in ace onblur
 * url methods on notebook?
 * engine lifecycle with notebook
-* Mathjax token compatibility
 
 
 Someday: 
