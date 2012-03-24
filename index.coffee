@@ -12,7 +12,6 @@ html ->
     script src: "/ace/build/src/ace.js"
     script src: "/ace/build/src/mode-javascript.js"
     script src: "/ace/build/src/mode-markdown.js"
-    script src: "/lib/lzw.js"
     script src: "/src/engine.js" 
     script src: "/src/notebook.js" 
     script src: "/src/views.js" 
