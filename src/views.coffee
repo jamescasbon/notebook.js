@@ -4,21 +4,46 @@ _.templateSettings = {interpolate : /\[\[=(.+?)\]\]/g, evaluate: /\[\[(.+?)\]\]/
 
 root = exports ? this
  
+
+# scrolling functions to check el in view and scroll to it
 NAVBAR_HEIGHT = 30
 
 isScrolledIntoView = (elem) -> 
-  console.log 'checking scroll status'
   docViewTop = $(window).scrollTop() + (2 * NAVBAR_HEIGHT)
-  docViewBottom = docViewTop + $(window).height() - (2 * NAVBAR_HEIGHT)
+  docViewBottom = $(window).scrollTop() + $(window).height() - (NAVBAR_HEIGHT)
 
   elemTop = elem.offset().top
   elemBottom = elemTop + elem.height()
 
   return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop))
 
+scrollToAtTop = (elem) ->
+  target = elem.offset().top - 3 * NAVBAR_HEIGHT
+  console.log 'stat', target
+  $(window).scrollTop(target)
+
+scrollToAtBottom = (elem) -> 
+  bottom = elem.offset().top + elem.height()
+  scrollbottom = bottom + (2 * NAVBAR_HEIGHT)
+  scrolltop = scrollbottom -  $(window).height()
+  console.log 'stab', scrolltop
+  $('body').scrollTop scrolltop
+
+
 
 class BaseNotebookView extends Backbone.View
   className: "app"
+
+  # events: TODO: base set of events 
+
+  goto: (e) => 
+    console.log('gt', e)
+    window.e = e
+    target = $(e.target).attr('href')
+    if target
+      console.log 'gt', target
+      target = $('#' + target)
+      scrollToAtTop(target)
 
   mathjaxReady: => 
     # perform initial typeset of output elements
@@ -35,32 +60,39 @@ class BaseNotebookView extends Backbone.View
     for el in @$('#notebook')
       console.log 'tp', el
       MathJax.Hub.Typeset(el) 
+    @$('#toc').html @generateToc()
 
   generateToc: => 
-    # todo
+    # TODO: create template and view for this
     toc = $( document.createElement('div') )
-    @$('.cell-output').each (i, cell) => 
 
-      console.log 'tc', i, cell
-      $(cell).find('h1, h2, h3').each(j, heading) -> 
-        $(heading).attr("id", "title" + i + '_' + j)
-        console.log("title" + i + '_' + j)
+    @$('.cell').each (i, cell) => 
+      
+      celldiv = $( document.createElement('div') ).appendTo(toc)
+      celldiv.addClass('toc-cell')
+      celldiv.attr('href', $(cell).attr('id'))
+      
+      $(cell).find('.cell-output > h1, h2, h3').each (j, heading) -> 
+        linkid = "title" + i + '_' + j
+
+        # set the target id
+        $(heading).attr('id', linkid)
+        
+        # create element in TOC
         el = $( document.createElement('div') )
         el.addClass(heading.tagName)
         el.addClass('toc-entry')
-
-        a = $( document.createElement('a') ).appendTo(el)
-        a.attr('fre')
-
+        el.attr('href', linkid)
         el.html($(heading).html())
-
         toc.append(el)
-    console.log(toc)
+
+    toc
 
 
 class ViewNotebookView extends BaseNotebookView
 
   events: 
+    'click #toc': 'goto'
     "click #toggle-edit" : "toggleEdit"
     "click #save-to-file": "saveToFile"
 
@@ -102,6 +134,7 @@ class EditNotebookView extends BaseNotebookView
 
   events: => (
     # there is a lone spawner at the bottom of the page
+    'click #toc': 'goto'
     "dblclick #spawner": 'spawnCellAtEnd'
     "keyup #spawner": 'spawnKeypress'
     "click #toggle-edit" : "toggleEdit" 
@@ -327,11 +360,9 @@ class CellEditView extends Backbone.View
       bindKey: {win: "Up", mac: "Up|Ctrl-P", sender: 'editor'},
       exec: (ed, args) => 
         cursor = @$('.ace_cursor')
-        #console.log 'lineup,inview?', isScrolledIntoView(cursor)
         if not isScrolledIntoView(cursor)
-          # FIXME: make this code explici3t
           #console.log('scrollup')
-          $('body').scrollTop(cursor.offset().top - 4 * NAVBAR_HEIGHT)
+          scrollToAtTop(cursor) 
 
         row = ed.getSession().getSelection().getCursor().row
         if row == 0
@@ -347,9 +378,7 @@ class CellEditView extends Backbone.View
       exec: (ed, args) => 
         cursor = @$('.ace_cursor')
         if not isScrolledIntoView(cursor)
-          #console.log('scrolldown')
-          # FIXME: make this code explicit 
-          $('body').scrollTop(cursor.offset().top - $(window).height() + 3 *  NAVBAR_HEIGHT)
+          scrollToAtBottom(cursor)
 
         row = ed.getSession().getSelection().getCursor().row
         last = @editor.getSession().getDocument().getLength() - 1

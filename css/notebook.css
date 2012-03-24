@@ -61,6 +61,37 @@ pre {
   -moz-box-shadow: rgba(0,0,0,0.50) 0 0 8px;
   height: 100%;
 }
+#toc {
+  position: fixed;
+  right: 0px;
+  background: rgba(0,0,0,0.50);
+  max-width: 250px;
+  padding: 10px;
+  color: #fff;
+}
+#toc .H1,
+#toc .H2,
+#toc .H3,
+#toc .toc-cell {
+  cursor: pointer;
+}
+#toc .H1 {
+  margin-left: 0px;
+  font-weight: bold;
+}
+#toc .H2 {
+  font-size: 90%;
+  margin-left: 5px;
+}
+#toc .H3 {
+  margin-left: 10px;
+  font-size: 80%;
+}
+#toc .toc-cell {
+  background: #00f;
+  height: 5px;
+  margin-bottom: 1px;
+}
 .cells {
   list-style-type: none;
   padding: 0;

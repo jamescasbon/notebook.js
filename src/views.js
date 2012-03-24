@@ -1,5 +1,5 @@
 (function() {
-  var BaseNotebookView, CellEditView, EditNotebookView, IndexView, NAVBAR_HEIGHT, NewView, NotebookRouter, ViewNotebookView, isScrolledIntoView, loadNotebook, mathjaxReady, root, saveFile, setTitle,
+  var BaseNotebookView, CellEditView, EditNotebookView, IndexView, NAVBAR_HEIGHT, NewView, NotebookRouter, ViewNotebookView, isScrolledIntoView, loadNotebook, mathjaxReady, root, saveFile, scrollToAtBottom, scrollToAtTop, setTitle,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
@@ -16,12 +16,27 @@
 
   isScrolledIntoView = function(elem) {
     var docViewBottom, docViewTop, elemBottom, elemTop;
-    console.log('checking scroll status');
     docViewTop = $(window).scrollTop() + (2 * NAVBAR_HEIGHT);
-    docViewBottom = docViewTop + $(window).height() - (2 * NAVBAR_HEIGHT);
+    docViewBottom = $(window).scrollTop() + $(window).height() - NAVBAR_HEIGHT;
     elemTop = elem.offset().top;
     elemBottom = elemTop + elem.height();
     return (elemBottom <= docViewBottom) && (elemTop >= docViewTop);
+  };
+
+  scrollToAtTop = function(elem) {
+    var target;
+    target = elem.offset().top - 3 * NAVBAR_HEIGHT;
+    console.log('stat', target);
+    return $(window).scrollTop(target);
+  };
+
+  scrollToAtBottom = function(elem) {
+    var bottom, scrollbottom, scrolltop;
+    bottom = elem.offset().top + elem.height();
+    scrollbottom = bottom + (2 * NAVBAR_HEIGHT);
+    scrolltop = scrollbottom - $(window).height();
+    console.log('stab', scrolltop);
+    return $('body').scrollTop(scrolltop);
   };
 
   BaseNotebookView = (function(_super) {
@@ -33,10 +48,23 @@
       this.typeset = __bind(this.typeset, this);
       this.saveToFile = __bind(this.saveToFile, this);
       this.mathjaxReady = __bind(this.mathjaxReady, this);
+      this.goto = __bind(this.goto, this);
       BaseNotebookView.__super__.constructor.apply(this, arguments);
     }
 
     BaseNotebookView.prototype.className = "app";
+
+    BaseNotebookView.prototype.goto = function(e) {
+      var target;
+      console.log('gt', e);
+      window.e = e;
+      target = $(e.target).attr('href');
+      if (target) {
+        console.log('gt', target);
+        target = $('#' + target);
+        return scrollToAtTop(target);
+      }
+    };
 
     BaseNotebookView.prototype.mathjaxReady = function() {
       console.log('mjr');
@@ -48,39 +76,40 @@
     };
 
     BaseNotebookView.prototype.typeset = function() {
-      var el, _i, _len, _ref, _results;
+      var el, _i, _len, _ref;
       console.log('typeset');
       prettyPrint();
       _ref = this.$('#notebook');
-      _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         el = _ref[_i];
         console.log('tp', el);
-        _results.push(MathJax.Hub.Typeset(el));
+        MathJax.Hub.Typeset(el);
       }
-      return _results;
+      return this.$('#toc').html(this.generateToc());
     };
 
     BaseNotebookView.prototype.generateToc = function() {
       var toc,
         _this = this;
       toc = $(document.createElement('div'));
-      this.$('.cell-output').each(function(i, cell) {
-        console.log('tc', i, cell);
-        return $(cell).find('h1, h2, h3').each(j, heading)(function() {
-          var a, el;
-          $(heading).attr("id", "title" + i + '_' + j);
-          console.log("title" + i + '_' + j);
+      this.$('.cell').each(function(i, cell) {
+        var celldiv;
+        celldiv = $(document.createElement('div')).appendTo(toc);
+        celldiv.addClass('toc-cell');
+        celldiv.attr('href', $(cell).attr('id'));
+        return $(cell).find('.cell-output > h1, h2, h3').each(function(j, heading) {
+          var el, linkid;
+          linkid = "title" + i + '_' + j;
+          $(heading).attr('id', linkid);
           el = $(document.createElement('div'));
           el.addClass(heading.tagName);
           el.addClass('toc-entry');
-          a = $(document.createElement('a')).appendTo(el);
-          a.attr('fre');
+          el.attr('href', linkid);
           el.html($(heading).html());
           return toc.append(el);
         });
       });
-      return console.log(toc);
+      return toc;
     };
 
     return BaseNotebookView;
@@ -102,6 +131,7 @@
     }
 
     ViewNotebookView.prototype.events = {
+      'click #toc': 'goto',
       "click #toggle-edit": "toggleEdit",
       "click #save-to-file": "saveToFile"
     };
@@ -169,6 +199,7 @@
 
     EditNotebookView.prototype.events = function() {
       return {
+        'click #toc': 'goto',
         "dblclick #spawner": 'spawnCellAtEnd',
         "keyup #spawner": 'spawnKeypress',
         "click #toggle-edit": "toggleEdit",
@@ -423,9 +454,7 @@
         exec: function(ed, args) {
           var cursor, row;
           cursor = _this.$('.ace_cursor');
-          if (!isScrolledIntoView(cursor)) {
-            $('body').scrollTop(cursor.offset().top - 4 * NAVBAR_HEIGHT);
-          }
+          if (!isScrolledIntoView(cursor)) scrollToAtTop(cursor);
           row = ed.getSession().getSelection().getCursor().row;
           if (row === 0) {
             _this.spawn.focus();
@@ -445,9 +474,7 @@
         exec: function(ed, args) {
           var cursor, last, row;
           cursor = _this.$('.ace_cursor');
-          if (!isScrolledIntoView(cursor)) {
-            $('body').scrollTop(cursor.offset().top - $(window).height() + 3 * NAVBAR_HEIGHT);
-          }
+          if (!isScrolledIntoView(cursor)) scrollToAtBottom(cursor);
           row = ed.getSession().getSelection().getCursor().row;
           last = _this.editor.getSession().getDocument().getLength() - 1;
           if (row === last) {
