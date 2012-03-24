@@ -7,7 +7,7 @@ html ->
       script src: "/lib/underscore/underscore.js" 
       script src: "/lib/underscore.string/lib/underscore.string.js" 
       script src: "/lib/backbone/backbone.js" 
-      script src: "/lib/backbone.localStorage/backbone.localStorage.js"
+      script src: "/lib/backbone.localstorage/backbone.localStorage.js"
       script src: "/lib/showdown/src/showdown.js",
       script src: "/src/engine.js" 
       script src: "/src/notebook.js" 
@@ -17,7 +17,7 @@ html ->
       script src: "/lib/underscore/underscore-min.js" 
       script src: "/lib/underscore.string/dist/underscore.string.min.js" 
       script src: "/lib/backbone/backbone-min.js" 
-      script src: "/lib/backbone.localStorage/backbone.localStorage-min.js"
+      script src: "/lib/backbone.localstorage/backbone.localStorage-min.js"
       script src: "/lib/showdown/compressed/showdown.js",
       script src: '/lib/notebook.js'
 
