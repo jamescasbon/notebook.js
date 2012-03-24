@@ -97,7 +97,7 @@
         celldiv = $(document.createElement('div')).appendTo(toc);
         celldiv.addClass('toc-cell');
         celldiv.attr('href', $(cell).attr('id'));
-        return $(cell).find('.cell-output > h1, h2, h3').each(function(j, heading) {
+        return $(cell).find('h1, h2, h3').each(function(j, heading) {
           var el, linkid;
           linkid = "title" + i + '_' + j;
           $(heading).attr('id', linkid);
@@ -387,7 +387,7 @@
     };
 
     CellEditView.prototype.afterDomInsert = function() {
-      var ace_id,
+      var ace_id, crs_to_add, i, input, _i, _len, _ref,
         _this = this;
       if (this.model.id != null) {
         ace_id = this.model.id;
@@ -406,10 +406,18 @@
       this.$('.ace_sb').css({
         display: 'none'
       });
-      this.editor.getSession().setValue(this.model.get('input'));
+      this.resizeEditor();
       this.editor.getSession().on('change', this.inputChange);
       this.setEditorHighlightMode();
-      this.resizeEditor();
+      input = this.model.get('input');
+      crs_to_add = Math.max(3 - _.string.count(input, '\n'), 0);
+      console.log('crs');
+      _ref = _.range(crs_to_add);
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        i = _ref[_i];
+        input = input + '\n';
+      }
+      this.editor.getSession().setValue(input);
       if (this.model.get('inputFold')) this.changeInputFold();
       this.editor.commands.addCommand({
         name: 'evaluate',
@@ -809,7 +817,6 @@
       notebook.readyCells();
       root.nb = notebook;
       console.log('notebook loaded; id=' + notebook.get('id'));
-      notebook.readyCells();
       return notebook;
     };
 
@@ -841,9 +848,15 @@
       confirmed = confirm('You really want to delete that?');
       if (confirmed) {
         notebook = this.getNotebook(nb);
-        notebook.cells.each(function(x) {
-          return x.destroy();
+        notebook.cells.fetch({
+          success: function(cells) {
+            return cells.each(function(cell) {
+              console.log('destroy', cell);
+              return cell.destroy();
+            });
+          }
         });
+        console.log('cells', notebook.cells.length);
         notebook.destroy();
         console.log('deleted');
       }
@@ -859,7 +872,10 @@
     };
 
     NotebookRouter.prototype.index = function() {
-      if (root.app) root.app.remove();
+      if (root.app) {
+        root.app.remove();
+        root.nb = null;
+      }
       console.log('index view');
       setTitle('');
       return root.app = new IndexView();

@@ -72,7 +72,7 @@ class BaseNotebookView extends Backbone.View
       celldiv.addClass('toc-cell')
       celldiv.attr('href', $(cell).attr('id'))
       
-      $(cell).find('.cell-output > h1, h2, h3').each (j, heading) -> 
+      $(cell).find('h1, h2, h3').each (j, heading) -> 
         linkid = "title" + i + '_' + j
 
         # set the target id
@@ -328,13 +328,21 @@ class CellEditView extends Backbone.View
     # TODO: size of line highlight not correct
     @$('.ace_sb').css({display: 'none'})
 
-  
-    @editor.getSession().setValue(@model.get('input'))
+    @resizeEditor()
+ 
+
     
     @editor.getSession().on('change', @inputChange)
     @setEditorHighlightMode()
-    # there is a race condition here looking up the line height
-    @resizeEditor()
+    
+    # chrome screws up on input sizes < 3
+    input = @model.get('input') 
+    crs_to_add = Math.max( 3 - _.string.count(input, '\n') , 0)
+    console.log 'crs'
+    for i in _.range(crs_to_add)
+      input = input + '\n'
+    
+    @editor.getSession().setValue(input)
 
     if @model.get('inputFold') 
       @changeInputFold()
@@ -632,7 +640,6 @@ class NotebookRouter extends Backbone.Router
     notebook.readyCells()
     root.nb = notebook
     console.log('notebook loaded; id=' +  notebook.get('id'))
-    notebook.readyCells()
     notebook
 
   edit: (nb) => 
@@ -658,8 +665,15 @@ class NotebookRouter extends Backbone.Router
     confirmed = confirm('You really want to delete that?')
     if confirmed
       notebook = @getNotebook(nb)
-      notebook.cells.each( (x) -> x.destroy() )
+      
+      notebook.cells.fetch success: (cells) -> 
+        cells.each (cell) -> 
+          console.log 'destroy', cell
+          cell.destroy()
+
+      console.log 'cells', notebook.cells.length
       notebook.destroy()
+
       console.log('deleted')
     root.router.navigate('', trigger: true) 
 
@@ -672,6 +686,7 @@ class NotebookRouter extends Backbone.Router
   index: => 
     if root.app
       root.app.remove()
+      root.nb = null
     console.log 'index view'
     setTitle('')
     root.app = new IndexView()
