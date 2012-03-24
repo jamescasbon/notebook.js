@@ -157,6 +157,7 @@ html ->
         div '#menu', -> 
           button '#toggle-edit', -> 'toggle edit/view'
           button '#save-to-file', -> 'save to file'
+          button '#share-url', -> 'share'
 
 
     script type: "text/template", id: "new-notebook-form", ->
@@ -168,4 +169,6 @@ html ->
             input type: 'text', id: 'name'
             button type: 'submit', 'Create'
 
-    
+    script type: "text/template", id: "share-notebook", ->
+      h1 -> "Share this link to share the notebook"
+      div id: 'share-url', style: "max-width: 500px; word-wrap: break-word", -> "[[= url ]]"

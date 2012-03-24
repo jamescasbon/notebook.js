@@ -173,6 +173,9 @@ and store the results locally.  Try the tutorials to learn more.
           <button id="save-to-file">
             save to file
           </button>
+          <button id="share-url">
+            share
+          </button>
         </div>
       </div>
     </script>
@@ -190,6 +193,14 @@ and store the results locally.  Try the tutorials to learn more.
             <button type="submit">Create</button>
           </form>
         </div>
+      </div>
+    </script>
+    <script type="text/template" id="share-notebook">
+      <h1>
+        Share this link to share the notebook
+      </h1>
+      <div id="share-url" style="max-width: 500px; word-wrap: break-word">
+        [[= url ]]
       </div>
     </script>
   </body>

@@ -1,7 +1,7 @@
 (function() {
   var _this = this;
 
-  importScripts('/lib/underscore.js');
+  importScripts('/lib/underscore/underscore-min.js');
 
   self.onmessage = function(ev) {
     var inputId, print, result, src;

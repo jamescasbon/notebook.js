@@ -46,6 +46,7 @@
     function BaseNotebookView() {
       this.generateToc = __bind(this.generateToc, this);
       this.typeset = __bind(this.typeset, this);
+      this.share = __bind(this.share, this);
       this.saveToFile = __bind(this.saveToFile, this);
       this.mathjaxReady = __bind(this.mathjaxReady, this);
       this.handleTocJump = __bind(this.handleTocJump, this);
@@ -56,18 +57,15 @@
 
     BaseNotebookView.prototype.handleTocJump = function(e) {
       var target;
-      console.log('gt', e);
       window.e = e;
       target = $(e.target).attr('href');
       if (target) {
-        console.log('gt', target);
         target = $('#' + target);
         return scrollToAtTop(target);
       }
     };
 
     BaseNotebookView.prototype.mathjaxReady = function() {
-      console.log('mjr');
       return this.typeset();
     };
 
@@ -75,9 +73,20 @@
       return saveFile(this.model.serialize());
     };
 
+    BaseNotebookView.prototype.share = function() {
+      var enc, tmpl, url;
+      enc = btoa(this.model.serialize());
+      url = escape('http://notebookjs.me/#import/' + enc + '/');
+      tmpl = _.template($('#share-notebook').html());
+      console.log('template');
+      console.log(url);
+      return window.open("data:text/html;charset=utf-8," + tmpl({
+        url: url
+      }));
+    };
+
     BaseNotebookView.prototype.typeset = function() {
       var el, _i, _len, _ref;
-      console.log('typeset');
       prettyPrint();
       _ref = this.$('#notebook');
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -133,7 +142,8 @@
     ViewNotebookView.prototype.events = {
       'click #toc': 'handleTocJump',
       "click #toggle-edit": "toggleEdit",
-      "click #save-to-file": "saveToFile"
+      "click #save-to-file": "saveToFile",
+      "click #share-url": "share"
     };
 
     ViewNotebookView.prototype.toggleEdit = function() {
@@ -203,7 +213,8 @@
         "dblclick #spawner": 'spawnCellAtEnd',
         "keyup #spawner": 'spawnKeypress',
         "click #toggle-edit": "toggleEdit",
-        "click #save-to-file": "saveToFile"
+        "click #save-to-file": "saveToFile",
+        "click #share-url": "share"
       };
     };
 
@@ -765,6 +776,8 @@
       var nb;
       nb = root.notebooks.create({
         title: this.$('input').val()
+      }, {
+        wait: true
       });
       nb.readyCells();
       nb.cells.create({
@@ -786,6 +799,7 @@
     __extends(NotebookRouter, _super);
 
     function NotebookRouter() {
+      this["import"] = __bind(this["import"], this);
       this.loadUrl = __bind(this.loadUrl, this);
       this.index = __bind(this.index, this);
       this["new"] = __bind(this["new"], this);
@@ -803,8 +817,8 @@
       ":nb/delete/": "delete",
       'load/*url': 'loadUrl',
       "new/": "new",
-      "": "index",
-      "*p": 'unmatched'
+      "import/*data/": 'import',
+      "": "index"
     };
 
     NotebookRouter.prototype.unmatched = function(p) {
@@ -893,6 +907,15 @@
       });
     };
 
+    NotebookRouter.prototype["import"] = function(data) {
+      var notebook;
+      data = JSON.parse(atob(data));
+      notebook = loadNotebook(data);
+      return root.router.navigate(notebook.get('id') + '/view/', {
+        trigger: true
+      });
+    };
+
     return NotebookRouter;
 
   })(Backbone.Router);
@@ -911,6 +934,8 @@
     delete nbdata.cells;
     nbdata.title = nbdata.title;
     try {
+      if (root.notebooks.get(nbdata.id)) raise('duplicate');
+      console.log('no such nb', nbdata.id);
       console.log('import notebook');
       notebook = root.notebooks.create(nbdata);
       notebook.readyCells();

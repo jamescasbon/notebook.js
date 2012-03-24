@@ -37,25 +37,29 @@ class BaseNotebookView extends Backbone.View
   # events: TODO: base set of events 
 
   handleTocJump: (e) => 
-    console.log('gt', e)
     window.e = e
     target = $(e.target).attr('href')
     if target
-      console.log 'gt', target
       target = $('#' + target)
       scrollToAtTop(target)
 
   mathjaxReady: => 
     # perform initial typeset of output elements
     # need to check if still not initialized
-    console.log 'mjr'
     @typeset()
 
   saveToFile: => 
     saveFile(@model.serialize())
+
+  share: => 
+    enc = btoa(@model.serialize())
+    url = escape('http://notebookjs.me/#import/' + enc + '/')
+    tmpl = _.template($('#share-notebook').html())
+    console.log 'template'
+    console.log(url)
+    window.open( "data:text/html;charset=utf-8," + tmpl(url: url))
    
   typeset: => 
-    console.log 'typeset'
     prettyPrint()
     for el in @$('#notebook')
       console.log 'tp', el
@@ -77,7 +81,7 @@ class BaseNotebookView extends Backbone.View
 
         # set the target id
         $(heading).attr('id', linkid)
-        
+      
         # create element in TOC
         el = $( document.createElement('div') )
         el.addClass(heading.tagName)
@@ -95,6 +99,7 @@ class ViewNotebookView extends BaseNotebookView
     'click #toc': 'handleTocJump'
     "click #toggle-edit" : "toggleEdit"
     "click #save-to-file": "saveToFile"
+    "click #share-url": "share"
 
   toggleEdit: => 
     root.router.navigate(@model.get('id') + '/edit/', trigger: true)
@@ -139,6 +144,7 @@ class EditNotebookView extends BaseNotebookView
     "keyup #spawner": 'spawnKeypress'
     "click #toggle-edit" : "toggleEdit" 
     "click #save-to-file": "saveToFile"
+    "click #share-url": "share"
   )
 
   # bind to dom and model events, fetch cells
@@ -610,7 +616,7 @@ class NewView extends Backbone.View
 
   create: => 
     #console.log 'creating'
-    nb = root.notebooks.create(title: @$('input').val())
+    nb = root.notebooks.create((title: @$('input').val()), (wait: true))
     nb.readyCells()
     nb.cells.create(position: nb.cells.posJump)
     root.router.navigate (nb.id + '/edit/'), trigger: true
@@ -627,8 +633,9 @@ class NotebookRouter extends Backbone.Router
     ":nb/delete/" : "delete"
     'load/*url': 'loadUrl'
     "new/": "new"
+    "import/*data/": 'import'
     "": "index"
-    "*p": 'unmatched'
+
 
   unmatched: (p) => console.log p
 
@@ -697,6 +704,12 @@ class NotebookRouter extends Backbone.Router
       notebook = loadNotebook(data)
       root.router.navigate(notebook.get('id') + '/view/', trigger: true)
 
+  import: (data) => 
+    data = JSON.parse(atob(data))
+    notebook = loadNotebook(data)
+    root.router.navigate(notebook.get('id') + '/view/', trigger: true)
+
+
   
 
 # crazy global methods? Go in the router?
@@ -714,6 +727,11 @@ loadNotebook = (nbdata) =>
 
   nbdata.title = nbdata.title 
   try
+
+    if root.notebooks.get(nbdata.id)
+      raise 'duplicate'
+    console.log 'no such nb', nbdata.id
+
     console.log 'import notebook' 
     notebook = root.notebooks.create(nbdata) 
     notebook.readyCells()

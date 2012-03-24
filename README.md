@@ -44,6 +44,8 @@ Now:
 * play all
 * TOC styling 
 * do not put non idempotent states in history
+* better dev mode 
+* ensure all urls are relative
 
 * detect whether content changed when evaluating (short circuit) - could do on isDirty except when
 new loaded notebook 
