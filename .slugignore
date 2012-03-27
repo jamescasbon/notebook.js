@@ -5,7 +5,6 @@ ace/build/textarea
 ace/lib
 ace/demo
 ace/tool
-src
 ace/.git
 lib/backbone/.git
 lib/underscore/.git
@@ -13,4 +12,3 @@ lib/backbone.localstorage/.git
 lib/showdown/.git
 lib/underscore.string/.git
 lib/underscore/.git
-
