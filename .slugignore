@@ -1,4 +1,4 @@
-./lib/backbone/docs
+lib/backbone/docs
 ./lib/backbone/test
 ./ace/build/demo
 ./ace/build/textarea
