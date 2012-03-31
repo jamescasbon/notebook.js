@@ -914,7 +914,8 @@
       data = JSON.parse(NotebookJS.base64UrlDecode(data));
       notebook = loadNotebook(data);
       return NotebookJS.router.navigate(notebook.get('id') + '/view/', {
-        trigger: true
+        trigger: true,
+        replace: true
       });
     };
 

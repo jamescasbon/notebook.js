@@ -704,7 +704,7 @@ class NotebookRouter extends Backbone.Router
   import: (data) =>
     data = JSON.parse(NotebookJS.base64UrlDecode(data))
     notebook = loadNotebook(data)
-    NotebookJS.router.navigate(notebook.get('id') + '/view/', trigger: true)
+    NotebookJS.router.navigate(notebook.get('id') + '/view/', (trigger: true, replace: true))
 
 
 
