@@ -57,7 +57,7 @@ class BaseNotebookView extends Backbone.View
     url = "http://#{location.host}/#import/#{escape(enc)}/"
     tmpl = _.template($('#share-notebook').html())
     modal = new NotebookJS.util.ModalDialog(tmpl(url: url))
-    modal.element.find('input').focus()
+    modal.element.find('input').focus().select()
 
   typeset: =>
     prettyPrint()

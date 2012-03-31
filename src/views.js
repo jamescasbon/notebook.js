@@ -86,7 +86,7 @@
       modal = new NotebookJS.util.ModalDialog(tmpl({
         url: url
       }));
-      return modal.element.find('input').focus();
+      return modal.element.find('input').focus().select();
     };
 
     BaseNotebookView.prototype.typeset = function() {
