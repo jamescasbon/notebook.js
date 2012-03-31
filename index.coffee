@@ -3,39 +3,39 @@ html ->
   head ->
     title 'notebook.js demo'
     if process.env.NJSMODE == 'dev'
-      script src: "/lib/jquery-1.7.2.js"
-      script src: "/lib/underscore/underscore.js"
-      script src: "/lib/underscore.string/lib/underscore.string.js"
-      script src: "/lib/backbone/backbone.js"
-      script src: "/lib/backbone.localstorage/backbone.localStorage.js"
-      script src: "/lib/showdown/src/showdown.js",
-      script src: "/src/util.js?" + (new Date).getTime()
-      script src: "/src/engine.js?" + (new Date).getTime()
-      script src: "/src/notebook.js?" + (new Date).getTime()
-      script src: "/src/views.js?" + (new Date).getTime()
+      script src: "lib/jquery-1.7.2.js"
+      script src: "lib/underscore/underscore.js"
+      script src: "lib/underscore.string/lib/underscore.string.js"
+      script src: "lib/backbone/backbone.js"
+      script src: "lib/backbone.localstorage/backbone.localStorage.js"
+      script src: "lib/showdown/src/showdown.js",
+      script src: "src/util.js?" + (new Date).getTime()
+      script src: "src/engine.js?" + (new Date).getTime()
+      script src: "src/notebook.js?" + (new Date).getTime()
+      script src: "src/views.js?" + (new Date).getTime()
     else
-      script src: "/lib/jquery-1.7.2.min.js"
-      script src: "/lib/underscore/underscore-min.js"
-      script src: "/lib/underscore.string/dist/underscore.string.min.js"
-      script src: "/lib/backbone/backbone-min.js"
-      script src: "/lib/backbone.localstorage/backbone.localStorage-min.js"
-      script src: "/lib/showdown/compressed/showdown.js",
-      script src: '/lib/notebook.js'
+      script src: "lib/jquery-1.7.2.min.js"
+      script src: "lib/underscore/underscore-min.js"
+      script src: "lib/underscore.string/dist/underscore.string.min.js"
+      script src: "lib/backbone/backbone-min.js"
+      script src: "lib/backbone.localstorage/backbone.localStorage-min.js"
+      script src: "lib/showdown/compressed/showdown.js",
+      script src: 'lib/notebook.js'
 
-    script src: "/lib/ace/build/src/ace.js"
-    script src: "/lib/ace/build/src/mode-javascript.js"
-    script src: "/lib/ace/build/src/mode-markdown.js"
-    script src: "/lib/google-code-prettify/prettify.js",
+    script src: "lib/ace/build/src/ace.js"
+    script src: "lib/ace/build/src/mode-javascript.js"
+    script src: "lib/ace/build/src/mode-markdown.js"
+    script src: "lib/google-code-prettify/prettify.js",
     link href: 'http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700', rel: 'stylesheet', type: 'text/css'
     script type: 'text/x-mathjax-config'
       "MathJax.Hub.Config({messageStyle: 'none', skipStartupTypeset: true, tex2jax: {inlineMath: [['$','$']]}});"
     script src: "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
 
-    link rel: 'stylesheet', href: '/css/base.css'
-    link rel: 'stylesheet', href: '/css/skeleton.css'
-    link rel: 'stylesheet', href: '/css/layout.css'
-    link rel: 'stylesheet', href: '/css/notebook.css'
-    link rel: 'stylesheet', href: '/lib/google-code-prettify/prettify.css'
+    link rel: 'stylesheet', href: 'css/base.css'
+    link rel: 'stylesheet', href: 'css/skeleton.css'
+    link rel: 'stylesheet', href: 'css/layout.css'
+    link rel: 'stylesheet', href: 'css/notebook.css'
+    link rel: 'stylesheet', href: 'lib/google-code-prettify/prettify.css'
 
     if process.env.NJSMODE == 'production'
 
