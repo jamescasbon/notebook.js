@@ -40,13 +40,20 @@ Frontend
 
 Now:
 
-* share urls
+* import URLS break browser back button (idempotence of urls??)
+* share URL broken on deploy 
+* double click in view mode goes to edit
+* new notebook hint on where to type
+* play button position next to input 
+* play buttons should not appear on load for markdown
+* hint user playing non first cell on new notebook load
+* play all button
+* delete cell button
+
+
 * play all
-* TOC styling 
-* do not put non idempotent states in history
 * better dev mode 
 * ensure all urls are relative
-
 * detect whether content changed when evaluating (short circuit) - could do on isDirty except when
 new loaded notebook 
 * Skip null output/ show null output placeholder
@@ -58,6 +65,7 @@ new loaded notebook
 
 
 Someday: 
+
 * Table of contents filter  http://www.jankoatwarpspeed.com/examples/table-of-contents/demo2.html
 * Same shortcuts on output as input (ctrl-c ctrl-fold ctrl-m)
 * Page Down
