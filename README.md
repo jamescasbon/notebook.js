@@ -25,7 +25,7 @@ Compile template:
 
 Compile model: 
 
-  coffeescript -c -w ./src &
+  coffee -c -w ./src &
 
 Compile css
   
