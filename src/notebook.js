@@ -1,10 +1,12 @@
 (function() {
-  var Cell, Cells, Notebook, Notebooks, root,
+  var Cell, Cells, Notebook, NotebookJS, Notebooks, root, _ref,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
   root = typeof exports !== "undefined" && exports !== null ? exports : this;
+
+  NotebookJS = root.NotebookJS = (_ref = root.NotebookJS) != null ? _ref : {};
 
   Notebook = (function(_super) {
 
@@ -119,7 +121,7 @@
         state: 'evaluating'
       });
       this.save();
-      this.handler = root.engines[this.get('type')];
+      this.handler = NotebookJS.engines[this.get('type')];
       return this.handler.evaluate(this.get('input'), this);
     };
 
@@ -236,12 +238,12 @@
 
   })(Backbone.Collection);
 
-  root.Notebook = Notebook;
+  NotebookJS.Notebook = Notebook;
 
-  root.Cell = Cell;
+  NotebookJS.Notebooks = Notebooks;
 
-  root.Notebooks = Notebooks;
+  NotebookJS.Cell = Cell;
 
-  root.Cells = Cells;
+  NotebookJS.Cells = Cells;
 
 }).call(this);

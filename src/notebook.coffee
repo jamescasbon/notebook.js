@@ -1,5 +1,5 @@
 root = exports ? this
-
+NotebookJS = root.NotebookJS = root.NotebookJS ? {}
 
 
 class Notebook extends Backbone.Model
@@ -61,7 +61,7 @@ class Cell extends Backbone.Model
     @save()
     # should we save the model at this point?
     # how to look up handler?
-    @handler = root.engines[@get('type')]
+    @handler = NotebookJS.engines[@get('type')]
     @handler.evaluate @get('input'), @
 
   interrupt: =>
@@ -132,10 +132,7 @@ class Cells extends Backbone.Collection
     @create position: (cellPos + prevPos)/2
 
 
-
-
-root.Notebook = Notebook
-root.Cell = Cell
-root.Notebooks = Notebooks
-root.Cells = Cells
-
+NotebookJS.Notebook = Notebook
+NotebookJS.Notebooks = Notebooks
+NotebookJS.Cell = Cell
+NotebookJS.Cells = Cells

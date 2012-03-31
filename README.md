@@ -45,9 +45,7 @@ Frontend
 
 Now:
 
-* import URLS break browser back button (idempotence of urls??)
 * share URL broken on deploy 
-* double click in view mode goes to edit
 * new notebook hint on where to type
 * play button position next to input 
 * play buttons should not appear on load for markdown
