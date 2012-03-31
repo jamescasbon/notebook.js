@@ -22,9 +22,9 @@ html ->
       script src: "/lib/showdown/compressed/showdown.js",
       script src: '/lib/notebook.js'
 
-    script src: "/ace/build/src/ace.js"
-    script src: "/ace/build/src/mode-javascript.js"
-    script src: "/ace/build/src/mode-markdown.js"
+    script src: "/lib/ace/build/src/ace.js"
+    script src: "/lib/ace/build/src/mode-javascript.js"
+    script src: "/lib/ace/build/src/mode-markdown.js"
     script src: "/lib/google-code-prettify/prettify.js",
     link href: 'http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700', rel: 'stylesheet', type: 'text/css'
     script type: 'text/x-mathjax-config'

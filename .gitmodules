@@ -1,18 +1,18 @@
-[submodule "ace"]
-	path = ace
-	url = https://github.com/ajaxorg/ace.git
 [submodule "lib/backbone"]
 	path = lib/backbone
-	url = https://github.com/documentcloud/backbone/
+	url = git://github.com/documentcloud/backbone.git
 [submodule "lib/underscore"]
 	path = lib/underscore
-	url = https://github.com/documentcloud/underscore
+	url = git://github.com/documentcloud/underscore.git
 [submodule "lib/showdown"]
 	path = lib/showdown
-	url = https://github.com/coreyti/showdown
+	url = git://github.com/coreyti/showdown.git
 [submodule "lib/underscore.string"]
 	path = lib/underscore.string
-	url = https://github.com/epeli/underscore.string
+	url = git://github.com/epeli/underscore.string.git
 [submodule "lib/backbone.localstorage"]
 	path = lib/backbone.localstorage
-	url = https://github.com/jeromegn/Backbone.localStorage
+	url = git://github.com/jeromegn/Backbone.localStorage.git
+[submodule "lib/ace"]
+	path = lib/ace
+	url = git://github.com/ajaxorg/ace.git
