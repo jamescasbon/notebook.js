@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "devDependencies": {
     "coffeecup": "~0.3.0",
+    "coffee-script": "~1.2.0",
     "stylus": "~0.24.0"
   }
 }
