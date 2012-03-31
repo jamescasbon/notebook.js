@@ -79,15 +79,14 @@
     };
 
     BaseNotebookView.prototype.share = function() {
-      var enc, tmpl, url;
+      var enc, modal, tmpl, url;
       enc = NotebookJS.util.base64UrlEncode(this.model.serialize());
-      url = escape('http://notebookjs.me/#import/' + enc + '/');
+      url = "http://" + location.host + "/#import/" + (escape(enc)) + "/";
       tmpl = _.template($('#share-notebook').html());
-      console.log('template');
-      console.log(url);
-      return window.open("data:text/html;charset=utf-8," + tmpl({
+      modal = new NotebookJS.util.ModalDialog(tmpl({
         url: url
       }));
+      return modal.element.find('input').focus().select();
     };
 
     BaseNotebookView.prototype.typeset = function() {
@@ -911,7 +910,7 @@
 
     NotebookRouter.prototype["import"] = function(data) {
       var notebook;
-      data = JSON.parse(NotebookJS.base64UrlDecode(data));
+      data = JSON.parse(NotebookJS.util.base64UrlDecode(data));
       notebook = loadNotebook(data);
       return NotebookJS.router.navigate(notebook.get('id') + '/view/', {
         trigger: true,
