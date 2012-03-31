@@ -146,7 +146,8 @@
       'click #toc': 'handleTocJump',
       "click #toggle-edit": "toggleEdit",
       "click #save-to-file": "saveToFile",
-      "click #share-url": "share"
+      "click #share-url": "share",
+      'dblclick #notebook': 'toggleEdit'
     };
 
     ViewNotebookView.prototype.toggleEdit = function() {
