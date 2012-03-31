@@ -700,7 +700,7 @@ class NotebookRouter extends Backbone.Router
     console.log 'loading url'
     $.getJSON url, (data) =>
       notebook = loadNotebook(data)
-      NotebookJS.router.navigate(notebook.get('id') + '/view/', trigger: true)
+      NotebookJS.router.navigate(notebook.get('id') + '/view/', (trigger: true, replace: true))
 
   import: (data) =>
     data = JSON.parse(atob(data))

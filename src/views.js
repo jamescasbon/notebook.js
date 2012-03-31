@@ -902,7 +902,8 @@
         var notebook;
         notebook = loadNotebook(data);
         return NotebookJS.router.navigate(notebook.get('id') + '/view/', {
-          trigger: true
+          trigger: true,
+          replace: true
         });
       });
     };
