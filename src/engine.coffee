@@ -2,12 +2,12 @@ root = exports ? this
 
 
 class JavascriptEval
-  evaluate: (input, handler) => 
+  evaluate: (input, handler) =>
     try
-      print = (d) -> 
+      print = (d) ->
         handler.handleMessage(msg: 'print', data: d.toString())
       result = eval(input)
-      
+
       #console.log 'eval produced', input, output
       if result?
         console.log('result', result)
@@ -16,7 +16,7 @@ class JavascriptEval
     catch error
       console.log(error.message, error.stack)
       handler.handleMessage(msg: 'error', data: error.toString())
-    finally 
+    finally
       handler.handleMessage(msg: 'evalEnd')
 
 
@@ -30,9 +30,9 @@ class MarkdownEval
     catch error
       console.log error.message
       onErr error.message
-    finally 
+    finally
       handler.handleMessage(msg: 'evalEnd')
-    
+
 
 class WorkerEval
   constructor: ->
@@ -52,14 +52,14 @@ class WorkerEval
     handler = @handlers[inputId]
     handler.handleMessage(ev.data)
     #TODO: remove handler when finished
-    
+
   interrupt: =>
     # TODO: cannot currently interrupt the worker, so we restart
     @worker.terminate()
     @worker = new Worker('/src/worker.js')
     @worker.onmessage = @handleMessage
 
-    
+
 
 
 engines = {}

@@ -1,5 +1,5 @@
 (function() {
-  var BaseNotebookView, CellEditView, EditNotebookView, IndexView, NAVBAR_HEIGHT, NewView, NotebookRouter, ViewNotebookView, isScrolledIntoView, loadNotebook, mathjaxReady, root, saveFile, scrollToAtBottom, scrollToAtTop, setTitle,
+  var BaseNotebookView, CellEditView, EditNotebookView, IndexView, NAVBAR_HEIGHT, NewView, NotebookRouter, ViewNotebookView, isScrolledIntoView, loadNotebook, mathjaxReady, root, scrollToAtBottom, scrollToAtTop, setTitle,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
@@ -69,8 +69,11 @@
       return this.typeset();
     };
 
-    BaseNotebookView.prototype.saveToFile = function() {
-      return saveFile(this.model.serialize());
+    BaseNotebookView.prototype.saveToFile = function(e) {
+      var data;
+      data = this.model.serialize();
+      $(e.target).attr('download', "notebook-" + (new Date().toISOString().slice(0, 10)) + ".json");
+      return $(e.target).attr('href', 'data:application/json;charset=utf-8,' + escape(data));
     };
 
     BaseNotebookView.prototype.share = function() {
@@ -195,7 +198,6 @@
     __extends(EditNotebookView, _super);
 
     function EditNotebookView() {
-      this.saveToFile = __bind(this.saveToFile, this);
       this.toggleEdit = __bind(this.toggleEdit, this);
       this.spawnKeypress = __bind(this.spawnKeypress, this);
       this.spawnCellAtEnd = __bind(this.spawnCellAtEnd, this);
@@ -279,10 +281,6 @@
       return root.router.navigate(this.model.get('id') + '/view/', {
         trigger: true
       });
-    };
-
-    EditNotebookView.prototype.saveToFile = function() {
-      return saveFile(this.model.serialize());
     };
 
     return EditNotebookView;
@@ -922,10 +920,6 @@
 
   setTitle = function(title) {
     return $('#title').html(title);
-  };
-
-  saveFile = function(data) {
-    return window.open("data:text/json;filename=data.json;charset=utf-8," + escape(data));
   };
 
   loadNotebook = function(nbdata) {
