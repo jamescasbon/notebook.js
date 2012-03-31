@@ -53,7 +53,7 @@ class BaseNotebookView extends Backbone.View
     $(e.target).attr('href', 'data:application/json;charset=utf-8,' + escape(data))
 
   share: =>
-    enc = btoa(@model.serialize())
+    enc = NotebookJS.util.base64UrlEncode(@model.serialize())
     url = escape('http://notebookjs.me/#import/' + enc + '/')
     tmpl = _.template($('#share-notebook').html())
     console.log 'template'
@@ -703,7 +703,7 @@ class NotebookRouter extends Backbone.Router
       NotebookJS.router.navigate(notebook.get('id') + '/view/', (trigger: true, replace: true))
 
   import: (data) =>
-    data = JSON.parse(atob(data))
+    data = JSON.parse(NotebookJS.base64UrlDecode(data))
     notebook = loadNotebook(data)
     NotebookJS.router.navigate(notebook.get('id') + '/view/', trigger: true)
 

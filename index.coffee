@@ -9,6 +9,7 @@ html ->
       script src: "/lib/backbone/backbone.js"
       script src: "/lib/backbone.localstorage/backbone.localStorage.js"
       script src: "/lib/showdown/src/showdown.js",
+      script src: "/src/util.js"
       script src: "/src/engine.js"
       script src: "/src/notebook.js"
       script src: "/src/views.js"

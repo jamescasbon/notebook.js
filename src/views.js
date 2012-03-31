@@ -80,7 +80,7 @@
 
     BaseNotebookView.prototype.share = function() {
       var enc, tmpl, url;
-      enc = btoa(this.model.serialize());
+      enc = NotebookJS.util.base64UrlEncode(this.model.serialize());
       url = escape('http://notebookjs.me/#import/' + enc + '/');
       tmpl = _.template($('#share-notebook').html());
       console.log('template');
@@ -910,7 +910,7 @@
 
     NotebookRouter.prototype["import"] = function(data) {
       var notebook;
-      data = JSON.parse(atob(data));
+      data = JSON.parse(NotebookJS.base64UrlDecode(data));
       notebook = loadNotebook(data);
       return NotebookJS.router.navigate(notebook.get('id') + '/view/', {
         trigger: true
