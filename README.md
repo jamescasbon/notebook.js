@@ -12,7 +12,9 @@ Requirements
 
 npm packages: coffeecup, stylus and coffee-script
 
-you need to fetch ace with git submodule init && git submodule update
+You can install these with `npm install .`
+
+You need to fetch ace with git submodule init && git submodule update
 
 Compilation
 -----------
@@ -31,6 +33,9 @@ Compile css
   
   stylus -w css/ &
   
+
+You can also make life much easier for yourself if you `pip install honcho && honcho -f Procfile.dev start`
+
 
 TODO: 
 =====
