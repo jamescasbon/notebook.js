@@ -157,7 +157,7 @@ html ->
           div id: 'spawner', tabindex: "1000000000"
         div '#menu', ->
           button '#toggle-edit', -> 'toggle edit/view'
-          button '#save-to-file', -> 'save to file'
+          a id: 'save-to-file', class: 'button', download: 'notebook.json', -> 'save to file'
           button '#share-url', -> 'share'
 
 

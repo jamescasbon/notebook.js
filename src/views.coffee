@@ -48,8 +48,10 @@ class BaseNotebookView extends Backbone.View
     # need to check if still not initialized
     @typeset()
 
-  saveToFile: =>
-    saveFile(@model.serialize())
+  saveToFile: (e) =>
+    data = @model.serialize()
+    $(e.target).attr('download', "notebook-#{new Date().toISOString().slice(0,10)}.json")
+    $(e.target).attr('href', 'data:application/json;charset=utf-8,' + escape(data))
 
   share: =>
     enc = btoa(@model.serialize())
@@ -197,9 +199,6 @@ class EditNotebookView extends BaseNotebookView
 
   toggleEdit: =>
     root.router.navigate(@model.get('id') + '/view/', trigger: true)
-
-  saveToFile: =>
-    saveFile(@model.serialize())
 
 
 # CellView manages the Dom elements associated with a cell
@@ -715,11 +714,6 @@ class NotebookRouter extends Backbone.Router
 # crazy global methods? Go in the router?
 setTitle = (title) =>
   $('#title').html(title)
-
-
-saveFile = (data) =>
-  window.open( "data:text/json;filename=data.json;charset=utf-8," + escape(data))
-
 
 loadNotebook = (nbdata) =>
   celldata = nbdata.cells
