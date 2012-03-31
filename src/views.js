@@ -900,7 +900,8 @@
         var notebook;
         notebook = loadNotebook(data);
         return root.router.navigate(notebook.get('id') + '/view/', {
-          trigger: true
+          trigger: true,
+          replace: true
         });
       });
     };
