@@ -1,9 +1,8 @@
 # use [[]] for underscore templates (i.e. client side templating)
 _.templateSettings = {interpolate : /\[\[=(.+?)\]\]/g, evaluate: /\[\[(.+?)\]\]/g}
 
-
 root = exports ? this
-
+NotebookJS = root.NotebookJS = root.NotebookJS ? {}
 
 # scrolling functions to check el in view and scroll to it
 NAVBAR_HEIGHT = 30
@@ -104,7 +103,7 @@ class ViewNotebookView extends BaseNotebookView
     "click #share-url": "share"
 
   toggleEdit: =>
-    root.router.navigate(@model.get('id') + '/edit/', trigger: true)
+    NotebookJS.router.navigate(@model.get('id') + '/edit/', trigger: true)
 
   initialize: =>
     @template = _.template($('#notebook-template').html())
@@ -114,7 +113,7 @@ class ViewNotebookView extends BaseNotebookView
     @cells = @$('.cells')
     console.log @cells
     @model.cells.fetch(success: @addAll)
-    if root.mathjaxReady
+    if NotebookJS.mathjaxReady
       @typeset()
 
   render: =>
@@ -158,7 +157,7 @@ class EditNotebookView extends BaseNotebookView
     @model.cells.bind 'add', @addOne
     @model.cells.bind 'refresh', @addAll
     @model.cells.fetch(success: @addAll)
-    if root.mathjaxReady
+    if NotebookJS.mathjaxReady
       console.log 'calling typeset at init'
       @typeset()
 
@@ -169,7 +168,7 @@ class EditNotebookView extends BaseNotebookView
 
   # add a cell by finding the correct order from the collection and inserting
   addOne: (cell) =>
-    root.c = cell
+    NotebookJS.c = cell
     view = new CellEditView(model: cell)
     newEl = view.render()
     index = @model.cells.indexOf(cell)
@@ -198,7 +197,7 @@ class EditNotebookView extends BaseNotebookView
       @model.cells.at(ncells - 1).view.output.focus()
 
   toggleEdit: =>
-    root.router.navigate(@model.get('id') + '/view/', trigger: true)
+    NotebookJS.router.navigate(@model.get('id') + '/view/', trigger: true)
 
 
 # CellView manages the Dom elements associated with a cell
@@ -291,7 +290,7 @@ class CellEditView extends Backbone.View
   changeOutput: =>
     #console.log 'updatting output to', @model.get('output')
     @output.html(@model.get('output'))
-    if root.mathjaxReady
+    if NotebookJS.mathjaxReady
       MathJax.Hub.Typeset(@output[0])
 
 
@@ -577,11 +576,11 @@ class IndexView extends Backbone.View
 
   addNbs: =>
     @nbtemplate = _.template($('#notebook-index-template').html())
-    root.notebooks.each(@addNb)
+    NotebookJS.notebooks.each(@addNb)
 
   new: =>
     console.log 'new'
-    root.router.navigate ('new/'), trigger: true
+    NotebookJS.router.navigate ('new/'), trigger: true
 
   loadFile: (ev) =>
     file = ev.target.files[0]
@@ -590,7 +589,7 @@ class IndexView extends Backbone.View
     reader.onload = (e) =>
       nbdata = JSON.parse(e.target.result)
       notebook = loadNotebook(nbdata)
-      root.router.navigate(notebook.get('id') + '/view/', trigger: true)
+      NotebookJS.router.navigate(notebook.get('id') + '/view/', trigger: true)
 
     reader.readAsText(file)
     # TODO: set loading status
@@ -615,10 +614,10 @@ class NewView extends Backbone.View
 
   create: =>
     #console.log 'creating'
-    nb = root.notebooks.create((title: @$('input').val()), (wait: true))
+    nb = NotebookJS.notebooks.create((title: @$('input').val()), (wait: true))
     nb.readyCells()
     nb.cells.create(position: nb.cells.posJump)
-    root.router.navigate (nb.id + '/edit/'), trigger: true
+    NotebookJS.router.navigate (nb.id + '/edit/'), trigger: true
 
   mathjaxReady: =>
     return
@@ -639,31 +638,31 @@ class NotebookRouter extends Backbone.Router
   unmatched: (p) => console.log p
 
   getNotebook: (nb) =>
-    notebook = root.notebooks.get(nb)
+    notebook = NotebookJS.notebooks.get(nb)
     #if notebook? # just create one for the minute!
-    #  notebook = root.notebooks.create()
+    #  notebook = NotebookJS.notebooks.create()
     # TODO: could wait for a sync signal to have the id
     notebook.readyCells()
-    root.nb = notebook
+    NotebookJS.nb = notebook
     console.log('notebook loaded; id=' +  notebook.get('id'))
     notebook
 
   edit: (nb) =>
-    if root.app
-      root.app.remove()
+    if NotebookJS.app
+      NotebookJS.app.remove()
     console.log 'activated edit route', nb
     notebook = @getNotebook(nb)
-    root.app = new EditNotebookView(model: notebook)
+    NotebookJS.app = new EditNotebookView(model: notebook)
     setTitle(notebook.get('title') + ' (Editing)')
 
   view: (nb) =>
-    if root.app
-      root.app.remove()
+    if NotebookJS.app
+      NotebookJS.app.remove()
     console.log 'activated view route'
     notebook = @getNotebook(nb)
     setTitle(notebook.get('title') + ' (Viewing)')
 
-    root.app = new ViewNotebookView(model: notebook)
+    NotebookJS.app = new ViewNotebookView(model: notebook)
 
 
   delete: (nb) =>
@@ -681,32 +680,32 @@ class NotebookRouter extends Backbone.Router
       notebook.destroy()
 
       console.log('deleted')
-    root.router.navigate('', trigger: true)
+    NotebookJS.router.navigate('', trigger: true)
 
   new: (nb) =>
     console.log 'new view'
-    if root.app
-      root.app.remove()
-    root.app = new NewView()
+    if NotebookJS.app
+      NotebookJS.app.remove()
+    NotebookJS.app = new NewView()
 
   index: =>
-    if root.app
-      root.app.remove()
-      root.nb = null
+    if NotebookJS.app
+      NotebookJS.app.remove()
+      NotebookJS.nb = null
     console.log 'index view'
     setTitle('')
-    root.app = new IndexView()
+    NotebookJS.app = new IndexView()
 
   loadUrl: (url) =>
     console.log 'loading url'
     $.getJSON url, (data) =>
       notebook = loadNotebook(data)
-      root.router.navigate(notebook.get('id') + '/view/', trigger: true)
+      NotebookJS.router.navigate(notebook.get('id') + '/view/', trigger: true)
 
   import: (data) =>
     data = JSON.parse(atob(data))
     notebook = loadNotebook(data)
-    root.router.navigate(notebook.get('id') + '/view/', trigger: true)
+    NotebookJS.router.navigate(notebook.get('id') + '/view/', trigger: true)
 
 
 
@@ -722,12 +721,12 @@ loadNotebook = (nbdata) =>
   nbdata.title = nbdata.title
   try
 
-    if root.notebooks.get(nbdata.id)
+    if NotebookJS.notebooks.get(nbdata.id)
       raise 'duplicate'
     console.log 'no such nb', nbdata.id
 
     console.log 'import notebook'
-    notebook = root.notebooks.create(nbdata)
+    notebook = NotebookJS.notebooks.create(nbdata)
     notebook.readyCells()
     for c in celldata
       do (c) -> notebook.cells.create(c)
@@ -739,17 +738,17 @@ loadNotebook = (nbdata) =>
 
 
 mathjaxReady = () ->
-  root.mathjaxReady = true
-  root.app.mathjaxReady()
+  NotebookJS.mathjaxReady = true
+  NotebookJS.app.mathjaxReady()
 
 
 $(document).ready ->
   console.log 'creating app'
-  root.notebooks = new Notebooks()
-  root.notebooks.fetch()
-  root.mathjaxReady = false
+  NotebookJS.notebooks = new NotebookJS.Notebooks()
+  NotebookJS.notebooks.fetch()
+  NotebookJS.mathjaxReady = false
 
-  root.router = new NotebookRouter()
+  NotebookJS.router = new NotebookRouter()
   Backbone.history.start()
   MathJax.Hub.Register.StartupHook('End', mathjaxReady)
 

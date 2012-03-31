@@ -1,8 +1,10 @@
 (function() {
-  var JavascriptEval, MarkdownEval, WorkerEval, engines, root,
+  var JavascriptEval, MarkdownEval, NotebookJS, WorkerEval, engines, root, _ref,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   root = typeof exports !== "undefined" && exports !== null ? exports : this;
+
+  NotebookJS = root.NotebookJS = (_ref = root.NotebookJS) != null ? _ref : {};
 
   JavascriptEval = (function() {
 
@@ -116,6 +118,6 @@
 
   engines.markdown = new MarkdownEval();
 
-  root.engines = engines;
+  NotebookJS.engines = engines;
 
 }).call(this);

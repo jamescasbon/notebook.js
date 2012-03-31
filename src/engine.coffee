@@ -1,5 +1,5 @@
 root = exports ? this
-
+NotebookJS = root.NotebookJS = root.NotebookJS ? {}
 
 class JavascriptEval
   evaluate: (input, handler) =>
@@ -59,12 +59,8 @@ class WorkerEval
     @worker = new Worker('/src/worker.js')
     @worker.onmessage = @handleMessage
 
-
-
-
 engines = {}
 engines.javascript = new WorkerEval()
 engines.markdown = new MarkdownEval()
 
-root.engines = engines
-
+NotebookJS.engines = engines
