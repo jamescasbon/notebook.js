@@ -1,11 +1,13 @@
 (function() {
-  var B64, NotebookJS, base64Decode, base64Encode, base64UrlDecode, base64UrlEncode, root, _ref, _ref2;
+  var $, B64, ModalDialog, NotebookJS, base64Decode, base64Encode, base64UrlDecode, base64UrlEncode, root, _ref, _ref2;
 
   root = typeof exports !== "undefined" && exports !== null ? exports : this;
 
   NotebookJS = root.NotebookJS = (_ref = root.NotebookJS) != null ? _ref : {};
 
   NotebookJS.util = (_ref2 = NotebookJS.util) != null ? _ref2 : {};
+
+  $ = jQuery;
 
   B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 
@@ -92,6 +94,30 @@
     return data;
   };
 
+  ModalDialog = (function() {
+
+    function ModalDialog(content) {
+      var _this = this;
+      this.element = $("<div class=\"modal\">\n  <div class=\"modal-inner\">\n    <a class=\"close\">&times;</a>\n    <div class=\"modal-content\"></div>\n  </div>\n</div>");
+      this.element.appendTo(document.body);
+      this.element.on('click', '.close', function() {
+        return _this.close();
+      });
+      if (content) this.setContent(content);
+    }
+
+    ModalDialog.prototype.setContent = function(content) {
+      return this.element.find('.modal-content').html(content);
+    };
+
+    ModalDialog.prototype.close = function() {
+      return this.element.remove();
+    };
+
+    return ModalDialog;
+
+  })();
+
   NotebookJS.util.base64Encode = base64Encode;
 
   NotebookJS.util.base64Decode = base64Decode;
@@ -99,5 +125,7 @@
   NotebookJS.util.base64UrlEncode = base64UrlEncode;
 
   NotebookJS.util.base64UrlDecode = base64UrlDecode;
+
+  NotebookJS.util.ModalDialog = ModalDialog;
 
 }).call(this);
