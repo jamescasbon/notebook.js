@@ -2,6 +2,8 @@ root = exports ? this
 NotebookJS = root.NotebookJS = root.NotebookJS ? {}
 NotebookJS.util = NotebookJS.util ? {}
 
+$ = jQuery
+
 B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
 
 base64Decode = (data) ->
@@ -98,7 +100,30 @@ base64UrlEncode = (data) ->
   data = data.replace(/\//g, '_')
   data
 
+class ModalDialog
+  constructor: (content) ->
+    @element = $("""<div class="modal">
+                      <div class="modal-inner">
+                        <a class="close">&times;</a>
+                        <div class="modal-content"></div>
+                      </div>
+                    </div>""")
+
+    @element.appendTo(document.body)
+    @element.on 'click', '.close', =>
+      this.close()
+
+    this.setContent(content) if content
+
+  setContent: (content) ->
+    @element.find('.modal-content').html(content)
+
+  close: ->
+    @element.remove()
+
+
 NotebookJS.util.base64Encode = base64Encode
 NotebookJS.util.base64Decode = base64Decode
 NotebookJS.util.base64UrlEncode = base64UrlEncode
 NotebookJS.util.base64UrlDecode = base64UrlDecode
+NotebookJS.util.ModalDialog = ModalDialog

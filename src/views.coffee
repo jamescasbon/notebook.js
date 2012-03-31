@@ -54,11 +54,10 @@ class BaseNotebookView extends Backbone.View
 
   share: =>
     enc = NotebookJS.util.base64UrlEncode(@model.serialize())
-    url = escape('http://notebookjs.me/#import/' + enc + '/')
+    url = "http://#{location.host}/#import/#{escape(enc)}/"
     tmpl = _.template($('#share-notebook').html())
-    console.log 'template'
-    console.log(url)
-    window.open( "data:text/html;charset=utf-8," + tmpl(url: url))
+    modal = new NotebookJS.util.ModalDialog(tmpl(url: url))
+    modal.element.find('input').focus()
 
   typeset: =>
     prettyPrint()
@@ -705,7 +704,7 @@ class NotebookRouter extends Backbone.Router
       NotebookJS.router.navigate(notebook.get('id') + '/view/', (trigger: true, replace: true))
 
   import: (data) =>
-    data = JSON.parse(NotebookJS.base64UrlDecode(data))
+    data = JSON.parse(NotebookJS.util.base64UrlDecode(data))
     notebook = loadNotebook(data)
     NotebookJS.router.navigate(notebook.get('id') + '/view/', trigger: true)
 

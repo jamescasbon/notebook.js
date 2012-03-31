@@ -8,10 +8,10 @@
     <script src="/lib/backbone/backbone.js"></script>
     <script src="/lib/backbone.localstorage/backbone.localStorage.js"></script>
     <script src="/lib/showdown/src/showdown.js"></script>
-    <script src="/src/util.js"></script>
-    <script src="/src/engine.js"></script>
-    <script src="/src/notebook.js"></script>
-    <script src="/src/views.js"></script>
+    <script src="/src/util.js?1333209977331"></script>
+    <script src="/src/engine.js?1333209977331"></script>
+    <script src="/src/notebook.js?1333209977331"></script>
+    <script src="/src/views.js?1333209977331"></script>
     <script src="/ace/build/src/ace.js"></script>
     <script src="/ace/build/src/mode-javascript.js"></script>
     <script src="/ace/build/src/mode-markdown.js"></script>
@@ -202,12 +202,10 @@ and store the results locally.  Try the tutorials to learn more.
       </div>
     </script>
     <script type="text/template" id="share-notebook">
-      <h1>
+      <h4>
         Share this link to share the notebook
-      </h1>
-      <div id="share-url" style="max-width: 500px; word-wrap: break-word">
-        [[= url ]]
-      </div>
+      </h4>
+      <input id="share-url" type="text" value="[[= url ]]" />
     </script>
   </body>
 </html>

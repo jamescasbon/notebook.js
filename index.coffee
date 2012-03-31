@@ -9,10 +9,10 @@ html ->
       script src: "/lib/backbone/backbone.js"
       script src: "/lib/backbone.localstorage/backbone.localStorage.js"
       script src: "/lib/showdown/src/showdown.js",
-      script src: "/src/util.js"
-      script src: "/src/engine.js"
-      script src: "/src/notebook.js"
-      script src: "/src/views.js"
+      script src: "/src/util.js?" + (new Date).getTime()
+      script src: "/src/engine.js?" + (new Date).getTime()
+      script src: "/src/notebook.js?" + (new Date).getTime()
+      script src: "/src/views.js?" + (new Date).getTime()
     else
       script src: "/lib/jquery-1.7.2.min.js"
       script src: "/lib/underscore/underscore-min.js"
@@ -172,5 +172,5 @@ html ->
             button type: 'submit', 'Create'
 
     script type: "text/template", id: "share-notebook", ->
-      h1 -> "Share this link to share the notebook"
-      div id: 'share-url', style: "max-width: 500px; word-wrap: break-word", -> "[[= url ]]"
+      h4 -> "Share this link to share the notebook"
+      input id: 'share-url', type: 'text', value: '[[= url ]]'

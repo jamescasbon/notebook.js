@@ -260,3 +260,39 @@ pre.prettyprint {
 .list-notebook > .right > a {
   margin-left: 20px;
 }
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba(0,0,0,0.50);
+  display: block;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+}
+.modal .modal-content {
+  margin: 15px;
+}
+.modal .modal-inner {
+  position: relative;
+  background: #fff;
+  margin: 10% auto auto auto;
+  width: 40%;
+  max-width: 500px;
+  border: 4px solid #aaa;
+  -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.40);
+  -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.40);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.40);
+}
+.modal a.close {
+  color: #555;
+  font-weight: bold;
+  font-size: 24px;
+  position: absolute;
+  top: 0;
+  right: 5px;
+  text-decoration: none !important;
+}
+.modal a.close:hover {
+  cursor: pointer;
+}
