@@ -418,9 +418,6 @@
       this.$('.ace_sb').css({
         display: 'none'
       });
-      this.resizeEditor();
-      this.editor.getSession().on('change', this.inputChange);
-      this.setEditorHighlightMode();
       input = this.model.get('input');
       crs_to_add = Math.max(3 - _.string.count(input, '\n'), 0);
       console.log('crs');
@@ -430,6 +427,9 @@
         input = input + '\n';
       }
       this.editor.getSession().setValue(input);
+      this.resizeEditor();
+      this.editor.getSession().on('change', this.inputChange);
+      this.setEditorHighlightMode();
       if (this.model.get('inputFold')) this.changeInputFold();
       this.editor.commands.addCommand({
         name: 'evaluate',

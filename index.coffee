@@ -80,6 +80,10 @@ html ->
         div 'ace-container', ->
           div class: "cell-input", style: "top:0;bottom:0;left:0;right:0;", id: "input-[[= id ]]", ->
 
+        div 'status-bar', ->
+          div 'tooltip', tooltip: 'Evaluate', ->
+            img 'evaluate', src: '/img/play.png'
+
         hr -> ''
 
         div 'cell-output', tabindex: "[[= position ]]c", ->
@@ -87,8 +91,6 @@ html ->
 
         # status controls in right margin
         div 'status-bar', ->
-          div 'tooltip', tooltip: 'Evaluate', ->
-            img 'evaluate', src: '/img/play.png'
           div 'tooltip', tooltip: 'Interrupt', ->
             img 'interrupt tooltip', src: '/img/ajax-loader.gif', tooltip: 'Interrupt'
 
@@ -105,7 +107,6 @@ html ->
         div "[[ } ]]"
 
         div class: "cell-output", -> "[[= output ]]"
-
 
 
     script type: "text/template", id: "index-template", ->

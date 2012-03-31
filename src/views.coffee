@@ -334,13 +334,6 @@ class CellEditView extends Backbone.View
     # TODO: size of line highlight not correct
     @$('.ace_sb').css({display: 'none'})
 
-    @resizeEditor()
-
-
-
-    @editor.getSession().on('change', @inputChange)
-    @setEditorHighlightMode()
-
     # chrome screws up on input sizes < 3
     input = @model.get('input')
     crs_to_add = Math.max( 3 - _.string.count(input, '\n') , 0)
@@ -349,6 +342,10 @@ class CellEditView extends Backbone.View
       input = input + '\n'
 
     @editor.getSession().setValue(input)
+
+    @resizeEditor()
+    @editor.getSession().on('change', @inputChange)
+    @setEditorHighlightMode()
 
     if @model.get('inputFold')
       @changeInputFold()

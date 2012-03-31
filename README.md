@@ -48,10 +48,10 @@ Now:
 * share URL broken on deploy 
 * new notebook hint on where to type
 * play button position next to input 
-* play buttons should not appear on load for markdown
 * hint user playing non first cell on new notebook load
 * play all button
 * delete cell button
+* Table of contens udpate
 
 
 * play all
