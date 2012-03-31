@@ -1,0 +1,9 @@
+{
+  "name": "notebook",
+  "version": "0.0.1",
+  "devDependencies": {
+    "coffee-script": "~1.2.0",
+    "coffeecup": "~0.3.0",
+    "stylus": "~0.24.0"
+  }
+}
