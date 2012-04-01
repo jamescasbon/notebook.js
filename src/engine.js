@@ -101,7 +101,6 @@
     JavascriptWorker.prototype.evaluate = function(input, handler) {
       this.inputId += 1;
       this.handlers[this.inputId] = handler;
-      handler.evalBegin();
       return this.worker.postMessage({
         src: input,
         id: this.inputId
@@ -113,6 +112,7 @@
       console.log('received worker data', ev.data, ev.data.msg);
       inputId = ev.data.inputId;
       handler = this.handlers[inputId];
+      console.log('handler is', handler);
       switch (ev.data.msg) {
         case 'log':
           return console.log(ev.data.data);

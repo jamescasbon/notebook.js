@@ -72,13 +72,13 @@ class JavascriptWorker
   evaluate: (input, handler) =>
     @inputId += 1
     @handlers[@inputId] = handler
-    handler.evalBegin()
     @worker.postMessage(src: input, id: @inputId)
 
   handleMessage: (ev) =>
     console.log 'received worker data', ev.data, ev.data.msg
     inputId = ev.data.inputId
     handler = @handlers[inputId]
+    console.log 'handler is', handler
     switch ev.data.msg
       when 'log' then console.log ev.data.data
       when 'evalBegin' then handler.evalBegin()

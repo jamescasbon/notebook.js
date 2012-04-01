@@ -16,7 +16,7 @@
       return self.postMessage({
         inputId: inputId,
         msg: 'print',
-        data: d
+        data: d.toString()
       });
     };
     try {

@@ -49,13 +49,26 @@ describe 'NotebookJS.engines', ->
       handler.evalEnd.should.have.calledOnce()
 
   describe 'worker javascript', -> 
-    it 'should be able to print', ->
+    it 'should be able to print', (done) ->
       js = new engines.JavascriptWorker()
-      js.evaluate('print(1)', handler)
-      
-      handler.evalBegin.should.have.calledOnce()
-      handler.print.should.have.calledOnce()
-      handler.print.should.have.calledWith('1')
-      handler.evalEnd.should.have.calledOnce()
 
+      handler.evalEnd = -> 
+        handler.evalBegin.should.have.calledOnce()
+        handler.print.should.have.calledOnce()
+        handler.print.should.have.calledWith("999")
+        done()
+      
+      js.evaluate('print(999)', handler)
+
+    it 'should be able to evaluate', (done) ->
+      js = new engines.JavascriptWorker()
+
+      handler.evalEnd = -> 
+        handler.evalBegin.should.have.calledOnce()
+        handler.print.should.have.calledOnce()
+        handler.print.should.have.calledWith("4")
+        done()
+      
+      js.evaluate('print(2+2)', handler)
+  
 

@@ -9,7 +9,7 @@ self.onmessage = (ev) =>
 
   # TODO: factor out API?  Interface?
   print = (d) =>
-    self.postMessage(inputId: inputId, msg: 'print', data: d)
+    self.postMessage(inputId: inputId, msg: 'print', data: d.toString())
 
   try
     self.postMessage(inputId: inputId, msg: 'evalBegin')
