@@ -13,6 +13,7 @@
     __extends(Notebook, _super);
 
     function Notebook() {
+      this.addCell = __bind(this.addCell, this);
       this.serialize = __bind(this.serialize, this);
       this.readyCells = __bind(this.readyCells, this);
       this.initialize = __bind(this.initialize, this);
@@ -30,7 +31,8 @@
 
     Notebook.prototype.readyCells = function() {
       this.cells = new Cells();
-      return this.cells.localStorage = new Store('cells-' + this.get('id'));
+      this.cells.localStorage = new Store('cells-' + this.get('id'));
+      return this.cells.on('add', this.addCell);
     };
 
     Notebook.prototype.serialize = function() {
@@ -38,6 +40,10 @@
       data = this.toJSON();
       data.cells = this.cells.toJSON();
       return JSON.stringify(data);
+    };
+
+    Notebook.prototype.addCell = function(cell) {
+      cell.engine = null;
     };
 
     return Notebook;
@@ -65,9 +71,9 @@
     __extends(Cell, _super);
 
     function Cell() {
-      this.handleMessage = __bind(this.handleMessage, this);
-      this.evaluateError = __bind(this.evaluateError, this);
-      this.evaluateSuccess = __bind(this.evaluateSuccess, this);
+      this.evalEnd = __bind(this.evalEnd, this);
+      this.evalBegin = __bind(this.evalBegin, this);
+      this.addOutput = __bind(this.addOutput, this);
       this.interrupt = __bind(this.interrupt, this);
       this.evaluate = __bind(this.evaluate, this);
       this.toggleInputFold = __bind(this.toggleInputFold, this);
@@ -106,10 +112,9 @@
     };
 
     Cell.prototype.toggleInputFold = function() {
-      this.set({
+      return this.set({
         inputFold: !this.get('inputFold')
       });
-      return this.save();
     };
 
     Cell.prototype.evaluate = function() {
@@ -120,66 +125,42 @@
       this.set({
         state: 'evaluating'
       });
-      this.save();
-      this.handler = NotebookJS.engines[this.get('type')];
-      return this.handler.evaluate(this.get('input'), this);
+      return this.engine.evaluate(this.get('input'), this);
     };
 
     Cell.prototype.interrupt = function() {
-      if (this.handler != null) {
-        this.onPrint('Interrupted', 'error');
-        this.handler.interrupt();
-        this.set({
-          state: null
-        });
-        return this.save();
-      }
-    };
-
-    Cell.prototype.evaluateSuccess = function(output) {
-      this.set({
-        output: output,
-        error: null
-      });
-      return this.save();
-    };
-
-    Cell.prototype.evaluateError = function(error) {
-      this.set({
-        error: error
-      });
-      return this.save;
-    };
-
-    Cell.prototype.handleMessage = function(data) {
-      switch (data.msg) {
-        case 'evalEnd':
-          this.set({
-            state: null
-          });
-          return this.save();
-        case 'error':
-          return this.onPrint(data.data, 'error');
-        case 'print':
-          return this.onPrint(data.data, 'print');
-        case 'result':
-          return this.onPrint(data.data, 'print');
-        case 'raw':
-          return this.onPrint(data.data, 'raw');
-      }
-    };
-
-    Cell.prototype.onError = function(error) {
+      this.addOutput('Interrupted', 'error');
+      this.engine.interrupt();
       return this.set({
-        error: error
+        state: null
       });
     };
 
-    Cell.prototype.onPrint = function(data, elName) {
+    Cell.prototype.addOutput = function(data, elName) {
       var current;
       current = this.get('output') || "";
       return this.set({
         output: current.concat('<div class="' + elName + '">' + data + '</div>')
+      });
+    };
+
+    Cell.prototype.error = function(data) {
+      return this.addOutput(data, 'error');
+    };
+
+    Cell.prototype.print = function(data) {
+      return this.addOutput(data, 'print');
+    };
+
+    Cell.prototype.result = function(data) {
+      return this.addOutput(data, 'print');
+    };
+
+    Cell.prototype.evalBegin = function() {};
+
+    Cell.prototype.evalEnd = function() {
+      return this.set({
+        state: null
       });
     };
 

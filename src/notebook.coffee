@@ -13,12 +13,16 @@ class Notebook extends Backbone.Model
     #console.log('creating store for nb id', @get('id'))
     @cells = new Cells()
     @cells.localStorage = new Store('cells-' + @get('id'))
+    @cells.on 'add', @addCell
 
   serialize: =>
     data = @toJSON()
     data.cells = @cells.toJSON()
     return JSON.stringify(data)
 
+  addCell: (cell) =>
+    cell.engine = null
+    return 
 
 class Notebooks extends Backbone.Collection
   model: Notebook
@@ -53,50 +57,30 @@ class Cell extends Backbone.Model
 
   toggleInputFold: =>
     @set inputFold: not @get('inputFold')
-    @save()
 
   evaluate: =>
     @set(output: null, error: null)
     @set state: 'evaluating'
-    @save()
-    # should we save the model at this point?
-    # how to look up handler?
-    @handler = NotebookJS.engines[@get('type')]
-    @handler.evaluate @get('input'), @
+    @engine.evaluate @get('input'), @
 
   interrupt: =>
-    if @handler?
+    @addOutput('Interrupted', 'error')
+    @engine.interrupt()
+    @set state: null
 
-      @onPrint('Interrupted', 'error')
-      @handler.interrupt()
-      @set state: null
-      @save()
-
-  evaluateSuccess: (output) =>
-    @set output: output, error: null
-    @save()
-
-  evaluateError: (error) =>
-    @set error: error
-    @save
-
-  handleMessage: (data) =>
-    #console.log 'cell handling message from engine', data
-    switch data.msg
-      when 'evalEnd'
-        @set(state: null)
-        @save()
-      when 'error' then @onPrint(data.data, 'error')
-      when 'print' then @onPrint(data.data, 'print')
-      when 'result' then @onPrint(data.data, 'print')
-      when 'raw' then @onPrint(data.data, 'raw')
-
-  onError: (error) ->
-    @set(error: error)
-
-  onPrint: (data, elName) ->
+  addOutput: (data, elName) =>
     current = @get('output') or ""
     @set(output: current.concat('<div class="' + elName + '">' + data + '</div>'))
+
+  # engine protocol
+  error: (data) -> @addOutput data, 'error'
+  print: (data) -> @addOutput data, 'print'
+  result: (data) -> @addOutput data, 'print'
+  evalBegin: => 
+    return 
+  evalEnd: =>
+    @set(state: null)
+
 
 
 

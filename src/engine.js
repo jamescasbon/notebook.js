@@ -23,9 +23,7 @@
 
     BaseHandler.prototype.result = function(data) {};
 
-    BaseHandler.prototype.print = function(data) {
-      console.log('handler print', data);
-    };
+    BaseHandler.prototype.print = function(data) {};
 
     BaseHandler.prototype.error = function(data) {};
 
@@ -109,10 +107,8 @@
 
     JavascriptWorker.prototype.handleMessage = function(ev) {
       var handler, inputId;
-      console.log('received worker data', ev.data, ev.data.msg);
       inputId = ev.data.inputId;
       handler = this.handlers[inputId];
-      console.log('handler is', handler);
       switch (ev.data.msg) {
         case 'log':
           return console.log(ev.data.data);
