@@ -85,17 +85,15 @@ base64Encode = (data) ->
 
 base64UrlDecode = (data) ->
   m = data.length % 4
-  if m != 0
-    for i in [0...4 - m]
-      data += '='
+  data += Array(5 - m).join('=') if m != 0
   data = data.replace(/-/g, '+')
   data = data.replace(/_/g, '/')
   base64Decode(data)
 
 base64UrlEncode = (data) ->
   data = base64Encode(data)
-  while data[-1...] is '='
-    data = data[...-1]
+  chop = data.indexOf('=')
+  data = data[...chop] if chop isnt -1
   data = data.replace(/\+/g, '-')
   data = data.replace(/\//g, '_')
   data
