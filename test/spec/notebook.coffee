@@ -1,6 +1,7 @@
 engines = NotebookJS.engines
 
 Cell = NotebookJS.Cell
+Notebook = NotebookJS.Notebook
 
 describe 'NotebookJS.Cell', ->
   
@@ -8,8 +9,8 @@ describe 'NotebookJS.Cell', ->
   beforeEach -> 
     c = new Cell()
 
-  it 'should call engine to evaluate and interrupt ', -> 
-    js = new engines.JavascriptWorker()
+  it 'should call engine to evaluate and interrupt ', ->
+    js = new engines.Javascript()
     evaluate = sinon.stub(js, 'evaluate')
     evaluate = sinon.stub(js, 'interrupt')
 
@@ -26,24 +27,35 @@ describe 'NotebookJS.Cell', ->
     c.get('output').should.equal('<div class="error">Interrupted</div>')
     # c.get('state') TODO: assert this is null
 
-  it 'should impement BaseHandler.print', -> 
+  it 'should impement BaseHandler.print', ->
     c.print('1') 
     c.get('output').should.equal('<div class="print">1</div>')
     
-   it 'should impement BaseHandler.error', -> 
+   it 'should impement BaseHandler.error', ->
     c.error('1') 
     c.get('output').should.equal('<div class="error">1</div>')
     
-   it 'should impement BaseHandler.result', -> 
+   it 'should impement BaseHandler.result', ->
     c.result('1') 
     c.get('output').should.equal('<div class="print">1</div>')
 
-   it 'should impement BaseHandler.evalEnd', -> 
+   it 'should impement BaseHandler.evalEnd', ->
     c.set(state: 'evaluating') 
     c.evalEnd() 
     # c.get('state') TODO: assert this is null
 
 
+describe 'NotebookJS.Notebook', ->
+  
+  n = null
+  beforeEach -> 
+    n = new Notebook()
+
+  it 'should call start engines ', ->
+    n.start()
+    console.log 'eng', n.engines
+
+ 
 
 
 

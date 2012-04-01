@@ -29,9 +29,9 @@ describe 'NotebookJS.engines', ->
       handler.result.should.have.calledWith(
         '<p><em>hi</em> from markdown</p>')
     
-  describe 'javascript', ->
+  describe 'javascript window', ->
     it 'should be able to print', ->
-      js = new engines.Javascript()
+      js = new engines.JavascriptWindow()
       js.evaluate('print(1)', handler)
       
       handler.evalBegin.should.have.calledOnce()
@@ -40,7 +40,7 @@ describe 'NotebookJS.engines', ->
       handler.evalEnd.should.have.calledOnce()
 
     it 'should be able to evaluate', ->
-      js = new engines.Javascript()
+      js = new engines.JavascriptWindow()
       js.evaluate('1+1', handler)
       
       handler.evalBegin.should.have.calledOnce()
@@ -50,7 +50,7 @@ describe 'NotebookJS.engines', ->
 
   describe 'worker javascript', -> 
     it 'should be able to print', (done) ->
-      js = new engines.JavascriptWorker()
+      js = new engines.Javascript()
 
       handler.evalEnd = -> 
         handler.evalBegin.should.have.calledOnce()
@@ -61,7 +61,7 @@ describe 'NotebookJS.engines', ->
       js.evaluate('print(999)', handler)
 
     it 'should be able to evaluate', (done) ->
-      js = new engines.JavascriptWorker()
+      js = new engines.Javascript()
 
       handler.evalEnd = -> 
         handler.evalBegin.should.have.calledOnce()

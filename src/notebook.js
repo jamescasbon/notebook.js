@@ -13,7 +13,8 @@
     __extends(Notebook, _super);
 
     function Notebook() {
-      this.addCell = __bind(this.addCell, this);
+      this.start = __bind(this.start, this);
+      this.cellAdded = __bind(this.cellAdded, this);
       this.serialize = __bind(this.serialize, this);
       this.readyCells = __bind(this.readyCells, this);
       this.initialize = __bind(this.initialize, this);
@@ -23,16 +24,20 @@
 
     Notebook.prototype.defaults = function() {
       return {
-        title: "untitled"
+        title: "untitled",
+        language: 'Javascript',
+        state: null
       };
     };
 
-    Notebook.prototype.initialize = function() {};
+    Notebook.prototype.initialize = function() {
+      this.cells = new Cells();
+      this.cells.on('add', this.cellAdded);
+      return this.engines = null;
+    };
 
     Notebook.prototype.readyCells = function() {
-      this.cells = new Cells();
-      this.cells.localStorage = new Store('cells-' + this.get('id'));
-      return this.cells.on('add', this.addCell);
+      return this.cells.localStorage = new Store('cells-' + this.get('id'));
     };
 
     Notebook.prototype.serialize = function() {
@@ -42,8 +47,15 @@
       return JSON.stringify(data);
     };
 
-    Notebook.prototype.addCell = function(cell) {
-      cell.engine = null;
+    Notebook.prototype.cellAdded = function(cell) {
+      return cell.engine = null;
+    };
+
+    Notebook.prototype.start = function() {
+      return this.engines = {
+        code: new NotebookJS.engines.Javascript(),
+        markdown: new NotebookJS.engines.Markdown()
+      };
     };
 
     return Notebook;
@@ -87,7 +99,7 @@
     Cell.prototype.defaults = function() {
       return {
         input: "",
-        type: "javascript",
+        type: "Javascript",
         inputFold: false,
         output: null,
         position: null,
@@ -97,13 +109,13 @@
     };
 
     Cell.prototype.toggleType = function() {
-      if (this.get('type') === 'javascript') {
+      if (this.get('type') === 'Javascript') {
         this.set({
-          type: 'markdown'
+          type: 'Markdown'
         });
       } else {
         this.set({
-          type: 'javascript'
+          type: 'Javascript'
         });
       }
       return this.set({

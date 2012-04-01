@@ -3,26 +3,31 @@ NotebookJS = root.NotebookJS = root.NotebookJS ? {}
 
 
 class Notebook extends Backbone.Model
-  defaults: => (title: "untitled")
+  defaults: =>
+    title: "untitled", 
+    language: 'Javascript'
+    state: null
 
   initialize: =>
-    return
+    @cells = new Cells()
+    @cells.on 'add', @cellAdded
+    @engines = null
 
   # we need this hook for localStorage because the id is not available at init
   readyCells: =>
     #console.log('creating store for nb id', @get('id'))
-    @cells = new Cells()
     @cells.localStorage = new Store('cells-' + @get('id'))
-    @cells.on 'add', @addCell
 
   serialize: =>
     data = @toJSON()
     data.cells = @cells.toJSON()
     return JSON.stringify(data)
 
-  addCell: (cell) =>
+  cellAdded: (cell) =>
     cell.engine = null
-    return 
+
+  start: => 
+    @engines = (code: new NotebookJS.engines.Javascript(), markdown: new NotebookJS.engines.Markdown())
 
 class Notebooks extends Backbone.Collection
   model: Notebook
@@ -40,7 +45,7 @@ class Cell extends Backbone.Model
   tagName: 'li'
   defaults: =>
     input: "",
-    type: "javascript",
+    type: "Javascript",
     inputFold: false
     output: null,
     position: null,
@@ -48,10 +53,10 @@ class Cell extends Backbone.Model
     state: null
 
   toggleType: =>
-    if @get('type') == 'javascript'
-      @set type: 'markdown'
+    if @get('type') == 'Javascript'
+      @set type: 'Markdown'
     else
-      @set type: 'javascript'
+      @set type: 'Javascript'
     @set state: 'dirty'
     #@evaluate()
 

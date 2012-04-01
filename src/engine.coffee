@@ -25,7 +25,7 @@ class BaseHandler
 # Javascript engine, runs in main thread and therefore 
 # has access to DOM and can block the UI
 # not currently used
-class Javascript
+class JavascriptWindow
   evaluate: (input, handler) =>
     try
       handler.evalBegin()
@@ -61,7 +61,7 @@ class Markdown
 
 
 # web worker evaluation
-class JavascriptWorker
+class Javascript
   constructor: ->
     @worker = new Worker('/src/worker.js')
     @worker.onmessage = @handleMessage
@@ -94,9 +94,9 @@ class JavascriptWorker
 
 engines = {}
 engines.BaseHandler = BaseHandler
-engines.Javascript = Javascript
+engines.JavascriptWindow = JavascriptWindow
 engines.Markdown = Markdown
-engines.JavascriptWorker = JavascriptWorker
+engines.Javascript = Javascript
 
 NotebookJS.engines = engines
 

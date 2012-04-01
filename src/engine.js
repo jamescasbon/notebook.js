@@ -1,5 +1,5 @@
 (function() {
-  var BaseHandler, Javascript, JavascriptWorker, Markdown, NotebookJS, engines, root, _ref,
+  var BaseHandler, Javascript, JavascriptWindow, Markdown, NotebookJS, engines, root, _ref,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   root = typeof exports !== "undefined" && exports !== null ? exports : this;
@@ -33,13 +33,13 @@
 
   })();
 
-  Javascript = (function() {
+  JavascriptWindow = (function() {
 
-    function Javascript() {
+    function JavascriptWindow() {
       this.evaluate = __bind(this.evaluate, this);
     }
 
-    Javascript.prototype.evaluate = function(input, handler) {
+    JavascriptWindow.prototype.evaluate = function(input, handler) {
       var print, result;
       try {
         handler.evalBegin();
@@ -56,7 +56,7 @@
       }
     };
 
-    return Javascript;
+    return JavascriptWindow;
 
   })();
 
@@ -85,9 +85,9 @@
 
   })();
 
-  JavascriptWorker = (function() {
+  Javascript = (function() {
 
-    function JavascriptWorker() {
+    function Javascript() {
       this.interrupt = __bind(this.interrupt, this);
       this.handleMessage = __bind(this.handleMessage, this);
       this.evaluate = __bind(this.evaluate, this);      this.worker = new Worker('/src/worker.js');
@@ -96,7 +96,7 @@
       this.handlers = {};
     }
 
-    JavascriptWorker.prototype.evaluate = function(input, handler) {
+    Javascript.prototype.evaluate = function(input, handler) {
       this.inputId += 1;
       this.handlers[this.inputId] = handler;
       return this.worker.postMessage({
@@ -105,7 +105,7 @@
       });
     };
 
-    JavascriptWorker.prototype.handleMessage = function(ev) {
+    Javascript.prototype.handleMessage = function(ev) {
       var handler, inputId;
       inputId = ev.data.inputId;
       handler = this.handlers[inputId];
@@ -125,13 +125,13 @@
       }
     };
 
-    JavascriptWorker.prototype.interrupt = function() {
+    Javascript.prototype.interrupt = function() {
       this.worker.terminate();
       this.worker = new Worker('/src/worker.js');
       return this.worker.onmessage = this.handleMessage;
     };
 
-    return JavascriptWorker;
+    return Javascript;
 
   })();
 
@@ -139,11 +139,11 @@
 
   engines.BaseHandler = BaseHandler;
 
-  engines.Javascript = Javascript;
+  engines.JavascriptWindow = JavascriptWindow;
 
   engines.Markdown = Markdown;
 
-  engines.JavascriptWorker = JavascriptWorker;
+  engines.Javascript = Javascript;
 
   NotebookJS.engines = engines;
 
