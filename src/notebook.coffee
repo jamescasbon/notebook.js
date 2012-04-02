@@ -54,6 +54,10 @@ class Notebook extends Backbone.Model
     @set state: null
     @engines = null
 
+  saveAll: => 
+    @save()
+    @model.cells.each (c) -> c.save()
+    @model.set pendingSaves: false
 
 
 class Notebooks extends Backbone.Collection
@@ -109,7 +113,11 @@ class Cell extends Backbone.Model
 
   addOutput: (data, elName) =>
     current = @get('output') or ""
+    if @get('type') == 'markdown'
+      elName = 'markdown'
+    
     @set(output: current.concat('<div class="' + elName + '">' + data + '</div>'))
+
 
   # engine protocol
   error: (data) -> @addOutput data, 'error'

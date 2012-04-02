@@ -13,6 +13,7 @@
     __extends(Notebook, _super);
 
     function Notebook() {
+      this.saveAll = __bind(this.saveAll, this);
       this.stop = __bind(this.stop, this);
       this.start = __bind(this.start, this);
       this.cellChanged = __bind(this.cellChanged, this);
@@ -92,6 +93,16 @@
         state: null
       });
       return this.engines = null;
+    };
+
+    Notebook.prototype.saveAll = function() {
+      this.save();
+      this.model.cells.each(function(c) {
+        return c.save();
+      });
+      return this.model.set({
+        pendingSaves: false
+      });
     };
 
     return Notebook;
@@ -195,6 +206,7 @@
     Cell.prototype.addOutput = function(data, elName) {
       var current;
       current = this.get('output') || "";
+      if (this.get('type') === 'markdown') elName = 'markdown';
       return this.set({
         output: current.concat('<div class="' + elName + '">' + data + '</div>')
       });

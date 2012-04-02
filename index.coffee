@@ -101,7 +101,7 @@ html ->
         # FIXME: mixing of underscore logic in this coffeekup template is not pretty
         # we need two fake divs here to get the text output
         # must be better way
-        div "[[ if (type != 'markdown' | inputFold == false) { ]]"
+        div "[[ if (type != 'markdown' & inputFold == false) { ]]"
         pre class: "cell-input prettyprint", -> "[[= input ]]"
         hr -> ''
         div "[[ } ]]"

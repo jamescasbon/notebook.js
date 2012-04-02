@@ -282,8 +282,11 @@
 
     EditNotebookView.prototype.save = function() {
       this.model.save();
-      return this.model.cells.each(function(c) {
+      this.model.cells.each(function(c) {
         return c.save();
+      });
+      return this.model.set({
+        pendingSaves: false
       });
     };
 
@@ -796,6 +799,7 @@
     __extends(NotebookRouter, _super);
 
     function NotebookRouter() {
+      this.onbeforeunload = __bind(this.onbeforeunload, this);
       this["import"] = __bind(this["import"], this);
       this.loadUrl = __bind(this.loadUrl, this);
       this.index = __bind(this.index, this);
@@ -915,6 +919,10 @@
       });
     };
 
+    NotebookRouter.prototype.onbeforeunload = function(e) {
+      if (NotebookJS.nb.get('pendingSaves')) return 'unsaved changes to notebook';
+    };
+
     return NotebookRouter;
 
   })(Backbone.Router);
@@ -960,7 +968,8 @@
     NotebookJS.mathjaxReady = false;
     NotebookJS.router = new NotebookRouter();
     Backbone.history.start();
-    return MathJax.Hub.Register.StartupHook('End', mathjaxReady);
+    MathJax.Hub.Register.StartupHook('End', mathjaxReady);
+    return window.onbeforeunload = NotebookJS.router.onbeforeunload;
   });
 
 }).call(this);

@@ -198,6 +198,7 @@ class EditNotebookView extends BaseNotebookView
   save: => 
     @model.save()
     @model.cells.each (c) -> c.save()
+    @model.set pendingSaves: false
 
 # CellView manages the Dom elements associated with a cell
 #
@@ -702,7 +703,9 @@ class NotebookRouter extends Backbone.Router
     notebook = loadNotebook(data)
     NotebookJS.router.navigate(notebook.get('id') + '/view/', (trigger: true, replace: true))
 
-
+  onbeforeunload: (e) => 
+    if NotebookJS.nb.get('pendingSaves')
+      'unsaved changes to notebook'
 
 
 # crazy global methods? Go in the router?
@@ -748,3 +751,4 @@ $(document).ready ->
   MathJax.Hub.Register.StartupHook('End', mathjaxReady)
 
 
+  window.onbeforeunload = NotebookJS.router.onbeforeunload
