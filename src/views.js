@@ -310,6 +310,8 @@
       this.setEditorHighlightMode = __bind(this.setEditorHighlightMode, this);
       this.focusCellBelow = __bind(this.focusCellBelow, this);
       this.focusCellAbove = __bind(this.focusCellAbove, this);
+      this.blurOutput = __bind(this.blurOutput, this);
+      this.focusOutput = __bind(this.focusOutput, this);
       this.blurInput = __bind(this.blurInput, this);
       this.focusInput = __bind(this.focusInput, this);
       this.changeInputFold = __bind(this.changeInputFold, this);
@@ -343,7 +345,9 @@
         "click .interrupt": "interrupt",
         "keyup .cell-output": 'handleKeypress',
         "focus .cell-input": "focusInput",
-        "blur .cell-input": "blurInput"
+        "focus .cell-output": "focusOutput",
+        "blur .cell-input": "blurInput",
+        "blur .cell-output": "blurOutput"
       };
     };
 
@@ -390,15 +394,16 @@
     };
 
     CellEditView.prototype.changeState = function() {
+      console.log('view changing state to', this.model.get('state'));
       switch (this.model.get('state')) {
         case 'evaluating':
           this.output.html('...');
-          this.intButton.addClass('active');
-          return this.evalButton.removeClass('active');
+          $(this.el).addClass('eval-cell');
+          return $(this.el).removeClass('dirty-cell');
         case 'dirty':
-          return this.evalButton.addClass('active');
+          return $(this.el).addClass('dirty-cell');
         case null:
-          return this.intButton.removeClass('active');
+          return $(this.el).removeClass('eval-cell');
       }
     };
 
@@ -575,6 +580,7 @@
     };
 
     CellEditView.prototype.focusInput = function(where) {
+      $(this.el).addClass('active-cell');
       if (where === 'top') {
         this.editor.gotoLine(1);
         this.editor.focus();
@@ -589,10 +595,19 @@
     };
 
     CellEditView.prototype.blurInput = function() {
+      $(this.el).removeClass('active-cell');
       if (this.editor != null) {
         this.editor.setHighlightActiveLine(false);
         return this.$('.ace_cursor-layer').hide();
       }
+    };
+
+    CellEditView.prototype.focusOutput = function() {
+      return $(this.el).addClass('active-cell');
+    };
+
+    CellEditView.prototype.blurOutput = function() {
+      return $(this.el).removeClass('active-cell');
     };
 
     CellEditView.prototype.focusCellAbove = function() {
@@ -631,6 +646,7 @@
     };
 
     CellEditView.prototype.destroy = function() {
+      console.log('destroy');
       return this.model.destroy();
     };
 

@@ -246,7 +246,9 @@ class CellEditView extends Backbone.View
     "click .interrupt": "interrupt",
     "keyup .cell-output": 'handleKeypress',
     "focus .cell-input" : "focusInput",
-    "blur .cell-input" : "blurInput"
+    "focus .cell-output": "focusOutput",
+    "blur .cell-input" : "blurInput",
+    "blur .cell-output" : "blurOutput",
   )
 
   # get template and bind to events
@@ -296,18 +298,17 @@ class CellEditView extends Backbone.View
 
   # handle state changes
   changeState: =>
-    #console.log('view changing state to', @model.get('state'))
+    console.log('view changing state to', @model.get('state'))
     switch @model.get('state')
       when 'evaluating'
         @output.html('...')
-        @intButton.addClass('active')
-        @evalButton.removeClass('active')
-
+        $(@el).addClass('eval-cell')
+        $(@el).removeClass('dirty-cell')
       when 'dirty'
-        @evalButton.addClass('active')
+        $(@el).addClass('dirty-cell')
 
       when null
-        @intButton.removeClass('active')
+        $(@el).removeClass('eval-cell')
 
   # Ace initialization and configuration happens after DOM insertion
   afterDomInsert: =>
@@ -458,6 +459,8 @@ class CellEditView extends Backbone.View
 
   # TODO: method is unclear, called both when focused and to focus
   focusInput: (where) =>
+  
+    $(@el).addClass('active-cell')
 
     # focus the input from a somewhere, and recall the focus
     if where == 'top'
@@ -473,15 +476,22 @@ class CellEditView extends Backbone.View
       @editor.setHighlightActiveLine(true)
       @$('.ace_cursor-layer').show()
 
-
   # remove editor decoration
   blurInput: =>
+    $(@el).removeClass('active-cell')
+
     if @editor?
       @editor.setHighlightActiveLine(false)
       @$('.ace_cursor-layer').hide() # cannot use renderer.hideCursor as it leaves a mark
 
     # TODO: only revaluate if not pressing eval button
     #@evaluate()
+
+  focusOutput: => 
+    $(@el).addClass('active-cell')
+
+  blurOutput: => 
+    $(@el).removeClass('active-cell')
 
 
   focusCellAbove: =>
@@ -512,6 +522,7 @@ class CellEditView extends Backbone.View
     @model.evaluate()
 
   destroy: =>
+    console.log 'destroy'
     @model.destroy()
 
   interrupt: =>

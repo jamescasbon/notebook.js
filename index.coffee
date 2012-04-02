@@ -72,6 +72,10 @@ html ->
         div 'tooltip', tooltip: 'Double click to create cell', ->
           div 'spawn-above', tabindex: '[[= position ]]a'
 
+        div 'status-bar', ->
+          div 'tooltip', tooltip: 'Delete', ->
+            img 'delete show-when-active', src: '/img/delete.png'
+
         # the fold button, tooltip outside to avoid rotating tooltip
         div 'fold-control tooltip', tooltip: 'Click to fold input', ->
           div 'fold-button', -> '>'
@@ -82,7 +86,7 @@ html ->
 
         div 'status-bar', ->
           div 'tooltip', tooltip: 'Evaluate', ->
-            img 'evaluate', src: '/img/play.png'
+            img 'evaluate show-when-active show-when-dirty', src: '/img/play.png'
 
         hr -> ''
 
@@ -92,7 +96,7 @@ html ->
         # status controls in right margin
         div 'status-bar', ->
           div 'tooltip', tooltip: 'Interrupt', ->
-            img 'interrupt tooltip', src: '/img/ajax-loader.gif', tooltip: 'Interrupt'
+            img 'interrupt show-when-eval', src: '/img/ajax-loader.gif', tooltip: 'Interrupt'
 
 
     script type: "text/template", id: 'cell-view-template', ->
