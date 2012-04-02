@@ -1,6 +1,8 @@
 (function() {
-  var BaseHandler, Javascript, JavascriptWindow, Markdown, NotebookJS, engines, root, _ref,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  var BaseEngine, BaseHandler, Javascript, JavascriptWindow, Markdown, NotebookJS, engines, root, _ref,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
   root = typeof exports !== "undefined" && exports !== null ? exports : this;
 
@@ -33,10 +35,31 @@
 
   })();
 
-  JavascriptWindow = (function() {
+  BaseEngine = (function() {
+
+    function BaseEngine() {
+      this.halt = __bind(this.halt, this);
+      this.interrupt = __bind(this.interrupt, this);
+      this.evaluate = __bind(this.evaluate, this);
+    }
+
+    BaseEngine.prototype.evaluate = function() {};
+
+    BaseEngine.prototype.interrupt = function() {};
+
+    BaseEngine.prototype.halt = function() {};
+
+    return BaseEngine;
+
+  })();
+
+  JavascriptWindow = (function(_super) {
+
+    __extends(JavascriptWindow, _super);
 
     function JavascriptWindow() {
       this.evaluate = __bind(this.evaluate, this);
+      JavascriptWindow.__super__.constructor.apply(this, arguments);
     }
 
     JavascriptWindow.prototype.evaluate = function(input, handler) {
@@ -58,12 +81,15 @@
 
     return JavascriptWindow;
 
-  })();
+  })(BaseEngine);
 
-  Markdown = (function() {
+  Markdown = (function(_super) {
+
+    __extends(Markdown, _super);
 
     function Markdown() {
       this.evaluate = __bind(this.evaluate, this);
+      Markdown.__super__.constructor.apply(this, arguments);
     }
 
     Markdown.prototype.evaluate = function(input, handler) {
@@ -83,11 +109,14 @@
 
     return Markdown;
 
-  })();
+  })(BaseEngine);
 
-  Javascript = (function() {
+  Javascript = (function(_super) {
+
+    __extends(Javascript, _super);
 
     function Javascript() {
+      this.halt = __bind(this.halt, this);
       this.interrupt = __bind(this.interrupt, this);
       this.handleMessage = __bind(this.handleMessage, this);
       this.evaluate = __bind(this.evaluate, this);      this.worker = new Worker('/src/worker.js');
@@ -115,7 +144,8 @@
         case 'evalBegin':
           return handler.evalBegin();
         case 'evalEnd':
-          return handler.evalEnd();
+          handler.evalEnd();
+          return this.handlers[inputId] = null;
         case 'print':
           return handler.print(ev.data.data);
         case 'result':
@@ -131,9 +161,14 @@
       return this.worker.onmessage = this.handleMessage;
     };
 
+    Javascript.prototype.halt = function() {
+      this.worker.terminate();
+      return this.worker = null;
+    };
+
     return Javascript;
 
-  })();
+  })(BaseEngine);
 
   engines = {};
 

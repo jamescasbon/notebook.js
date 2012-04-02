@@ -7,15 +7,18 @@ class Notebook extends Backbone.Model
     title: "untitled", 
     language: 'Javascript'
     state: null
+    pendingSaves: false
 
   initialize: =>
     @cells = new Cells()
     @cells.on 'add', @cellAdded
+    @cells.on 'change', @cellChanged
+    @cells.on 'remove', @cellChanged
+    @cells.on 'fetch', @cellsFetched
     @engines = null
 
   # we need this hook for localStorage because the id is not available at init
   readyCells: =>
-    #console.log('creating store for nb id', @get('id'))
     @cells.localStorage = new Store('cells-' + @get('id'))
 
   serialize: =>
@@ -23,11 +26,35 @@ class Notebook extends Backbone.Model
     data.cells = @cells.toJSON()
     return JSON.stringify(data)
 
-  cellAdded: (cell) =>
-    cell.engine = null
+  # update cell engine refs when fetched 
+  cellsFetched: (cells) =>
+    cells.each (cell) ->
+      cell.engines = @engines
 
+  # new cells need a reference to the engines and the notebooks needs saving
+  cellAdded: (cell) =>
+    cell.engines = @engines
+    @set pendingSaves: true
+
+  # set the notebook as needing to be saved when a cell changes
+  cellChanged: =>  
+    @set pendingSaves: true
+
+  # start the engines for this notebook
   start: => 
-    @engines = (code: new NotebookJS.engines.Javascript(), markdown: new NotebookJS.engines.Markdown())
+    @set state: 'running'
+    @engines = 
+      code: new NotebookJS.engines.Javascript(),
+      markdown: new NotebookJS.engines.Markdown()
+    @cells.each (cell) => 
+      cell.engines = @engines
+
+  # stop the engines for this notebook
+  stop: => 
+    @set state: null
+    @engines = null
+
+
 
 class Notebooks extends Backbone.Collection
   model: Notebook
@@ -45,7 +72,7 @@ class Cell extends Backbone.Model
   tagName: 'li'
   defaults: =>
     input: "",
-    type: "Javascript",
+    type: "code",
     inputFold: false
     output: null,
     position: null,
@@ -53,10 +80,11 @@ class Cell extends Backbone.Model
     state: null
 
   toggleType: =>
-    if @get('type') == 'Javascript'
-      @set type: 'Markdown'
+    # TODO: check if evaluating here and interrupt?
+    if @get('type') == 'code'
+      @set type: 'markdown'
     else
-      @set type: 'Javascript'
+      @set type: 'code'
     @set state: 'dirty'
     #@evaluate()
 
@@ -66,11 +94,11 @@ class Cell extends Backbone.Model
   evaluate: =>
     @set(output: null, error: null)
     @set state: 'evaluating'
-    @engine.evaluate @get('input'), @
+    @engines[@get('type')].evaluate @get('input'), @
 
   interrupt: =>
     @addOutput('Interrupted', 'error')
-    @engine.interrupt()
+    @engines[@get('type')].interrupt()
     @set state: null
 
   addOutput: (data, elName) =>

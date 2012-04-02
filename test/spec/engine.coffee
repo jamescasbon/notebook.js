@@ -71,4 +71,7 @@ describe 'NotebookJS.engines', ->
       
       js.evaluate('print(2+2)', handler)
   
+    it 'should be able to halt', ->
+      js = new engines.Javascript()
+      js.halt()
 

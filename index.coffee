@@ -160,6 +160,7 @@ html ->
         div '#menu', ->
           button '#toggle-edit', -> 'toggle edit/view'
           a id: 'save-to-file', class: 'button', download: 'notebook.json', -> 'save to file'
+          a id: 'save', class: 'button', -> 'save'
           button '#share-url', -> 'share'
 
 

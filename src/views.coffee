@@ -147,6 +147,7 @@ class EditNotebookView extends BaseNotebookView
     "click #toggle-edit" : "toggleEdit"
     "click #save-to-file": "saveToFile"
     "click #share-url": "share"
+    "click #save": "save"
   )
 
   # bind to dom and model events, fetch cells
@@ -200,6 +201,10 @@ class EditNotebookView extends BaseNotebookView
   toggleEdit: =>
     NotebookJS.router.navigate(@model.get('id') + '/view/', trigger: true)
 
+  save: => 
+    console.log 'saving'
+    @model.save()
+    @model.cells.each (c) -> c.save()
 
 # CellView manages the Dom elements associated with a cell
 #
@@ -336,7 +341,6 @@ class CellEditView extends Backbone.View
     # chrome screws up on input sizes < 3
     input = @model.get('input')
     crs_to_add = Math.max( 3 - _.string.count(input, '\n') , 0)
-    console.log 'crs'
     for i in _.range(crs_to_add)
       input = input + '\n'
 
@@ -652,6 +656,7 @@ class NotebookRouter extends Backbone.Router
     notebook = @getNotebook(nb)
     NotebookJS.app = new EditNotebookView(model: notebook)
     setTitle(notebook.get('title') + ' (Editing)')
+    notebook.start()
 
   view: (nb) =>
     if NotebookJS.app

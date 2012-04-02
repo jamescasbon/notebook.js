@@ -200,6 +200,7 @@
     __extends(EditNotebookView, _super);
 
     function EditNotebookView() {
+      this.save = __bind(this.save, this);
       this.toggleEdit = __bind(this.toggleEdit, this);
       this.spawnKeypress = __bind(this.spawnKeypress, this);
       this.spawnCellAtEnd = __bind(this.spawnCellAtEnd, this);
@@ -218,7 +219,8 @@
         "keyup #spawner": 'spawnKeypress',
         "click #toggle-edit": "toggleEdit",
         "click #save-to-file": "saveToFile",
-        "click #share-url": "share"
+        "click #share-url": "share",
+        "click #save": "save"
       };
     };
 
@@ -282,6 +284,14 @@
     EditNotebookView.prototype.toggleEdit = function() {
       return NotebookJS.router.navigate(this.model.get('id') + '/view/', {
         trigger: true
+      });
+    };
+
+    EditNotebookView.prototype.save = function() {
+      console.log('saving');
+      this.model.save();
+      return this.model.cells.each(function(c) {
+        return c.save();
       });
     };
 
@@ -419,7 +429,6 @@
       });
       input = this.model.get('input');
       crs_to_add = Math.max(3 - _.string.count(input, '\n'), 0);
-      console.log('crs');
       _ref2 = _.range(crs_to_add);
       for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
         i = _ref2[_i];
@@ -842,7 +851,8 @@
       NotebookJS.app = new EditNotebookView({
         model: notebook
       });
-      return setTitle(notebook.get('title') + ' (Editing)');
+      setTitle(notebook.get('title') + ' (Editing)');
+      return notebook.start();
     };
 
     NotebookRouter.prototype.view = function(nb) {

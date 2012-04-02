@@ -22,10 +22,23 @@ class BaseHandler
   handleMessage: => 
     return 
 
+
+class BaseEngine
+
+  evaluate: => 
+    return 
+
+  interrupt: => 
+    return 
+
+  halt: => 
+    return 
+
+
 # Javascript engine, runs in main thread and therefore 
 # has access to DOM and can block the UI
 # not currently used
-class JavascriptWindow
+class JavascriptWindow extends BaseEngine
   evaluate: (input, handler) =>
     try
       handler.evalBegin()
@@ -45,7 +58,7 @@ class JavascriptWindow
 
 
 # markdown evaluation using showdown
-class Markdown
+class Markdown extends BaseEngine
   evaluate: (input, handler) =>
     try
       handler.evalBegin()
@@ -61,7 +74,7 @@ class Markdown
 
 
 # web worker evaluation
-class Javascript
+class Javascript extends BaseEngine
   constructor: ->
     @worker = new Worker('/src/worker.js')
     @worker.onmessage = @handleMessage
@@ -80,7 +93,9 @@ class Javascript
     switch ev.data.msg
       when 'log' then console.log ev.data.data
       when 'evalBegin' then handler.evalBegin()
-      when 'evalEnd' then handler.evalEnd()
+      when 'evalEnd' 
+        handler.evalEnd()
+        @handlers[inputId] = null
       when 'print' then handler.print(ev.data.data)
       when 'result' then handler.result(ev.data.data)
       when 'error' then handler.error(ev.data.data)
@@ -91,6 +106,11 @@ class Javascript
     @worker.terminate()
     @worker = new Worker('/src/worker.js')
     @worker.onmessage = @handleMessage
+
+  halt: =>
+    @worker.terminate()
+    @worker = null
+
 
 engines = {}
 engines.BaseHandler = BaseHandler

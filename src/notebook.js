@@ -13,8 +13,11 @@
     __extends(Notebook, _super);
 
     function Notebook() {
+      this.stop = __bind(this.stop, this);
       this.start = __bind(this.start, this);
+      this.cellChanged = __bind(this.cellChanged, this);
       this.cellAdded = __bind(this.cellAdded, this);
+      this.cellsFetched = __bind(this.cellsFetched, this);
       this.serialize = __bind(this.serialize, this);
       this.readyCells = __bind(this.readyCells, this);
       this.initialize = __bind(this.initialize, this);
@@ -26,13 +29,17 @@
       return {
         title: "untitled",
         language: 'Javascript',
-        state: null
+        state: null,
+        pendingSaves: false
       };
     };
 
     Notebook.prototype.initialize = function() {
       this.cells = new Cells();
       this.cells.on('add', this.cellAdded);
+      this.cells.on('change', this.cellChanged);
+      this.cells.on('remove', this.cellChanged);
+      this.cells.on('fetch', this.cellsFetched);
       return this.engines = null;
     };
 
@@ -47,15 +54,44 @@
       return JSON.stringify(data);
     };
 
+    Notebook.prototype.cellsFetched = function(cells) {
+      return cells.each(function(cell) {
+        return cell.engines = this.engines;
+      });
+    };
+
     Notebook.prototype.cellAdded = function(cell) {
-      return cell.engine = null;
+      cell.engines = this.engines;
+      return this.set({
+        pendingSaves: true
+      });
+    };
+
+    Notebook.prototype.cellChanged = function() {
+      return this.set({
+        pendingSaves: true
+      });
     };
 
     Notebook.prototype.start = function() {
-      return this.engines = {
+      var _this = this;
+      this.set({
+        state: 'running'
+      });
+      this.engines = {
         code: new NotebookJS.engines.Javascript(),
         markdown: new NotebookJS.engines.Markdown()
       };
+      return this.cells.each(function(cell) {
+        return cell.engines = _this.engines;
+      });
+    };
+
+    Notebook.prototype.stop = function() {
+      this.set({
+        state: null
+      });
+      return this.engines = null;
     };
 
     return Notebook;
@@ -99,7 +135,7 @@
     Cell.prototype.defaults = function() {
       return {
         input: "",
-        type: "Javascript",
+        type: "code",
         inputFold: false,
         output: null,
         position: null,
@@ -109,13 +145,13 @@
     };
 
     Cell.prototype.toggleType = function() {
-      if (this.get('type') === 'Javascript') {
+      if (this.get('type') === 'code') {
         this.set({
-          type: 'Markdown'
+          type: 'markdown'
         });
       } else {
         this.set({
-          type: 'Javascript'
+          type: 'code'
         });
       }
       return this.set({
@@ -137,12 +173,12 @@
       this.set({
         state: 'evaluating'
       });
-      return this.engine.evaluate(this.get('input'), this);
+      return this.engines[this.get('type')].evaluate(this.get('input'), this);
     };
 
     Cell.prototype.interrupt = function() {
       this.addOutput('Interrupted', 'error');
-      this.engine.interrupt();
+      this.engines[this.get('type')].interrupt();
       return this.set({
         state: null
       });
