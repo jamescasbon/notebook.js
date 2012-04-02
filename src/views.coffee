@@ -1,4 +1,3 @@
-# use [[]] for underscore templates (i.e. client side templating)
 _.templateSettings = {interpolate : /\[\[=(.+?)\]\]/g, evaluate: /\[\[(.+?)\]\]/g}
 
 root = exports ? this
@@ -18,14 +17,12 @@ isScrolledIntoView = (elem) ->
 
 scrollToAtTop = (elem) ->
   target = elem.offset().top - 3 * NAVBAR_HEIGHT
-  console.log 'stat', target
   $(window).scrollTop(target)
 
 scrollToAtBottom = (elem) ->
   bottom = elem.offset().top + elem.height()
   scrollbottom = bottom + (2 * NAVBAR_HEIGHT)
   scrolltop = scrollbottom -  $(window).height()
-  console.log 'stab', scrolltop
   $('body').scrollTop scrolltop
 
 
@@ -62,7 +59,6 @@ class BaseNotebookView extends Backbone.View
   typeset: =>
     prettyPrint()
     for el in @$('#notebook')
-      console.log 'tp', el
       MathJax.Hub.Typeset(el)
     @$('#toc').html @generateToc()
 
@@ -112,7 +108,6 @@ class ViewNotebookView extends BaseNotebookView
     $('.container').append(@render())
 
     @cells = @$('.cells')
-    console.log @cells
     @model.cells.fetch(success: @addAll)
     if NotebookJS.mathjaxReady
       @typeset()
@@ -147,6 +142,7 @@ class EditNotebookView extends BaseNotebookView
     "click #toggle-edit" : "toggleEdit"
     "click #save-to-file": "saveToFile"
     "click #share-url": "share"
+    "click #save": "save"
   )
 
   # bind to dom and model events, fetch cells
@@ -159,7 +155,6 @@ class EditNotebookView extends BaseNotebookView
     @model.cells.bind 'refresh', @addAll
     @model.cells.fetch(success: @addAll)
     if NotebookJS.mathjaxReady
-      console.log 'calling typeset at init'
       @typeset()
 
   # render by setting up title and meta elements
@@ -200,6 +195,10 @@ class EditNotebookView extends BaseNotebookView
   toggleEdit: =>
     NotebookJS.router.navigate(@model.get('id') + '/view/', trigger: true)
 
+  save: => 
+    @model.save()
+    @model.cells.each (c) -> c.save()
+    @model.set pendingSaves: false
 
 # CellView manages the Dom elements associated with a cell
 #
@@ -336,9 +335,7 @@ class CellEditView extends Backbone.View
     # chrome screws up on input sizes < 3
     input = @model.get('input')
     crs_to_add = Math.max( 3 - _.string.count(input, '\n') , 0)
-    console.log 'crs'
-    for i in _.range(crs_to_add)
-      input = input + '\n'
+    input = input + '\n'
 
     @editor.getSession().setValue(input)
 
@@ -503,7 +500,7 @@ class CellEditView extends Backbone.View
       $('#spawner').focus()
 
   setEditorHighlightMode: =>
-    if @model.get('type') == 'javascript'
+    if @model.get('type') == 'code'
       mode = require("ace/mode/javascript").Mode
     else if @model.get('type') == 'markdown'
       mode = require("ace/mode/markdown").Mode
@@ -642,7 +639,7 @@ class NotebookRouter extends Backbone.Router
     # TODO: could wait for a sync signal to have the id
     notebook.readyCells()
     NotebookJS.nb = notebook
-    console.log('notebook loaded; id=' +  notebook.get('id'))
+    #console.log('notebook loaded; id=' +  notebook.get('id'))
     notebook
 
   edit: (nb) =>
@@ -652,6 +649,7 @@ class NotebookRouter extends Backbone.Router
     notebook = @getNotebook(nb)
     NotebookJS.app = new EditNotebookView(model: notebook)
     setTitle(notebook.get('title') + ' (Editing)')
+    notebook.start()
 
   view: (nb) =>
     if NotebookJS.app
@@ -705,7 +703,9 @@ class NotebookRouter extends Backbone.Router
     notebook = loadNotebook(data)
     NotebookJS.router.navigate(notebook.get('id') + '/view/', (trigger: true, replace: true))
 
-
+  onbeforeunload: (e) => 
+    if NotebookJS.nb.get('pendingSaves')
+      'unsaved changes to notebook'
 
 
 # crazy global methods? Go in the router?
@@ -751,3 +751,4 @@ $(document).ready ->
   MathJax.Hub.Register.StartupHook('End', mathjaxReady)
 
 
+  window.onbeforeunload = NotebookJS.router.onbeforeunload

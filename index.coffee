@@ -101,7 +101,7 @@ html ->
         # FIXME: mixing of underscore logic in this coffeekup template is not pretty
         # we need two fake divs here to get the text output
         # must be better way
-        div "[[ if (type == 'javascript' & inputFold == false) { ]]"
+        div "[[ if (type != 'markdown' & inputFold == false) { ]]"
         pre class: "cell-input prettyprint", -> "[[= input ]]"
         hr -> ''
         div "[[ } ]]"
@@ -160,6 +160,7 @@ html ->
         div '#menu', ->
           button '#toggle-edit', -> 'toggle edit/view'
           a id: 'save-to-file', class: 'button', download: 'notebook.json', -> 'save to file'
+          a id: 'save', class: 'button', -> 'save'
           button '#share-url', -> 'share'
 
 
