@@ -92,11 +92,17 @@ class Cell extends Backbone.Model
     @set inputFold: not @get('inputFold')
 
   evaluate: =>
+    if not @engines?
+      console.log 'WARNING: evaluation called with no engines'
+      return 
     @set(output: null, error: null)
     @set state: 'evaluating'
     @engines[@get('type')].evaluate @get('input'), @
 
   interrupt: =>
+    if not @engines?
+      console.log 'WARNING: interrupt called with no engines'
+      return 
     @addOutput('Interrupted', 'error')
     @engines[@get('type')].interrupt()
     @set state: null

@@ -28,7 +28,6 @@
   scrollToAtTop = function(elem) {
     var target;
     target = elem.offset().top - 3 * NAVBAR_HEIGHT;
-    console.log('stat', target);
     return $(window).scrollTop(target);
   };
 
@@ -37,7 +36,6 @@
     bottom = elem.offset().top + elem.height();
     scrollbottom = bottom + (2 * NAVBAR_HEIGHT);
     scrolltop = scrollbottom - $(window).height();
-    console.log('stab', scrolltop);
     return $('body').scrollTop(scrolltop);
   };
 
@@ -95,7 +93,6 @@
       _ref2 = this.$('#notebook');
       for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
         el = _ref2[_i];
-        console.log('tp', el);
         MathJax.Hub.Typeset(el);
       }
       return this.$('#toc').html(this.generateToc());
@@ -162,7 +159,6 @@
       this.cellTemplate = _.template($('#cell-view-template').html());
       $('.container').append(this.render());
       this.cells = this.$('.cells');
-      console.log(this.cells);
       this.model.cells.fetch({
         success: this.addAll
       });
@@ -233,10 +229,7 @@
       this.model.cells.fetch({
         success: this.addAll
       });
-      if (NotebookJS.mathjaxReady) {
-        console.log('calling typeset at init');
-        return this.typeset();
-      }
+      if (NotebookJS.mathjaxReady) return this.typeset();
     };
 
     EditNotebookView.prototype.render = function() {
@@ -288,7 +281,6 @@
     };
 
     EditNotebookView.prototype.save = function() {
-      console.log('saving');
       this.model.save();
       return this.model.cells.each(function(c) {
         return c.save();
@@ -408,7 +400,7 @@
     };
 
     CellEditView.prototype.afterDomInsert = function() {
-      var ace_id, crs_to_add, i, input, _i, _len, _ref2,
+      var ace_id, crs_to_add, input,
         _this = this;
       if (this.model.id != null) {
         ace_id = this.model.id;
@@ -429,11 +421,7 @@
       });
       input = this.model.get('input');
       crs_to_add = Math.max(3 - _.string.count(input, '\n'), 0);
-      _ref2 = _.range(crs_to_add);
-      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-        i = _ref2[_i];
-        input = input + '\n';
-      }
+      input = input + '\n';
       this.editor.getSession().setValue(input);
       this.resizeEditor();
       this.editor.getSession().on('change', this.inputChange);
@@ -624,7 +612,7 @@
 
     CellEditView.prototype.setEditorHighlightMode = function() {
       var mode;
-      if (this.model.get('type') === 'javascript') {
+      if (this.model.get('type') === 'code') {
         mode = require("ace/mode/javascript").Mode;
       } else if (this.model.get('type') === 'markdown') {
         mode = require("ace/mode/markdown").Mode;
@@ -839,7 +827,6 @@
       notebook = NotebookJS.notebooks.get(nb);
       notebook.readyCells();
       NotebookJS.nb = notebook;
-      console.log('notebook loaded; id=' + notebook.get('id'));
       return notebook;
     };
 

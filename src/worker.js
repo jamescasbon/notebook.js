@@ -7,11 +7,6 @@
     var inputId, print, result, src;
     inputId = ev.data.id;
     src = ev.data.src;
-    self.postMessage({
-      inputId: inputId,
-      msg: 'log',
-      data: 'worker started'
-    });
     print = function(d) {
       return self.postMessage({
         inputId: inputId,

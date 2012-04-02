@@ -4,7 +4,7 @@ self.onmessage = (ev) =>
 
   inputId = ev.data.id
   src = ev.data.src
-  self.postMessage(inputId: inputId, msg: 'log', data: 'worker started')
+  #self.postMessage(inputId: inputId, msg: 'log', data: 'worker called')
 
 
   # TODO: factor out API?  Interface?

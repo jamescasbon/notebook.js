@@ -166,6 +166,10 @@
     };
 
     Cell.prototype.evaluate = function() {
+      if (!(this.engines != null)) {
+        console.log('WARNING: evaluation called with no engines');
+        return;
+      }
       this.set({
         output: null,
         error: null
@@ -177,6 +181,10 @@
     };
 
     Cell.prototype.interrupt = function() {
+      if (!(this.engines != null)) {
+        console.log('WARNING: interrupt called with no engines');
+        return;
+      }
       this.addOutput('Interrupted', 'error');
       this.engines[this.get('type')].interrupt();
       return this.set({
