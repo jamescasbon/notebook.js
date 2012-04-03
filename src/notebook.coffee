@@ -30,7 +30,7 @@ class Notebook extends Backbone.Model
   serialize: =>
     data = @toJSON()
     data.cells = @cells.toJSON()
-    return JSON.stringify(data)
+    return JSON.stringify(data, null, 2)
 
   # update cell engine refs when fetched 
   cellsFetched: (cells) =>
@@ -97,6 +97,10 @@ class Cell extends Backbone.Model
     position: null,
     error: null,
     state: null
+
+  initialize: => 
+    # backwards compatibility shim for new release, can go v soon
+    if @get('type') == 'javascript' then @set type: 'code'
 
   toggleType: =>
     # TODO: check if evaluating here and interrupt?

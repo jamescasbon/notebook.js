@@ -60,7 +60,7 @@
       var data;
       data = this.toJSON();
       data.cells = this.cells.toJSON();
-      return JSON.stringify(data);
+      return JSON.stringify(data, null, 2);
     };
 
     Notebook.prototype.cellsFetched = function(cells) {
@@ -160,6 +160,7 @@
       this.evaluate = __bind(this.evaluate, this);
       this.toggleInputFold = __bind(this.toggleInputFold, this);
       this.toggleType = __bind(this.toggleType, this);
+      this.initialize = __bind(this.initialize, this);
       this.defaults = __bind(this.defaults, this);
       Cell.__super__.constructor.apply(this, arguments);
     }
@@ -176,6 +177,14 @@
         error: null,
         state: null
       };
+    };
+
+    Cell.prototype.initialize = function() {
+      if (this.get('type') === 'javascript') {
+        return this.set({
+          type: 'code'
+        });
+      }
     };
 
     Cell.prototype.toggleType = function() {

@@ -70,9 +70,10 @@
     };
 
     BaseNotebookView.prototype.saveToFile = function(e) {
-      var data;
+      var data, slug;
       data = this.model.serialize();
-      $(e.target).attr('download', "notebook-" + (new Date().toISOString().slice(0, 10)) + ".json");
+      slug = _.string.slugify(this.model.get('title'));
+      $(e.target).attr('download', slug + ".notebook");
       return $(e.target).attr('href', 'data:application/json;charset=utf-8,' + escape(data));
     };
 
