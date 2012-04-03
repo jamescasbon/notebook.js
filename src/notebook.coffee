@@ -8,8 +8,14 @@ class Notebook extends Backbone.Model
     language: 'Javascript'
     state: null
     pendingSaves: false
+    engineUrl: null
 
   initialize: =>
+    
+    # if the browser is closed, notebooks are left hanging 
+    if @get('state') == 'running' and @get('engineUrl') == 'browser://'
+      @set state: null, engineUrl: null
+
     @cells = new Cells()
     @cells.on 'add', @cellAdded
     @cells.on 'change', @cellChanged
@@ -43,6 +49,7 @@ class Notebook extends Backbone.Model
   # start the engines for this notebook
   start: => 
     @set state: 'running'
+    @set engineUrl: 'browser://'
     @engines = 
       code: new NotebookJS.engines.Javascript(),
       markdown: new NotebookJS.engines.Markdown()
@@ -55,9 +62,17 @@ class Notebook extends Backbone.Model
     @engines = null
 
   saveAll: => 
+    console.log 'saving nb'
     @save()
-    @model.cells.each (c) -> c.save()
-    @model.set pendingSaves: false
+    @cells.each (c) -> c.save()
+    @set pendingSaves: false
+
+  destroyAll: =>
+    @cells.fetch success: (cells) ->
+      cells.each (cell) ->
+        cell.destroy()
+    @destroy()
+    
 
 
 class Notebooks extends Backbone.Collection

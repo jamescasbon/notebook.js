@@ -13,6 +13,7 @@
     __extends(Notebook, _super);
 
     function Notebook() {
+      this.destroyAll = __bind(this.destroyAll, this);
       this.saveAll = __bind(this.saveAll, this);
       this.stop = __bind(this.stop, this);
       this.start = __bind(this.start, this);
@@ -31,11 +32,18 @@
         title: "untitled",
         language: 'Javascript',
         state: null,
-        pendingSaves: false
+        pendingSaves: false,
+        engineUrl: null
       };
     };
 
     Notebook.prototype.initialize = function() {
+      if (this.get('state') === 'running' && this.get('engineUrl') === 'browser://') {
+        this.set({
+          state: null,
+          engineUrl: null
+        });
+      }
       this.cells = new Cells();
       this.cells.on('add', this.cellAdded);
       this.cells.on('change', this.cellChanged);
@@ -79,6 +87,9 @@
       this.set({
         state: 'running'
       });
+      this.set({
+        engineUrl: 'browser://'
+      });
       this.engines = {
         code: new NotebookJS.engines.Javascript(),
         markdown: new NotebookJS.engines.Markdown()
@@ -96,13 +107,25 @@
     };
 
     Notebook.prototype.saveAll = function() {
+      console.log('saving nb');
       this.save();
-      this.model.cells.each(function(c) {
+      this.cells.each(function(c) {
         return c.save();
       });
-      return this.model.set({
+      return this.set({
         pendingSaves: false
       });
+    };
+
+    Notebook.prototype.destroyAll = function() {
+      this.cells.fetch({
+        success: function(cells) {
+          return cells.each(function(cell) {
+            return cell.destroy();
+          });
+        }
+      });
+      return this.destroy();
     };
 
     return Notebook;

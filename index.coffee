@@ -173,10 +173,9 @@ html ->
       div id: "notebook", class: "sixteen columns", ->
         div 'cell', ->
           h1 -> "Create new notebook"
-          form ->
-            label for: 'name', -> 'Name'
-            input type: 'text', id: 'name'
-            button type: 'submit', 'Create'
+          label for: 'name', -> 'Name'
+          input type: 'text', id: 'name'
+          button '#create', => 'Create'
 
     script type: "text/template", id: "share-notebook", ->
       h4 -> "Share this link to share the notebook"

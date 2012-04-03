@@ -775,7 +775,7 @@
     NewView.prototype.className = 'app';
 
     NewView.prototype.events = {
-      'click button': 'create'
+      'click #create': 'create'
     };
 
     NewView.prototype.initialize = function() {
@@ -789,9 +789,11 @@
     };
 
     NewView.prototype.create = function() {
-      var nb;
+      var nb, title;
+      title = this.$('input').val();
+      if (title === '') return;
       nb = NotebookJS.notebooks.create({
-        title: this.$('input').val()
+        title: title
       }, {
         wait: true
       });
@@ -799,7 +801,7 @@
       nb.cells.create({
         position: nb.cells.posJump
       });
-      return NotebookJS.router.navigate(nb.id + '/edit/', {
+      return NotebookJS.router.navigate(nb.get('id') + '/edit/', {
         trigger: true
       });
     };
@@ -844,7 +846,11 @@
     };
 
     NotebookRouter.prototype.removeView = function() {
-      if (NotebookJS.app != null) return NotebookJS.app.remove();
+      if (NotebookJS.app != null) NotebookJS.app.remove();
+      if (NotebookJS.nb != null) {
+        NotebookJS.nb.saveAll();
+        return NotebookJS.nb = null;
+      }
     };
 
     NotebookRouter.prototype.getNotebook = function(nb) {
@@ -864,7 +870,7 @@
         model: notebook
       });
       setTitle(notebook.get('title') + ' (Editing)');
-      return notebook.start();
+      if (!(notebook.get('running') != null)) return notebook.start();
     };
 
     NotebookRouter.prototype.view = function(nb) {
@@ -880,24 +886,15 @@
 
     NotebookRouter.prototype["delete"] = function(nb) {
       var confirmed, notebook;
-      console.log('deleting nb', nb);
       confirmed = confirm('You really want to delete that?');
       if (confirmed) {
         notebook = this.getNotebook(nb);
-        notebook.cells.fetch({
-          success: function(cells) {
-            return cells.each(function(cell) {
-              console.log('destroy', cell);
-              return cell.destroy();
-            });
-          }
-        });
-        console.log('cells', notebook.cells.length);
-        notebook.destroy();
-        console.log('deleted');
+        notebook.destroyAll();
+        NotebookJS.nb = null;
       }
       return NotebookJS.router.navigate('', {
-        trigger: true
+        trigger: true,
+        replace: true
       });
     };
 
@@ -908,10 +905,7 @@
     };
 
     NotebookRouter.prototype.index = function() {
-      if (NotebookJS.app) {
-        NotebookJS.app.remove();
-        NotebookJS.nb = null;
-      }
+      this.removeView();
       console.log('index view');
       setTitle('');
       return NotebookJS.app = new IndexView();
@@ -942,13 +936,10 @@
 
     NotebookRouter.prototype.onbeforeunload = function(e) {
       if (NotebookJS.nb != null) NotebookJS.nb.saveAll();
-      console.log(_.any(NotebookJS.notebooks.map(function(x) {
-        return x.get('state') === 'running';
-      })));
       if (_.any(NotebookJS.notebooks.map(function(x) {
         return x.get('state') === 'running';
       }))) {
-        return 'unsaved changes to notebook';
+        return 'You have running notebooks, are you sure?';
       }
     };
 

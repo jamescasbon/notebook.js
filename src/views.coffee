@@ -586,7 +586,7 @@ class IndexView extends Backbone.View
 
   new: =>
     console.log 'new'
-    NotebookJS.router.navigate ('new/'), trigger: true
+    NotebookJS.router.navigate('new/', trigger: true)
 
   loadFile: (ev) =>
     file = ev.target.files[0]
@@ -608,7 +608,7 @@ class NewView extends Backbone.View
   className: 'app'
 
   events:
-    'click button' : 'create'
+    'click #create' : 'create'
 
   initialize: =>
     @template = _.template($('#new-notebook-form').html())
@@ -619,11 +619,15 @@ class NewView extends Backbone.View
     @el
 
   create: =>
-    #console.log 'creating'
-    nb = NotebookJS.notebooks.create((title: @$('input').val()), (wait: true))
+    title =  @$('input').val()
+    if title == ''
+      # TODO: use nb validation and flash user
+      return
+
+    nb = NotebookJS.notebooks.create((title: title), (wait: true))
     nb.readyCells()
     nb.cells.create(position: nb.cells.posJump)
-    NotebookJS.router.navigate (nb.id + '/edit/'), trigger: true
+    NotebookJS.router.navigate(nb.get('id') + '/edit/', trigger: true)
 
   mathjaxReady: =>
     return
@@ -646,12 +650,13 @@ class NotebookRouter extends Backbone.Router
   removeView: =>
     if NotebookJS.app?
       NotebookJS.app.remove()
+    if NotebookJS.nb?
+      NotebookJS.nb.saveAll()
+      NotebookJS.nb = null
+      # TODO: do I need to clean up cell references to views for GC? 
 
   getNotebook: (nb) =>
     notebook = NotebookJS.notebooks.get(nb)
-    #if notebook? # just create one for the minute!
-    #  notebook = NotebookJS.notebooks.create()
-    # TODO: could wait for a sync signal to have the id
     notebook.readyCells()
     NotebookJS.nb = notebook
     #console.log('notebook loaded; id=' +  notebook.get('id'))
@@ -663,33 +668,25 @@ class NotebookRouter extends Backbone.Router
     notebook = @getNotebook(nb)
     NotebookJS.app = new EditNotebookView(model: notebook)
     setTitle(notebook.get('title') + ' (Editing)')
-    notebook.start()
+
+    if not notebook.get('running')?
+      notebook.start()
 
   view: (nb) =>
     @removeView()
     console.log 'activated view route'
     notebook = @getNotebook(nb)
     setTitle(notebook.get('title') + ' (Viewing)')
-
     NotebookJS.app = new ViewNotebookView(model: notebook)
 
-
   delete: (nb) =>
-    console.log 'deleting nb', nb
     confirmed = confirm('You really want to delete that?')
     if confirmed
       notebook = @getNotebook(nb)
+      notebook.destroyAll()
+      NotebookJS.nb = null
 
-      notebook.cells.fetch success: (cells) ->
-        cells.each (cell) ->
-          console.log 'destroy', cell
-          cell.destroy()
-
-      console.log 'cells', notebook.cells.length
-      notebook.destroy()
-
-      console.log('deleted')
-    NotebookJS.router.navigate('', trigger: true)
+    NotebookJS.router.navigate('', trigger: true, replace: true)
 
   new: (nb) =>
     console.log 'new view'
@@ -697,9 +694,7 @@ class NotebookRouter extends Backbone.Router
     NotebookJS.app = new NewView()
 
   index: =>
-    if NotebookJS.app
-      NotebookJS.app.remove()
-      NotebookJS.nb = null
+    @removeView()
     console.log 'index view'
     setTitle('')
     NotebookJS.app = new IndexView()
@@ -719,11 +714,8 @@ class NotebookRouter extends Backbone.Router
     if NotebookJS.nb?
       NotebookJS.nb.saveAll() 
     
-    console.log(_.any(NotebookJS.notebooks.map (x) -> x.get('state') == 'running'))
-
-    if _.any(NotebookJS.notebooks.map (x) -> x.get('state') == 'running')
-      return 'unsaved changes to notebook'
-    return 
+    if _.any(NotebookJS.notebooks.map((x) -> x.get('state') == 'running') )
+      return 'You have running notebooks, are you sure?'
 
 
 
