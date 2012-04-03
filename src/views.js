@@ -716,6 +716,7 @@
     __extends(IndexView, _super);
 
     function IndexView() {
+      this.github = __bind(this.github, this);
       this.mathjaxReady = __bind(this.mathjaxReady, this);
       this.loadFile = __bind(this.loadFile, this);
       this["new"] = __bind(this["new"], this);
@@ -730,7 +731,8 @@
 
     IndexView.prototype.events = {
       'click #new-notebook-button': 'new',
-      'change #load-file': 'loadFile'
+      'change #load-file': 'loadFile',
+      'click #github': 'github'
     };
 
     IndexView.prototype.initialize = function() {
@@ -777,6 +779,34 @@
     };
 
     IndexView.prototype.mathjaxReady = function() {};
+
+    IndexView.prototype.github = function() {
+      var authdata, password, result, username;
+      username = this.$('#github-username').val();
+      password = this.$('#github-password').val();
+      authdata = {
+        scopes: ['gist'],
+        url: 'http://notebookjs.me',
+        note: 'notebook.js'
+      };
+      return result = $.ajax({
+        type: 'POST',
+        url: 'https://api.github.com/authorizations',
+        data: JSON.stringify(authdata),
+        beforeSend: function(xhr) {
+          return xhr.setRequestHeader("Authorization", "Basic " + btoa(username + ':' + password));
+        },
+        success: function(data, status, xhr) {
+          var token;
+          console.log('auth status', status);
+          token = data.token;
+          return NotebookJS.preferences.update('github_token', token);
+        },
+        error: function(xhr, status, err) {
+          return alert('authentication failed ' + err);
+        }
+      });
+    };
 
     return IndexView;
 
@@ -1025,6 +1055,8 @@
   $(document).ready(function() {
     NotebookJS.notebooks = new NotebookJS.Notebooks();
     NotebookJS.notebooks.fetch();
+    NotebookJS.preferences = new NotebookJS.Preferences();
+    NotebookJS.preferences.fetch();
     NotebookJS.mathjaxReady = false;
     NotebookJS.router = new NotebookRouter();
     Backbone.history.start();

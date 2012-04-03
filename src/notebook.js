@@ -1,5 +1,5 @@
 (function() {
-  var Cell, Cells, Notebook, NotebookJS, Notebooks, root, _ref,
+  var Cell, Cells, Notebook, NotebookJS, Notebooks, Preference, Preferences, root, _ref,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
@@ -350,6 +350,58 @@
 
   })(Backbone.Collection);
 
+  Preference = (function(_super) {
+
+    __extends(Preference, _super);
+
+    function Preference() {
+      this.defaults = __bind(this.defaults, this);
+      Preference.__super__.constructor.apply(this, arguments);
+    }
+
+    Preference.prototype.defaults = function() {
+      return {
+        value: null
+      };
+    };
+
+    return Preference;
+
+  })(Backbone.Model);
+
+  Preferences = (function(_super) {
+
+    __extends(Preferences, _super);
+
+    function Preferences() {
+      this.update = __bind(this.update, this);
+      Preferences.__super__.constructor.apply(this, arguments);
+    }
+
+    Preferences.prototype.model = Preference;
+
+    Preferences.prototype.localStorage = new Store('notebook.js.preferences');
+
+    Preferences.prototype.update = function(id, value) {
+      var pref;
+      pref = this.get(id);
+      if (pref != null) {
+        pref.set({
+          value: token
+        });
+      } else {
+        pref = this.create({
+          id: id,
+          value: value
+        });
+      }
+      return pref.save();
+    };
+
+    return Preferences;
+
+  })(Backbone.Collection);
+
   NotebookJS.Notebook = Notebook;
 
   NotebookJS.Notebooks = Notebooks;
@@ -357,5 +409,9 @@
   NotebookJS.Cell = Cell;
 
   NotebookJS.Cells = Cells;
+
+  NotebookJS.Preference = Preference;
+
+  NotebookJS.Preferences = Preferences;
 
 }).call(this);

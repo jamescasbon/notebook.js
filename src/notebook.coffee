@@ -205,7 +205,29 @@ class Cells extends Backbone.Collection
     @create position: (cellPos + prevPos)/2
 
 
+
+class Preference extends Backbone.Model
+  defaults: => 
+    value: null
+
+class Preferences extends Backbone.Collection
+  model: Preference
+  localStorage: new Store('notebook.js.preferences')
+
+  update: (id, value) => 
+    pref = @get id
+    if pref?
+      pref.set value: token
+    else
+      pref = @create(id: id, value: value)
+    pref.save()
+
+
+
 NotebookJS.Notebook = Notebook
 NotebookJS.Notebooks = Notebooks
 NotebookJS.Cell = Cell
 NotebookJS.Cells = Cells
+NotebookJS.Preference = Preference
+NotebookJS.Preferences = Preferences
+

@@ -144,6 +144,16 @@ html ->
               li -> a href: '/#load/examples/tut_eqn.notebook', -> 'Using equations'
               li -> a href: '/#load/examples/tut_sharing.notebook', -> 'Sharing notebooks'
 
+        hr -> ''
+        div '#prefs', class: 'eight columns offset-by-one', ->
+          h2 'Github account'
+          label for: 'name', -> 'Username'
+          input type: 'text', id: 'github-username'
+          label for: 'name', -> 'Password'
+          input type: 'password', id: 'github-password'
+          button '#github', -> 'Use github credentials'
+
+
 
     script type: "text/template", id: "notebook-index-template", ->
       li class: "list-notebook", ->
@@ -180,3 +190,6 @@ html ->
     script type: "text/template", id: "share-notebook", ->
       h4 -> "Share this link to share the notebook"
       input id: 'share-url', type: 'text', value: '[[= url ]]'
+
+
+

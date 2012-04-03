@@ -601,6 +601,7 @@ class IndexView extends Backbone.View
   events:
     'click #new-notebook-button': 'new'
     'change #load-file' : 'loadFile'
+    'click #github': 'github'
 
   initialize: =>
     @template = _.template($('#index-template').html())
@@ -636,6 +637,28 @@ class IndexView extends Backbone.View
 
   mathjaxReady: =>
     return
+
+  github: => 
+    username = @$('#github-username').val()
+    password = @$('#github-password').val()
+
+    authdata = 
+      scopes: ['gist']
+      url: 'http://notebookjs.me'
+      note: 'notebook.js'
+
+    result = $.ajax
+      type: 'POST'
+      url: 'https://api.github.com/authorizations'
+      data: JSON.stringify(authdata) 
+      beforeSend: (xhr) -> 
+        xhr.setRequestHeader("Authorization", "Basic " + btoa(username + ':' + password))
+      success: (data, status, xhr) ->  
+        console.log 'auth status', status
+        token = data.token
+        NotebookJS.preferences.update('github_token', token)
+      error: (xhr, status, err) -> 
+        alert 'authentication failed ' + err
 
 
 class NewView extends Backbone.View
@@ -690,6 +713,7 @@ class NotebookRouter extends Backbone.Router
 
   unmatched: (p) => console.log p
 
+  # clean up notebook and view
   removeView: =>
 
     # remove view if present
@@ -771,7 +795,7 @@ class NotebookRouter extends Backbone.Router
     
     if _.any(NotebookJS.notebooks.map((x) -> x.get('state') == 'running') )
       return 'You have running notebooks, are you sure?'
-
+  
 
 
 # crazy global methods? Go in the router?
@@ -807,6 +831,8 @@ mathjaxReady = () ->
 $(document).ready ->
   NotebookJS.notebooks = new NotebookJS.Notebooks()
   NotebookJS.notebooks.fetch()
+  NotebookJS.preferences = new NotebookJS.Preferences()
+  NotebookJS.preferences.fetch()
   NotebookJS.mathjaxReady = false
 
   NotebookJS.router = new NotebookRouter()
