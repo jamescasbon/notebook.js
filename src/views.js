@@ -224,8 +224,8 @@
       this.template = _.template($('#notebook-template').html());
       $('.container').append(this.render());
       this.cells = this.$('.cells');
-      this.model.cells.bind('add', this.addOne);
-      this.model.cells.bind('refresh', this.addAll);
+      this.model.cells.bind('add', this.addOne, this);
+      this.model.cells.bind('refresh', this.addAll, this);
       this.model.cells.fetch({
         success: this.addAll
       });
@@ -239,6 +239,7 @@
 
     EditNotebookView.prototype.addOne = function(cell) {
       var index, newEl, previous, previousView, view;
+      console.log('addOne');
       NotebookJS.c = cell;
       view = new CellEditView({
         model: cell
@@ -353,11 +354,11 @@
 
     CellEditView.prototype.initialize = function() {
       this.template = _.template($('#cell-edit-template').html());
-      this.model.bind('change:state', this.changeState);
-      this.model.bind('change:type', this.changeType);
-      this.model.bind('change:output', this.changeOutput);
-      this.model.bind('change:inputFold', this.changeInputFold);
-      this.model.bind('destroy', this.remove);
+      this.model.bind('change:state', this.changeState, this);
+      this.model.bind('change:type', this.changeType, this);
+      this.model.bind('change:output', this.changeOutput, this);
+      this.model.bind('change:inputFold', this.changeInputFold, this);
+      this.model.bind('destroy', this.remove, this);
       this.model.view = this;
       return this.editor = null;
     };
@@ -846,9 +847,22 @@
     };
 
     NotebookRouter.prototype.removeView = function() {
-      if (NotebookJS.app != null) NotebookJS.app.remove();
+      var n, view;
+      view = NotebookJS.app;
+      if (view != null) view.remove();
       if (NotebookJS.nb != null) {
-        NotebookJS.nb.saveAll();
+        n = NotebookJS.nb;
+        n.saveAll();
+        if (view != null) {
+          n.off(null, null, view);
+          n.cells.off(null, null, view);
+        }
+        n.cells.each(function(c) {
+          if (c.view != null) {
+            c.view = null;
+            return c.off(null, null, c.view);
+          }
+        });
         return NotebookJS.nb = null;
       }
     };

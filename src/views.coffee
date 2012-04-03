@@ -151,8 +151,8 @@ class EditNotebookView extends BaseNotebookView
     $('.container').append(@render())
 
     @cells = @$('.cells')
-    @model.cells.bind 'add', @addOne
-    @model.cells.bind 'refresh', @addAll
+    @model.cells.bind 'add', @addOne, @
+    @model.cells.bind 'refresh', @addAll, @
     @model.cells.fetch(success: @addAll)
     if NotebookJS.mathjaxReady
       @typeset()
@@ -164,6 +164,7 @@ class EditNotebookView extends BaseNotebookView
 
   # add a cell by finding the correct order from the collection and inserting
   addOne: (cell) =>
+    console.log 'addOne' 
     NotebookJS.c = cell
     view = new CellEditView(model: cell)
     newEl = view.render()
@@ -254,11 +255,11 @@ class CellEditView extends Backbone.View
   # get template and bind to events
   initialize: =>
     @template = _.template($('#cell-edit-template').html())
-    @model.bind 'change:state', @changeState
-    @model.bind 'change:type', @changeType
-    @model.bind 'change:output', @changeOutput
-    @model.bind 'change:inputFold', @changeInputFold
-    @model.bind 'destroy', @remove
+    @model.bind 'change:state', @changeState, @
+    @model.bind 'change:type', @changeType, @
+    @model.bind 'change:output', @changeOutput, @
+    @model.bind 'change:inputFold', @changeInputFold, @
+    @model.bind 'destroy', @remove, @
     @model.view = @
     @editor = null
 
@@ -648,12 +649,29 @@ class NotebookRouter extends Backbone.Router
   unmatched: (p) => console.log p
 
   removeView: =>
-    if NotebookJS.app?
-      NotebookJS.app.remove()
+
+    # remove view if present
+    view = NotebookJS.app
+    if view?
+      view.remove()
+
+    # clean up notebook
     if NotebookJS.nb?
-      NotebookJS.nb.saveAll()
+      n = NotebookJS.nb
+
+      # save the notebook and cells
+      n.saveAll()
+    
+      # remove all event handlers in view contexts
+      if view?
+        n.off(null, null, view)
+        n.cells.off(null, null, view)
+      n.cells.each (c) -> 
+        if c.view?
+          c.view = null
+          c.off(null, null, c.view)
+
       NotebookJS.nb = null
-      # TODO: do I need to clean up cell references to views for GC? 
 
   getNotebook: (nb) =>
     notebook = NotebookJS.notebooks.get(nb)
