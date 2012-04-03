@@ -11,7 +11,6 @@ class Notebook extends Backbone.Model
     engineUrl: null
 
   initialize: =>
-    
     # if the browser is closed, notebooks are left hanging 
     if @get('state') == 'running' and @get('engineUrl') == 'browser://'
       @set state: null, engineUrl: null
