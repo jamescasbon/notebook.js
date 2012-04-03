@@ -643,6 +643,10 @@ class NotebookRouter extends Backbone.Router
 
   unmatched: (p) => console.log p
 
+  removeView: =>
+    if NotebookJS.app?
+      NotebookJS.app.remove()
+
   getNotebook: (nb) =>
     notebook = NotebookJS.notebooks.get(nb)
     #if notebook? # just create one for the minute!
@@ -654,8 +658,7 @@ class NotebookRouter extends Backbone.Router
     notebook
 
   edit: (nb) =>
-    if NotebookJS.app
-      NotebookJS.app.remove()
+    @removeView()
     console.log 'activated edit route', nb
     notebook = @getNotebook(nb)
     NotebookJS.app = new EditNotebookView(model: notebook)
@@ -663,8 +666,7 @@ class NotebookRouter extends Backbone.Router
     notebook.start()
 
   view: (nb) =>
-    if NotebookJS.app
-      NotebookJS.app.remove()
+    @removeView()
     console.log 'activated view route'
     notebook = @getNotebook(nb)
     setTitle(notebook.get('title') + ' (Viewing)')
@@ -691,8 +693,7 @@ class NotebookRouter extends Backbone.Router
 
   new: (nb) =>
     console.log 'new view'
-    if NotebookJS.app
-      NotebookJS.app.remove()
+    @removeView()
     NotebookJS.app = new NewView()
 
   index: =>
@@ -715,8 +716,15 @@ class NotebookRouter extends Backbone.Router
     NotebookJS.router.navigate(notebook.get('id') + '/view/', (trigger: true, replace: true))
 
   onbeforeunload: (e) => 
-    if NotebookJS.nb.get('pendingSaves')
-      'unsaved changes to notebook'
+    if NotebookJS.nb?
+      NotebookJS.nb.saveAll() 
+    
+    console.log(_.any(NotebookJS.notebooks.map (x) -> x.get('state') == 'running'))
+
+    if _.any(NotebookJS.notebooks.map (x) -> x.get('state') == 'running')
+      return 'unsaved changes to notebook'
+    return 
+
 
 
 # crazy global methods? Go in the router?

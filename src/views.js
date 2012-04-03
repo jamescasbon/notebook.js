@@ -824,6 +824,7 @@
       this.view = __bind(this.view, this);
       this.edit = __bind(this.edit, this);
       this.getNotebook = __bind(this.getNotebook, this);
+      this.removeView = __bind(this.removeView, this);
       this.unmatched = __bind(this.unmatched, this);
       NotebookRouter.__super__.constructor.apply(this, arguments);
     }
@@ -842,6 +843,10 @@
       return console.log(p);
     };
 
+    NotebookRouter.prototype.removeView = function() {
+      if (NotebookJS.app != null) return NotebookJS.app.remove();
+    };
+
     NotebookRouter.prototype.getNotebook = function(nb) {
       var notebook;
       notebook = NotebookJS.notebooks.get(nb);
@@ -852,7 +857,7 @@
 
     NotebookRouter.prototype.edit = function(nb) {
       var notebook;
-      if (NotebookJS.app) NotebookJS.app.remove();
+      this.removeView();
       console.log('activated edit route', nb);
       notebook = this.getNotebook(nb);
       NotebookJS.app = new EditNotebookView({
@@ -864,7 +869,7 @@
 
     NotebookRouter.prototype.view = function(nb) {
       var notebook;
-      if (NotebookJS.app) NotebookJS.app.remove();
+      this.removeView();
       console.log('activated view route');
       notebook = this.getNotebook(nb);
       setTitle(notebook.get('title') + ' (Viewing)');
@@ -898,7 +903,7 @@
 
     NotebookRouter.prototype["new"] = function(nb) {
       console.log('new view');
-      if (NotebookJS.app) NotebookJS.app.remove();
+      this.removeView();
       return NotebookJS.app = new NewView();
     };
 
@@ -936,7 +941,15 @@
     };
 
     NotebookRouter.prototype.onbeforeunload = function(e) {
-      if (NotebookJS.nb.get('pendingSaves')) return 'unsaved changes to notebook';
+      if (NotebookJS.nb != null) NotebookJS.nb.saveAll();
+      console.log(_.any(NotebookJS.notebooks.map(function(x) {
+        return x.get('state') === 'running';
+      })));
+      if (_.any(NotebookJS.notebooks.map(function(x) {
+        return x.get('state') === 'running';
+      }))) {
+        return 'unsaved changes to notebook';
+      }
     };
 
     return NotebookRouter;

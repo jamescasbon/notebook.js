@@ -75,6 +75,8 @@ html ->
         div 'status-bar', ->
           div 'tooltip', tooltip: 'Delete', ->
             img 'delete show-when-active', src: '/img/delete.png'
+          div 'tooltip', tooltip: 'Evaluate', ->
+            img 'evaluate show-when-active show-when-dirty', src: '/img/play.png'
 
         # the fold button, tooltip outside to avoid rotating tooltip
         div 'fold-control tooltip', tooltip: 'Click to fold input', ->
@@ -84,9 +86,8 @@ html ->
         div 'ace-container', ->
           div class: "cell-input", style: "top:0;bottom:0;left:0;right:0;", id: "input-[[= id ]]", ->
 
-        div 'status-bar', ->
-          div 'tooltip', tooltip: 'Evaluate', ->
-            img 'evaluate show-when-active show-when-dirty', src: '/img/play.png'
+
+
 
         hr -> ''
 
