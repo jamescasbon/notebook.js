@@ -840,6 +840,19 @@
       "": "index"
     };
 
+    NotebookRouter.prototype.initialize = function() {
+      return this.bind('all', this._trackPageview);
+    };
+
+    NotebookRouter.prototype._trackPageview = function() {
+      var url;
+      if (typeof _gaq !== "undefined" && _gaq !== null) {
+        url = Backbone.history.getFragment();
+        console.log('pageview', "/" + url);
+        return _gaq.push(['_trackPageview', "/" + url]);
+      }
+    };
+
     NotebookRouter.prototype.unmatched = function(p) {
       return console.log(p);
     };
@@ -876,7 +889,6 @@
     NotebookRouter.prototype.edit = function(nb) {
       var notebook;
       this.removeView();
-      console.log('activated edit route', nb);
       notebook = this.getNotebook(nb);
       NotebookJS.app = new EditNotebookView({
         model: notebook
@@ -888,7 +900,6 @@
     NotebookRouter.prototype.view = function(nb) {
       var notebook;
       this.removeView();
-      console.log('activated view route');
       notebook = this.getNotebook(nb);
       setTitle(notebook.get('title') + ' (Viewing)');
       return NotebookJS.app = new ViewNotebookView({
@@ -911,21 +922,18 @@
     };
 
     NotebookRouter.prototype["new"] = function(nb) {
-      console.log('new view');
       this.removeView();
       return NotebookJS.app = new NewView();
     };
 
     NotebookRouter.prototype.index = function() {
       this.removeView();
-      console.log('index view');
       setTitle('');
       return NotebookJS.app = new IndexView();
     };
 
     NotebookRouter.prototype.loadUrl = function(url) {
       var _this = this;
-      console.log('loading url');
       return $.getJSON(url, function(data) {
         var notebook;
         notebook = loadNotebook(data);
@@ -969,9 +977,7 @@
     delete nbdata.cells;
     nbdata.title = nbdata.title;
     try {
-      if (NotebookJS.notebooks.get(nbdata.id)) raise('duplicate');
-      console.log('no such nb', nbdata.id);
-      console.log('import notebook');
+      if (NotebookJS.notebooks.get(nbdata.id)) throw 'duplicate notebook';
       notebook = NotebookJS.notebooks.create(nbdata);
       notebook.readyCells();
       _fn = function(c) {
@@ -983,7 +989,7 @@
       }
       return notebook;
     } catch (error) {
-      alert('Could not import notebook probably because it already exists.  try deleting');
+      alert('Could not import notebook because it already exists.  try deleting');
       return console.log(error);
     }
   };
@@ -994,7 +1000,6 @@
   };
 
   $(document).ready(function() {
-    console.log('creating app');
     NotebookJS.notebooks = new NotebookJS.Notebooks();
     NotebookJS.notebooks.fetch();
     NotebookJS.mathjaxReady = false;

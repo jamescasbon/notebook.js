@@ -644,6 +644,15 @@ class NotebookRouter extends Backbone.Router
     "import/*data/": 'import'
     "": "index"
 
+  initialize: ->
+    @bind 'all', @_trackPageview
+
+  _trackPageview: ->
+    if _gaq?
+      url = Backbone.history.getFragment()
+      console.log 'pageview', "/#{url}"
+      _gaq.push(['_trackPageview', "/#{url}"])
+
 
   unmatched: (p) => console.log p
 
@@ -681,7 +690,6 @@ class NotebookRouter extends Backbone.Router
 
   edit: (nb) =>
     @removeView()
-    console.log 'activated edit route', nb
     notebook = @getNotebook(nb)
     NotebookJS.app = new EditNotebookView(model: notebook)
     setTitle(notebook.get('title') + ' (Editing)')
@@ -691,7 +699,6 @@ class NotebookRouter extends Backbone.Router
 
   view: (nb) =>
     @removeView()
-    console.log 'activated view route'
     notebook = @getNotebook(nb)
     setTitle(notebook.get('title') + ' (Viewing)')
     NotebookJS.app = new ViewNotebookView(model: notebook)
@@ -706,18 +713,15 @@ class NotebookRouter extends Backbone.Router
     NotebookJS.router.navigate('', trigger: true, replace: true)
 
   new: (nb) =>
-    console.log 'new view'
     @removeView()
     NotebookJS.app = new NewView()
 
   index: =>
     @removeView()
-    console.log 'index view'
     setTitle('')
     NotebookJS.app = new IndexView()
 
   loadUrl: (url) =>
-    console.log 'loading url'
     $.getJSON url, (data) =>
       notebook = loadNotebook(data)
       NotebookJS.router.navigate(notebook.get('id') + '/view/', (trigger: true, replace: true))
@@ -748,10 +752,8 @@ loadNotebook = (nbdata) =>
   try
 
     if NotebookJS.notebooks.get(nbdata.id)
-      raise 'duplicate'
-    console.log 'no such nb', nbdata.id
+      throw 'duplicate notebook'
 
-    console.log 'import notebook'
     notebook = NotebookJS.notebooks.create(nbdata)
     notebook.readyCells()
     for c in celldata
@@ -759,7 +761,7 @@ loadNotebook = (nbdata) =>
 
     return notebook
   catch error
-    alert 'Could not import notebook probably because it already exists.  try deleting'
+    alert 'Could not import notebook because it already exists.  try deleting'
     console.log error
 
 
@@ -769,7 +771,6 @@ mathjaxReady = () ->
 
 
 $(document).ready ->
-  console.log 'creating app'
   NotebookJS.notebooks = new NotebookJS.Notebooks()
   NotebookJS.notebooks.fetch()
   NotebookJS.mathjaxReady = false
