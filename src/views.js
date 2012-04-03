@@ -239,7 +239,6 @@
 
     EditNotebookView.prototype.addOne = function(cell) {
       var index, newEl, previous, previousView, view;
-      console.log('addOne');
       NotebookJS.c = cell;
       view = new CellEditView({
         model: cell
@@ -395,7 +394,6 @@
     };
 
     CellEditView.prototype.changeState = function() {
-      console.log('view changing state to', this.model.get('state'));
       switch (this.model.get('state')) {
         case 'evaluating':
           this.output.html('...');

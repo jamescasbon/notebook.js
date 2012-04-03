@@ -164,7 +164,6 @@ class EditNotebookView extends BaseNotebookView
 
   # add a cell by finding the correct order from the collection and inserting
   addOne: (cell) =>
-    console.log 'addOne' 
     NotebookJS.c = cell
     view = new CellEditView(model: cell)
     newEl = view.render()
@@ -299,7 +298,7 @@ class CellEditView extends Backbone.View
 
   # handle state changes
   changeState: =>
-    console.log('view changing state to', @model.get('state'))
+    #console.log('view changing state to', @model.get('state'))
     switch @model.get('state')
       when 'evaluating'
         @output.html('...')
