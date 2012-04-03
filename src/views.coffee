@@ -201,6 +201,39 @@ class EditNotebookView extends BaseNotebookView
     @model.cells.each (c) -> c.save()
     @model.set pendingSaves: false
 
+    # TODO:
+    if false
+      # TODO: create fork?
+        
+      # create new gist 
+      if not @model.gist?
+        o = $.ajax
+          type: "POST"
+          url: 'https://api.github.com/gists'
+          data: JSON.stringify(gist)
+          beforeSend: (xhr) -> 
+            xhr.setRequestHeader(
+              "Authorization"
+              "Basic " + btoa("username:password")
+            )
+        # now get the gist id and set on the model
+      else
+        o = $.ajax
+          type: "PATCH"
+          url: @model.gist
+          data: JSON.stringify(gist)
+          beforeSend: (xhr) -> 
+            xhr.setRequestHeader(
+              "Authorization"
+              "Basic " + btoa("username:password")
+            )
+
+  
+
+
+
+
+
 # CellView manages the Dom elements associated with a cell
 #
 # A cell view has several dom elements (see the template in index.coffee):

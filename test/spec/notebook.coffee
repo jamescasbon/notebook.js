@@ -69,7 +69,7 @@ describe 'NotebookJS.model', ->
       #should.not.exist(n.get('state'))
 
    
-    it 'should register engines on newly added cells', -> 
+    it 'should register engines on newly added cells', ->
       n.start()
       # not using n.cells.create as this requires storage
       c = new Cell()
@@ -78,7 +78,7 @@ describe 'NotebookJS.model', ->
       
       n.get('pendingSaves').should.equal(true)
 
-    it 'should notice cell changes', -> 
+    it 'should notice cell changes', ->
       c = new Cell()
       n.cells.add(c)
       n.set pendingSaves: false
@@ -89,4 +89,38 @@ describe 'NotebookJS.model', ->
       n.cells.remove c
       n.get('pendingSaves').should.equal true
   
+    it 'should be able to create gists', ->
+      n.set title: 'example gist'
+      c = new Cell 
+        type: 'markdown'
+        input: 'oh hai'
+        output: '<p>oh hai</p>'
+      c2 = new Cell 
+        type: 'code'
+        input: 'print(1+1)\n'
+        output: '2'
+      n.cells.add(c)
+      n.cells.add(c2)
+
+      gist = n.asGist()
+      console.log gist
+      gist.description.should.equal 'example gist'
+      gist.files['notebook.json'].should.exist
+      console.log JSON.stringify(gist)
+  
+
+    it 'should be able to create a script', ->
+      n.set title: 'example gist'
+      c1 = new Cell 
+        type: 'markdown'
+        input: 'oh hai\n'
+        output: '<p>oh hai</p>'
+      c2 = new Cell 
+        type: 'code'
+        input: 'print(1+1)\n'
+        output: '2'
+      n.cells.add(c1)
+      n.cells.add(c2)
+      console.log n.asScript()
+
 

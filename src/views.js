@@ -282,13 +282,35 @@
     };
 
     EditNotebookView.prototype.save = function() {
+      var o;
       this.model.save();
       this.model.cells.each(function(c) {
         return c.save();
       });
-      return this.model.set({
+      this.model.set({
         pendingSaves: false
       });
+      if (false) {
+        if (!(this.model.gist != null)) {
+          return o = $.ajax({
+            type: "POST",
+            url: 'https://api.github.com/gists',
+            data: JSON.stringify(gist),
+            beforeSend: function(xhr) {
+              return xhr.setRequestHeader("Authorization", "Basic " + btoa("username:password"));
+            }
+          });
+        } else {
+          return o = $.ajax({
+            type: "PATCH",
+            url: this.model.gist,
+            data: JSON.stringify(gist),
+            beforeSend: function(xhr) {
+              return xhr.setRequestHeader("Authorization", "Basic " + btoa("username:password"));
+            }
+          });
+        }
+      }
     };
 
     return EditNotebookView;

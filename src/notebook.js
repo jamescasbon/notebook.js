@@ -13,6 +13,8 @@
     __extends(Notebook, _super);
 
     function Notebook() {
+      this.asGist = __bind(this.asGist, this);
+      this.asScript = __bind(this.asScript, this);
       this.destroyAll = __bind(this.destroyAll, this);
       this.saveAll = __bind(this.saveAll, this);
       this.stop = __bind(this.stop, this);
@@ -30,10 +32,12 @@
     Notebook.prototype.defaults = function() {
       return {
         title: "untitled",
+        description: "",
         language: 'Javascript',
         state: null,
         pendingSaves: false,
-        engineUrl: null
+        engineUrl: null,
+        gist: null
       };
     };
 
@@ -126,6 +130,33 @@
         }
       });
       return this.destroy();
+    };
+
+    Notebook.prototype.asScript = function() {
+      var script;
+      script = "";
+      this.cells.each(function(c) {
+        if (c.get('type') === 'markdown') script += '/*\n';
+        script += c.get('input');
+        if (c.get('type') === 'markdown') script += '*/\n';
+        return script += '\n';
+      });
+      return script;
+    };
+
+    Notebook.prototype.asGist = function() {
+      return {
+        description: this.get('title'),
+        public: true,
+        files: {
+          'notebook.json': {
+            content: this.serialize()
+          },
+          'notebook.js': {
+            content: this.asScript()
+          }
+        }
+      };
     };
 
     return Notebook;

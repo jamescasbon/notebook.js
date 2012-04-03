@@ -4,11 +4,13 @@ NotebookJS = root.NotebookJS = root.NotebookJS ? {}
 
 class Notebook extends Backbone.Model
   defaults: =>
-    title: "untitled", 
+    title: "untitled"
+    description: ""
     language: 'Javascript'
     state: null
     pendingSaves: false
     engineUrl: null
+    gist: null
 
   initialize: =>
     
@@ -72,7 +74,28 @@ class Notebook extends Backbone.Model
       cells.each (cell) ->
         cell.destroy()
     @destroy()
+   
+  asScript: =>
+    script = ""
+
+    @cells.each (c) -> 
+      if c.get('type') == 'markdown' then script += '/*\n'
+      script += c.get('input')
+      if c.get('type') == 'markdown' then script += '*/\n'
+      script += '\n'
     
+    script
+
+
+  asGist: =>
+    description: @get('title')
+    public: true
+    files:  
+      'notebook.json': 
+        content: @serialize()
+      'notebook.js': 
+        content: @asScript()
+      
 
 
 class Notebooks extends Backbone.Collection
