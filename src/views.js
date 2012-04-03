@@ -794,13 +794,12 @@
       if (title === '') return;
       nb = NotebookJS.notebooks.create({
         title: title
-      }, {
-        wait: true
       });
       nb.readyCells();
       nb.cells.create({
         position: nb.cells.posJump
       });
+      NotebookJS.notebooks.fetch();
       return NotebookJS.router.navigate(nb.get('id') + '/edit/', {
         trigger: true
       });
@@ -882,6 +881,9 @@
     NotebookRouter.prototype.getNotebook = function(nb) {
       var notebook;
       notebook = NotebookJS.notebooks.get(nb);
+      if (!(notebook != null)) {
+        console.log('WARNING: non existent notebook requested', nb);
+      }
       notebook.readyCells();
       NotebookJS.nb = notebook;
       return notebook;

@@ -625,9 +625,14 @@ class NewView extends Backbone.View
       # TODO: use nb validation and flash user
       return
 
-    nb = NotebookJS.notebooks.create((title: title), (wait: true))
+    nb = NotebookJS.notebooks.create(title: title)
     nb.readyCells()
     nb.cells.create(position: nb.cells.posJump)
+
+    # FIXME: a newly created notebook cannot be retrieved with get
+    # Is this a localStorage bug?
+    NotebookJS.notebooks.fetch()
+
     NotebookJS.router.navigate(nb.get('id') + '/edit/', trigger: true)
 
   mathjaxReady: =>
@@ -684,6 +689,8 @@ class NotebookRouter extends Backbone.Router
 
   getNotebook: (nb) =>
     notebook = NotebookJS.notebooks.get(nb)
+    if not notebook?
+      console.log 'WARNING: non existent notebook requested', nb
     notebook.readyCells()
     NotebookJS.nb = notebook
     #console.log('notebook loaded; id=' +  notebook.get('id'))
