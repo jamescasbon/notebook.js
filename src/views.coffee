@@ -197,26 +197,38 @@ class EditNotebookView extends BaseNotebookView
     NotebookJS.router.navigate(@model.get('id') + '/view/', trigger: true)
 
   save: => 
-    @model.save()
-    @model.cells.each (c) -> c.save()
-    @model.set pendingSaves: false
+    @model.saveAll()
 
-    # TODO:
-    if false
-      # TODO: create fork?
-        
+    # FIXME: should probably go in controller code
+    # TODO: allow anonymous gists
+    tokenPref = NotebookJS.preferences.get('github_token')
+    if tokenPref?
+      console.log 'gist save'
+      # TODO: handling forks of imported notebooks
+      
+      gist = @model.asGist()
+
       # create new gist 
-      if not @model.gist?
+      if not @model.get('gist')?
         o = $.ajax
           type: "POST"
           url: 'https://api.github.com/gists'
           data: JSON.stringify(gist)
+          dataType: 'json'
           beforeSend: (xhr) -> 
             xhr.setRequestHeader(
-              "Authorization"
-              "Basic " + btoa("username:password")
+              "Authorization",
+              "token " + tokenPref.get('value')
             )
-        # now get the gist id and set on the model
+          success: (data, status, xhr) =>  
+            console.log 'saved gist', status
+            @model.set gist: data.html_url
+            @model.save()
+          error: (xhr, status, err) => 
+            alert 'gist failed to save ' + err
+
+
+      # now get the gist id and set on the model
       else
         o = $.ajax
           type: "PATCH"
@@ -225,13 +237,12 @@ class EditNotebookView extends BaseNotebookView
           beforeSend: (xhr) -> 
             xhr.setRequestHeader(
               "Authorization"
-              "Basic " + btoa("username:password")
+              "token " + tokenPref.get('value')
             )
-
-  
-
-
-
+          success: (data, status, xhr) =>  
+            console.log 'patched gist', data.html_url
+          error: (chr, status, err) => 
+            console.log 'failed to patch'
 
 
 # CellView manages the Dom elements associated with a cell
@@ -651,10 +662,13 @@ class IndexView extends Backbone.View
       type: 'POST'
       url: 'https://api.github.com/authorizations'
       data: JSON.stringify(authdata) 
+      dataType: 'json'
       beforeSend: (xhr) -> 
-        xhr.setRequestHeader("Authorization", "Basic " + btoa(username + ':' + password))
+        payload = NotebookJS.util.base64Encode(username + ':' + password)
+        xhr.setRequestHeader("Authorization", "Basic " + payload)
       success: (data, status, xhr) ->  
-        console.log 'auth status', status
+        console.log 'auth status', status, data
+        window.foo = data
         token = data.token
         NotebookJS.preferences.update('github_token', token)
       error: (xhr, status, err) -> 

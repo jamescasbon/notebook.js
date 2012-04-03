@@ -65,10 +65,10 @@ class Notebook extends Backbone.Model
 
   saveAll: => 
     console.log 'saving nb'
+    @set pendingSaves: false
     @save()
     @cells.each (c) -> c.save()
-    @set pendingSaves: false
-
+    
   destroyAll: =>
     @cells.fetch success: (cells) ->
       cells.each (cell) ->
@@ -215,9 +215,10 @@ class Preferences extends Backbone.Collection
   localStorage: new Store('notebook.js.preferences')
 
   update: (id, value) => 
+    console.log 'pref update', id, value
     pref = @get id
     if pref?
-      pref.set value: token
+      pref.set value: value
     else
       pref = @create(id: id, value: value)
     pref.save()

@@ -112,12 +112,12 @@
 
     Notebook.prototype.saveAll = function() {
       console.log('saving nb');
-      this.save();
-      this.cells.each(function(c) {
-        return c.save();
-      });
-      return this.set({
+      this.set({
         pendingSaves: false
+      });
+      this.save();
+      return this.cells.each(function(c) {
+        return c.save();
       });
     };
 
@@ -384,10 +384,11 @@
 
     Preferences.prototype.update = function(id, value) {
       var pref;
+      console.log('pref update', id, value);
       pref = this.get(id);
       if (pref != null) {
         pref.set({
-          value: token
+          value: value
         });
       } else {
         pref = this.create({

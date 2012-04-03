@@ -282,22 +282,31 @@
     };
 
     EditNotebookView.prototype.save = function() {
-      var o;
-      this.model.save();
-      this.model.cells.each(function(c) {
-        return c.save();
-      });
-      this.model.set({
-        pendingSaves: false
-      });
-      if (false) {
-        if (!(this.model.gist != null)) {
+      var gist, o, tokenPref,
+        _this = this;
+      this.model.saveAll();
+      tokenPref = NotebookJS.preferences.get('github_token');
+      if (tokenPref != null) {
+        console.log('gist save');
+        gist = this.model.asGist();
+        if (!(this.model.get('gist') != null)) {
           return o = $.ajax({
             type: "POST",
             url: 'https://api.github.com/gists',
             data: JSON.stringify(gist),
+            dataType: 'json',
             beforeSend: function(xhr) {
-              return xhr.setRequestHeader("Authorization", "Basic " + btoa("username:password"));
+              return xhr.setRequestHeader("Authorization", "token " + tokenPref.get('value'));
+            },
+            success: function(data, status, xhr) {
+              console.log('saved gist', status);
+              _this.model.set({
+                gist: data.html_url
+              });
+              return _this.model.save();
+            },
+            error: function(xhr, status, err) {
+              return alert('gist failed to save ' + err);
             }
           });
         } else {
@@ -306,7 +315,13 @@
             url: this.model.gist,
             data: JSON.stringify(gist),
             beforeSend: function(xhr) {
-              return xhr.setRequestHeader("Authorization", "Basic " + btoa("username:password"));
+              return xhr.setRequestHeader("Authorization", "token " + tokenPref.get('value'));
+            },
+            success: function(data, status, xhr) {
+              return console.log('patched gist', data.html_url);
+            },
+            error: function(chr, status, err) {
+              return console.log('failed to patch');
             }
           });
         }
@@ -793,12 +808,16 @@
         type: 'POST',
         url: 'https://api.github.com/authorizations',
         data: JSON.stringify(authdata),
+        dataType: 'json',
         beforeSend: function(xhr) {
-          return xhr.setRequestHeader("Authorization", "Basic " + btoa(username + ':' + password));
+          var payload;
+          payload = NotebookJS.util.base64Encode(username + ':' + password);
+          return xhr.setRequestHeader("Authorization", "Basic " + payload);
         },
         success: function(data, status, xhr) {
           var token;
-          console.log('auth status', status);
+          console.log('auth status', status, data);
+          window.foo = data;
           token = data.token;
           return NotebookJS.preferences.update('github_token', token);
         },
