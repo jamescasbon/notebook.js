@@ -1,83 +1,122 @@
 (function() {
-  var JavascriptEval, MarkdownEval, NotebookJS, WorkerEval, engines, root, _ref,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  var BaseEngine, BaseHandler, Javascript, JavascriptWindow, Markdown, NotebookJS, engines, root, _ref,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
   root = typeof exports !== "undefined" && exports !== null ? exports : this;
 
   NotebookJS = root.NotebookJS = (_ref = root.NotebookJS) != null ? _ref : {};
 
-  JavascriptEval = (function() {
+  BaseHandler = (function() {
 
-    function JavascriptEval() {
+    function BaseHandler() {
+      this.handleMessage = __bind(this.handleMessage, this);
+      this.error = __bind(this.error, this);
+      this.print = __bind(this.print, this);
+      this.result = __bind(this.result, this);
+      this.evalEnd = __bind(this.evalEnd, this);
+      this.evalBegin = __bind(this.evalBegin, this);
+    }
+
+    BaseHandler.prototype.evalBegin = function() {};
+
+    BaseHandler.prototype.evalEnd = function() {};
+
+    BaseHandler.prototype.result = function(data) {};
+
+    BaseHandler.prototype.print = function(data) {};
+
+    BaseHandler.prototype.error = function(data) {};
+
+    BaseHandler.prototype.handleMessage = function() {};
+
+    return BaseHandler;
+
+  })();
+
+  BaseEngine = (function() {
+
+    function BaseEngine() {
+      this.halt = __bind(this.halt, this);
+      this.interrupt = __bind(this.interrupt, this);
       this.evaluate = __bind(this.evaluate, this);
     }
 
-    JavascriptEval.prototype.evaluate = function(input, handler) {
+    BaseEngine.prototype.evaluate = function() {};
+
+    BaseEngine.prototype.interrupt = function() {};
+
+    BaseEngine.prototype.halt = function() {};
+
+    return BaseEngine;
+
+  })();
+
+  JavascriptWindow = (function(_super) {
+
+    __extends(JavascriptWindow, _super);
+
+    function JavascriptWindow() {
+      this.evaluate = __bind(this.evaluate, this);
+      JavascriptWindow.__super__.constructor.apply(this, arguments);
+    }
+
+    JavascriptWindow.prototype.evaluate = function(input, handler) {
       var print, result;
       try {
+        handler.evalBegin();
         print = function(d) {
-          return handler.handleMessage({
-            msg: 'print',
-            data: d.toString()
-          });
+          return handler.print(d.toString());
         };
         result = eval(input);
-        if (result != null) {
-          console.log('result', result);
-          return handler.handleMessage({
-            msg: 'result',
-            data: result.toString()
-          });
-        }
+        if (result != null) return handler.result(result.toString());
       } catch (error) {
         console.log(error.message, error.stack);
-        return handler.handleMessage({
-          msg: 'error',
-          data: error.toString()
-        });
+        return handler.error(error.toString());
       } finally {
-        handler.handleMessage({
-          msg: 'evalEnd'
-        });
+        handler.evalEnd();
       }
     };
 
-    return JavascriptEval;
+    return JavascriptWindow;
 
-  })();
+  })(BaseEngine);
 
-  MarkdownEval = (function() {
+  Markdown = (function(_super) {
 
-    function MarkdownEval() {
+    __extends(Markdown, _super);
+
+    function Markdown() {
       this.evaluate = __bind(this.evaluate, this);
+      Markdown.__super__.constructor.apply(this, arguments);
     }
 
-    MarkdownEval.prototype.evaluate = function(input, handler) {
+    Markdown.prototype.evaluate = function(input, handler) {
       var html, markdownConvertor;
       try {
+        handler.evalBegin();
         markdownConvertor = new Showdown.converter();
         html = markdownConvertor.makeHtml(input);
-        return handler.handleMessage({
-          msg: 'raw',
-          data: html
-        });
+        return handler.result(html);
       } catch (error) {
         console.log(error.message);
-        return onErr(error.message);
+        return handler.error(error.toString());
       } finally {
-        handler.handleMessage({
-          msg: 'evalEnd'
-        });
+        handler.evalEnd();
       }
     };
 
-    return MarkdownEval;
+    return Markdown;
 
-  })();
+  })(BaseEngine);
 
-  WorkerEval = (function() {
+  Javascript = (function(_super) {
 
-    function WorkerEval() {
+    __extends(Javascript, _super);
+
+    function Javascript() {
+      this.halt = __bind(this.halt, this);
       this.interrupt = __bind(this.interrupt, this);
       this.handleMessage = __bind(this.handleMessage, this);
       this.evaluate = __bind(this.evaluate, this);      this.worker = new Worker('/src/worker.js');
@@ -86,7 +125,7 @@
       this.handlers = {};
     }
 
-    WorkerEval.prototype.evaluate = function(input, handler) {
+    Javascript.prototype.evaluate = function(input, handler) {
       this.inputId += 1;
       this.handlers[this.inputId] = handler;
       return this.worker.postMessage({
@@ -95,28 +134,51 @@
       });
     };
 
-    WorkerEval.prototype.handleMessage = function(ev) {
+    Javascript.prototype.handleMessage = function(ev) {
       var handler, inputId;
       inputId = ev.data.inputId;
       handler = this.handlers[inputId];
-      return handler.handleMessage(ev.data);
+      switch (ev.data.msg) {
+        case 'log':
+          return console.log(ev.data.data);
+        case 'evalBegin':
+          return handler.evalBegin();
+        case 'evalEnd':
+          handler.evalEnd();
+          return this.handlers[inputId] = null;
+        case 'print':
+          return handler.print(ev.data.data);
+        case 'result':
+          return handler.result(ev.data.data);
+        case 'error':
+          return handler.error(ev.data.data);
+      }
     };
 
-    WorkerEval.prototype.interrupt = function() {
+    Javascript.prototype.interrupt = function() {
       this.worker.terminate();
       this.worker = new Worker('/src/worker.js');
       return this.worker.onmessage = this.handleMessage;
     };
 
-    return WorkerEval;
+    Javascript.prototype.halt = function() {
+      this.worker.terminate();
+      return this.worker = null;
+    };
 
-  })();
+    return Javascript;
+
+  })(BaseEngine);
 
   engines = {};
 
-  engines.javascript = new WorkerEval();
+  engines.BaseHandler = BaseHandler;
 
-  engines.markdown = new MarkdownEval();
+  engines.JavascriptWindow = JavascriptWindow;
+
+  engines.Markdown = Markdown;
+
+  engines.Javascript = Javascript;
 
   NotebookJS.engines = engines;
 

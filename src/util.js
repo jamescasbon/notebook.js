@@ -72,23 +72,19 @@
   };
 
   base64UrlDecode = function(data) {
-    var i, m, _ref3;
+    var m;
     m = data.length % 4;
-    if (m !== 0) {
-      for (i = 0, _ref3 = 4 - m; 0 <= _ref3 ? i < _ref3 : i > _ref3; 0 <= _ref3 ? i++ : i--) {
-        data += '=';
-      }
-    }
+    if (m !== 0) data += Array(5 - m).join('=');
     data = data.replace(/-/g, '+');
     data = data.replace(/_/g, '/');
     return base64Decode(data);
   };
 
   base64UrlEncode = function(data) {
+    var chop;
     data = base64Encode(data);
-    while (data.slice(-1) === '=') {
-      data = data.slice(0, -1);
-    }
+    chop = data.indexOf('=');
+    if (chop !== -1) data = data.slice(0, chop);
     data = data.replace(/\+/g, '-');
     data = data.replace(/\//g, '_');
     return data;

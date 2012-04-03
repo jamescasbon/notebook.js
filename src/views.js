@@ -28,7 +28,6 @@
   scrollToAtTop = function(elem) {
     var target;
     target = elem.offset().top - 3 * NAVBAR_HEIGHT;
-    console.log('stat', target);
     return $(window).scrollTop(target);
   };
 
@@ -37,7 +36,6 @@
     bottom = elem.offset().top + elem.height();
     scrollbottom = bottom + (2 * NAVBAR_HEIGHT);
     scrolltop = scrollbottom - $(window).height();
-    console.log('stab', scrolltop);
     return $('body').scrollTop(scrolltop);
   };
 
@@ -72,9 +70,10 @@
     };
 
     BaseNotebookView.prototype.saveToFile = function(e) {
-      var data;
+      var data, slug;
       data = this.model.serialize();
-      $(e.target).attr('download', "notebook-" + (new Date().toISOString().slice(0, 10)) + ".json");
+      slug = _.string.slugify(this.model.get('title'));
+      $(e.target).attr('download', slug + ".notebook");
       return $(e.target).attr('href', 'data:application/json;charset=utf-8,' + escape(data));
     };
 
@@ -95,7 +94,6 @@
       _ref2 = this.$('#notebook');
       for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
         el = _ref2[_i];
-        console.log('tp', el);
         MathJax.Hub.Typeset(el);
       }
       return this.$('#toc').html(this.generateToc());
@@ -162,7 +160,6 @@
       this.cellTemplate = _.template($('#cell-view-template').html());
       $('.container').append(this.render());
       this.cells = this.$('.cells');
-      console.log(this.cells);
       this.model.cells.fetch({
         success: this.addAll
       });
@@ -200,6 +197,7 @@
     __extends(EditNotebookView, _super);
 
     function EditNotebookView() {
+      this.save = __bind(this.save, this);
       this.toggleEdit = __bind(this.toggleEdit, this);
       this.spawnKeypress = __bind(this.spawnKeypress, this);
       this.spawnCellAtEnd = __bind(this.spawnCellAtEnd, this);
@@ -218,7 +216,8 @@
         "keyup #spawner": 'spawnKeypress',
         "click #toggle-edit": "toggleEdit",
         "click #save-to-file": "saveToFile",
-        "click #share-url": "share"
+        "click #share-url": "share",
+        "click #save": "save"
       };
     };
 
@@ -226,15 +225,12 @@
       this.template = _.template($('#notebook-template').html());
       $('.container').append(this.render());
       this.cells = this.$('.cells');
-      this.model.cells.bind('add', this.addOne);
-      this.model.cells.bind('refresh', this.addAll);
+      this.model.cells.bind('add', this.addOne, this);
+      this.model.cells.bind('refresh', this.addAll, this);
       this.model.cells.fetch({
         success: this.addAll
       });
-      if (NotebookJS.mathjaxReady) {
-        console.log('calling typeset at init');
-        return this.typeset();
-      }
+      if (NotebookJS.mathjaxReady) return this.typeset();
     };
 
     EditNotebookView.prototype.render = function() {
@@ -285,6 +281,16 @@
       });
     };
 
+    EditNotebookView.prototype.save = function() {
+      this.model.save();
+      this.model.cells.each(function(c) {
+        return c.save();
+      });
+      return this.model.set({
+        pendingSaves: false
+      });
+    };
+
     return EditNotebookView;
 
   })(BaseNotebookView);
@@ -305,6 +311,8 @@
       this.setEditorHighlightMode = __bind(this.setEditorHighlightMode, this);
       this.focusCellBelow = __bind(this.focusCellBelow, this);
       this.focusCellAbove = __bind(this.focusCellAbove, this);
+      this.blurOutput = __bind(this.blurOutput, this);
+      this.focusOutput = __bind(this.focusOutput, this);
       this.blurInput = __bind(this.blurInput, this);
       this.focusInput = __bind(this.focusInput, this);
       this.changeInputFold = __bind(this.changeInputFold, this);
@@ -338,17 +346,19 @@
         "click .interrupt": "interrupt",
         "keyup .cell-output": 'handleKeypress',
         "focus .cell-input": "focusInput",
-        "blur .cell-input": "blurInput"
+        "focus .cell-output": "focusOutput",
+        "blur .cell-input": "blurInput",
+        "blur .cell-output": "blurOutput"
       };
     };
 
     CellEditView.prototype.initialize = function() {
       this.template = _.template($('#cell-edit-template').html());
-      this.model.bind('change:state', this.changeState);
-      this.model.bind('change:type', this.changeType);
-      this.model.bind('change:output', this.changeOutput);
-      this.model.bind('change:inputFold', this.changeInputFold);
-      this.model.bind('destroy', this.remove);
+      this.model.bind('change:state', this.changeState, this);
+      this.model.bind('change:type', this.changeType, this);
+      this.model.bind('change:output', this.changeOutput, this);
+      this.model.bind('change:inputFold', this.changeInputFold, this);
+      this.model.bind('destroy', this.remove, this);
       this.model.view = this;
       return this.editor = null;
     };
@@ -388,17 +398,17 @@
       switch (this.model.get('state')) {
         case 'evaluating':
           this.output.html('...');
-          this.intButton.addClass('active');
-          return this.evalButton.removeClass('active');
+          $(this.el).addClass('eval-cell');
+          return $(this.el).removeClass('dirty-cell');
         case 'dirty':
-          return this.evalButton.addClass('active');
+          return $(this.el).addClass('dirty-cell');
         case null:
-          return this.intButton.removeClass('active');
+          return $(this.el).removeClass('eval-cell');
       }
     };
 
     CellEditView.prototype.afterDomInsert = function() {
-      var ace_id, crs_to_add, i, input, _i, _len, _ref2,
+      var ace_id, crs_to_add, input,
         _this = this;
       if (this.model.id != null) {
         ace_id = this.model.id;
@@ -419,12 +429,7 @@
       });
       input = this.model.get('input');
       crs_to_add = Math.max(3 - _.string.count(input, '\n'), 0);
-      console.log('crs');
-      _ref2 = _.range(crs_to_add);
-      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-        i = _ref2[_i];
-        input = input + '\n';
-      }
+      input = input + '\n';
       this.editor.getSession().setValue(input);
       this.resizeEditor();
       this.editor.getSession().on('change', this.inputChange);
@@ -575,6 +580,7 @@
     };
 
     CellEditView.prototype.focusInput = function(where) {
+      $(this.el).addClass('active-cell');
       if (where === 'top') {
         this.editor.gotoLine(1);
         this.editor.focus();
@@ -589,10 +595,19 @@
     };
 
     CellEditView.prototype.blurInput = function() {
+      $(this.el).removeClass('active-cell');
       if (this.editor != null) {
         this.editor.setHighlightActiveLine(false);
         return this.$('.ace_cursor-layer').hide();
       }
+    };
+
+    CellEditView.prototype.focusOutput = function() {
+      return $(this.el).addClass('active-cell');
+    };
+
+    CellEditView.prototype.blurOutput = function() {
+      return $(this.el).removeClass('active-cell');
     };
 
     CellEditView.prototype.focusCellAbove = function() {
@@ -615,7 +630,7 @@
 
     CellEditView.prototype.setEditorHighlightMode = function() {
       var mode;
-      if (this.model.get('type') === 'javascript') {
+      if (this.model.get('type') === 'code') {
         mode = require("ace/mode/javascript").Mode;
       } else if (this.model.get('type') === 'markdown') {
         mode = require("ace/mode/markdown").Mode;
@@ -631,6 +646,7 @@
     };
 
     CellEditView.prototype.destroy = function() {
+      console.log('destroy');
       return this.model.destroy();
     };
 
@@ -759,7 +775,7 @@
     NewView.prototype.className = 'app';
 
     NewView.prototype.events = {
-      'click button': 'create'
+      'click #create': 'create'
     };
 
     NewView.prototype.initialize = function() {
@@ -773,9 +789,11 @@
     };
 
     NewView.prototype.create = function() {
-      var nb;
+      var nb, title;
+      title = this.$('input').val();
+      if (title === '') return;
       nb = NotebookJS.notebooks.create({
-        title: this.$('input').val()
+        title: title
       }, {
         wait: true
       });
@@ -783,7 +801,7 @@
       nb.cells.create({
         position: nb.cells.posJump
       });
-      return NotebookJS.router.navigate(nb.id + '/edit/', {
+      return NotebookJS.router.navigate(nb.get('id') + '/edit/', {
         trigger: true
       });
     };
@@ -799,6 +817,7 @@
     __extends(NotebookRouter, _super);
 
     function NotebookRouter() {
+      this.onbeforeunload = __bind(this.onbeforeunload, this);
       this["import"] = __bind(this["import"], this);
       this.loadUrl = __bind(this.loadUrl, this);
       this.index = __bind(this.index, this);
@@ -807,6 +826,7 @@
       this.view = __bind(this.view, this);
       this.edit = __bind(this.edit, this);
       this.getNotebook = __bind(this.getNotebook, this);
+      this.removeView = __bind(this.removeView, this);
       this.unmatched = __bind(this.unmatched, this);
       NotebookRouter.__super__.constructor.apply(this, arguments);
     }
@@ -821,8 +841,42 @@
       "": "index"
     };
 
+    NotebookRouter.prototype.initialize = function() {
+      return this.bind('all', this._trackPageview);
+    };
+
+    NotebookRouter.prototype._trackPageview = function() {
+      var url;
+      if (typeof _gaq !== "undefined" && _gaq !== null) {
+        url = Backbone.history.getFragment();
+        console.log('pageview', "/" + url);
+        return _gaq.push(['_trackPageview', "/" + url]);
+      }
+    };
+
     NotebookRouter.prototype.unmatched = function(p) {
       return console.log(p);
+    };
+
+    NotebookRouter.prototype.removeView = function() {
+      var n, view;
+      view = NotebookJS.app;
+      if (view != null) view.remove();
+      if (NotebookJS.nb != null) {
+        n = NotebookJS.nb;
+        n.saveAll();
+        if (view != null) {
+          n.off(null, null, view);
+          n.cells.off(null, null, view);
+        }
+        n.cells.each(function(c) {
+          if (c.view != null) {
+            c.view = null;
+            return c.off(null, null, c.view);
+          }
+        });
+        return NotebookJS.nb = null;
+      }
     };
 
     NotebookRouter.prototype.getNotebook = function(nb) {
@@ -830,25 +884,23 @@
       notebook = NotebookJS.notebooks.get(nb);
       notebook.readyCells();
       NotebookJS.nb = notebook;
-      console.log('notebook loaded; id=' + notebook.get('id'));
       return notebook;
     };
 
     NotebookRouter.prototype.edit = function(nb) {
       var notebook;
-      if (NotebookJS.app) NotebookJS.app.remove();
-      console.log('activated edit route', nb);
+      this.removeView();
       notebook = this.getNotebook(nb);
       NotebookJS.app = new EditNotebookView({
         model: notebook
       });
-      return setTitle(notebook.get('title') + ' (Editing)');
+      setTitle(notebook.get('title') + ' (Editing)');
+      if (!(notebook.get('running') != null)) return notebook.start();
     };
 
     NotebookRouter.prototype.view = function(nb) {
       var notebook;
-      if (NotebookJS.app) NotebookJS.app.remove();
-      console.log('activated view route');
+      this.removeView();
       notebook = this.getNotebook(nb);
       setTitle(notebook.get('title') + ' (Viewing)');
       return NotebookJS.app = new ViewNotebookView({
@@ -858,46 +910,31 @@
 
     NotebookRouter.prototype["delete"] = function(nb) {
       var confirmed, notebook;
-      console.log('deleting nb', nb);
       confirmed = confirm('You really want to delete that?');
       if (confirmed) {
         notebook = this.getNotebook(nb);
-        notebook.cells.fetch({
-          success: function(cells) {
-            return cells.each(function(cell) {
-              console.log('destroy', cell);
-              return cell.destroy();
-            });
-          }
-        });
-        console.log('cells', notebook.cells.length);
-        notebook.destroy();
-        console.log('deleted');
+        notebook.destroyAll();
+        NotebookJS.nb = null;
       }
       return NotebookJS.router.navigate('', {
-        trigger: true
+        trigger: true,
+        replace: true
       });
     };
 
     NotebookRouter.prototype["new"] = function(nb) {
-      console.log('new view');
-      if (NotebookJS.app) NotebookJS.app.remove();
+      this.removeView();
       return NotebookJS.app = new NewView();
     };
 
     NotebookRouter.prototype.index = function() {
-      if (NotebookJS.app) {
-        NotebookJS.app.remove();
-        NotebookJS.nb = null;
-      }
-      console.log('index view');
+      this.removeView();
       setTitle('');
       return NotebookJS.app = new IndexView();
     };
 
     NotebookRouter.prototype.loadUrl = function(url) {
       var _this = this;
-      console.log('loading url');
       return $.getJSON(url, function(data) {
         var notebook;
         notebook = loadNotebook(data);
@@ -918,6 +955,15 @@
       });
     };
 
+    NotebookRouter.prototype.onbeforeunload = function(e) {
+      if (NotebookJS.nb != null) NotebookJS.nb.saveAll();
+      if (_.any(NotebookJS.notebooks.map(function(x) {
+        return x.get('state') === 'running';
+      }))) {
+        return 'You have running notebooks, are you sure?';
+      }
+    };
+
     return NotebookRouter;
 
   })(Backbone.Router);
@@ -932,9 +978,7 @@
     delete nbdata.cells;
     nbdata.title = nbdata.title;
     try {
-      if (NotebookJS.notebooks.get(nbdata.id)) raise('duplicate');
-      console.log('no such nb', nbdata.id);
-      console.log('import notebook');
+      if (NotebookJS.notebooks.get(nbdata.id)) throw 'duplicate notebook';
       notebook = NotebookJS.notebooks.create(nbdata);
       notebook.readyCells();
       _fn = function(c) {
@@ -946,7 +990,7 @@
       }
       return notebook;
     } catch (error) {
-      alert('Could not import notebook probably because it already exists.  try deleting');
+      alert('Could not import notebook because it already exists.  try deleting');
       return console.log(error);
     }
   };
@@ -957,13 +1001,13 @@
   };
 
   $(document).ready(function() {
-    console.log('creating app');
     NotebookJS.notebooks = new NotebookJS.Notebooks();
     NotebookJS.notebooks.fetch();
     NotebookJS.mathjaxReady = false;
     NotebookJS.router = new NotebookRouter();
     Backbone.history.start();
-    return MathJax.Hub.Register.StartupHook('End', mathjaxReady);
+    MathJax.Hub.Register.StartupHook('End', mathjaxReady);
+    return window.onbeforeunload = NotebookJS.router.onbeforeunload;
   });
 
 }).call(this);

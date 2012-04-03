@@ -72,6 +72,12 @@ html ->
         div 'tooltip', tooltip: 'Double click to create cell', ->
           div 'spawn-above', tabindex: '[[= position ]]a'
 
+        div 'status-bar', ->
+          div 'tooltip', tooltip: 'Delete', ->
+            img 'delete show-when-active', src: '/img/delete.png'
+          div 'tooltip', tooltip: 'Evaluate', ->
+            img 'evaluate show-when-active show-when-dirty', src: '/img/play.png'
+
         # the fold button, tooltip outside to avoid rotating tooltip
         div 'fold-control tooltip', tooltip: 'Click to fold input', ->
           div 'fold-button', -> '>'
@@ -80,9 +86,8 @@ html ->
         div 'ace-container', ->
           div class: "cell-input", style: "top:0;bottom:0;left:0;right:0;", id: "input-[[= id ]]", ->
 
-        div 'status-bar', ->
-          div 'tooltip', tooltip: 'Evaluate', ->
-            img 'evaluate', src: '/img/play.png'
+
+
 
         hr -> ''
 
@@ -92,7 +97,7 @@ html ->
         # status controls in right margin
         div 'status-bar', ->
           div 'tooltip', tooltip: 'Interrupt', ->
-            img 'interrupt tooltip', src: '/img/ajax-loader.gif', tooltip: 'Interrupt'
+            img 'interrupt show-when-eval', src: '/img/ajax-loader.gif', tooltip: 'Interrupt'
 
 
     script type: "text/template", id: 'cell-view-template', ->
@@ -101,7 +106,7 @@ html ->
         # FIXME: mixing of underscore logic in this coffeekup template is not pretty
         # we need two fake divs here to get the text output
         # must be better way
-        div "[[ if (type == 'javascript' & inputFold == false) { ]]"
+        div "[[ if (type != 'markdown' & inputFold == false) { ]]"
         pre class: "cell-input prettyprint", -> "[[= input ]]"
         hr -> ''
         div "[[ } ]]"
@@ -160,6 +165,7 @@ html ->
         div '#menu', ->
           button '#toggle-edit', -> 'toggle edit/view'
           a id: 'save-to-file', class: 'button', download: 'notebook.json', -> 'save to file'
+          a id: 'save', class: 'button', -> 'save'
           button '#share-url', -> 'share'
 
 
@@ -167,10 +173,9 @@ html ->
       div id: "notebook", class: "sixteen columns", ->
         div 'cell', ->
           h1 -> "Create new notebook"
-          form ->
-            label for: 'name', -> 'Name'
-            input type: 'text', id: 'name'
-            button type: 'submit', 'Create'
+          label for: 'name', -> 'Name'
+          input type: 'text', id: 'name'
+          button '#create', => 'Create'
 
     script type: "text/template", id: "share-notebook", ->
       h4 -> "Share this link to share the notebook"

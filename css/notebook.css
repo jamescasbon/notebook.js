@@ -235,11 +235,22 @@ pre.prettyprint {
 }
 .status-bar img {
   cursor: pointer;
-  display: none;
+  visibility: hidden;
+  opacity: 0;
+  -webkit-transition: visibility 0s linear 0.5s;
+  -moz-transition: visibility 0s linear 0.5s;
 }
-.status-bar img.active {
+.active-cell .show-when-active {
   opacity: 1;
-  display: block;
+  visibility: visible;
+}
+.eval-cell .show-when-eval {
+  opacity: 1;
+  visibility: visible;
+}
+.dirty-cell .show-when-dirty {
+  opacity: 1;
+  visibility: visible;
 }
 .list-notebook:nth-child(odd) {
   background: rgba(50,50,50,0.05);

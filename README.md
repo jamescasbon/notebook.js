@@ -45,17 +45,16 @@ Frontend
 
 Now:
 
-* share URL broken on deploy 
 * new notebook hint on where to type
-* play button position next to input 
 * hint user playing non first cell on new notebook load
 * play all button
-* delete cell button
 * Table of contens udpate
+* show play/delete when active
+* User prefs
 
 
+* remove tooltips on view mode
 * play all
-* better dev mode 
 * ensure all urls are relative
 * detect whether content changed when evaluating (short circuit) - could do on isDirty except when
 new loaded notebook 

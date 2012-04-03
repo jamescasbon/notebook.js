@@ -1,1 +1,40 @@
-{"title":"Using equations","id":"24898df7-bc7d-8531-daf2-fd51b272b835","cells":[{"input":"Using equations \n===============\n\nWe can use tex style equations inline with a single dollar, like this: $e = mc^2$.  Or we can create block equations with double dollar signs such as this identity of Ramanujan: \n\n$$ \\frac{1}{\\Bigl(\\sqrt{\\phi \\sqrt{5}}-\\phi\\Bigr) e^{\\frac25 \\pi}} =\n1+\\frac{e^{-2\\pi}} {1+\\frac{e^{-4\\pi}} {1+\\frac{e^{-6\\pi}}\n{1+\\frac{e^{-8\\pi}} {1+\\ldots} } } } $$\n\n","type":"markdown","inputFold":true,"output":"<div class=\"raw\"><h1 id=\"usingequations\">Using equations </h1>\n\n<p>We can use tex style equations inline with a single dollar, like this: $e = mc^2$.  Or we can create block equations with double dollar signs such as this identity of Ramanujan: </p>\n\n<p>$$ \\frac{1}{\\Bigl(\\sqrt{\\phi \\sqrt{5}}-\\phi\\Bigr) e^{\\frac25 \\pi}} =\n1+\\frac{e^{-2\\pi}} {1+\\frac{e^{-4\\pi}} {1+\\frac{e^{-6\\pi}}\n{1+\\frac{e^{-8\\pi}} {1+\\ldots} } } } $$</p></div>","position":65536,"error":null,"state":null,"id":"6ed67fa1-b2e6-eb10-0936-84a73942a42d"},{"input":"This is useful if we want to show mathematical definitions and relate them back to code.  For instance, the dot product of two vectors $\\mathbf{a}$, $\\mathbf{b}$ is defined: \n$$ \\mathbf{a} . \\mathbf{b} = \\sum\\_i a\\_i b\\_i $$\n\nWe can use the __dot__ function in sylvester for this:\n","type":"markdown","inputFold":true,"output":"<div class=\"raw\"><p>This is useful if we want to show mathematical definitions and relate them back to code.  For instance, the dot product of two vectors $\\mathbf{a}$, $\\mathbf{b}$ is defined: \n$$ \\mathbf{a} . \\mathbf{b} = \\sum_i a_i b_i $$</p>\n\n<p>We can use the <strong>dot</strong> function in sylvester for this:</p></div>","position":131072,"error":null,"state":null,"id":"3c56f7ce-fd6d-e93d-3a7c-e3a610545103"},{"input":"importScripts('/ext/sylvester.js');\nvar V1 = $V([3,4,5]);\nvar V2 = $V([9,-3,0]);\n\nvar d = V1.dot(V2);\nprint('dot product is ' + d)","type":"javascript","inputFold":false,"output":"<div class=\"print\">dot product is 15</div><div class=\"print\">-</div>","position":196608,"error":null,"state":null,"id":"b332e537-0902-3fcf-ade5-ec18fba37f0f"}]}
+{
+  "title": "Tutorial: Using equations",
+  "language": "Javascript",
+  "state": "running",
+  "pendingSaves": false,
+  "engineUrl": "browser://",
+  "id": "24898df7-bc7d-8531-daf2-fd51b272b835",
+  "cells": [
+    {
+      "input": "Using equations \n===============\n\nWe can use tex style equations inline with a single dollar, like this: $e = mc^2$.  Or we can create block equations with double dollar signs such as this identity of Ramanujan: \n\n$$ \\frac{1}{\\Bigl(\\sqrt{\\phi \\sqrt{5}}-\\phi\\Bigr) e^{\\frac25 \\pi}} =\n1+\\frac{e^{-2\\pi}} {1+\\frac{e^{-4\\pi}} {1+\\frac{e^{-6\\pi}}\n{1+\\frac{e^{-8\\pi}} {1+\\ldots} } } } $$\n\n",
+      "type": "markdown",
+      "inputFold": true,
+      "output": "<div class=\"raw\"><h1 id=\"usingequations\">Using equations </h1>\n\n<p>We can use tex style equations inline with a single dollar, like this: $e = mc^2$.  Or we can create block equations with double dollar signs such as this identity of Ramanujan: </p>\n\n<p>$$ \\frac{1}{\\Bigl(\\sqrt{\\phi \\sqrt{5}}-\\phi\\Bigr) e^{\\frac25 \\pi}} =\n1+\\frac{e^{-2\\pi}} {1+\\frac{e^{-4\\pi}} {1+\\frac{e^{-6\\pi}}\n{1+\\frac{e^{-8\\pi}} {1+\\ldots} } } } $$</p></div>",
+      "position": 65536,
+      "error": null,
+      "state": null,
+      "id": "6ed67fa1-b2e6-eb10-0936-84a73942a42d"
+    },
+    {
+      "input": "This is useful if we want to show mathematical definitions and relate them back to code.  For instance, the dot product of two vectors $\\mathbf{a}$, $\\mathbf{b}$ is defined: \n$$ \\mathbf{a} . \\mathbf{b} = \\sum\\_i a\\_i b\\_i $$\n\nWe can use the __dot__ function in sylvester for this:\n",
+      "type": "markdown",
+      "inputFold": true,
+      "output": "<div class=\"raw\"><p>This is useful if we want to show mathematical definitions and relate them back to code.  For instance, the dot product of two vectors $\\mathbf{a}$, $\\mathbf{b}$ is defined: \n$$ \\mathbf{a} . \\mathbf{b} = \\sum_i a_i b_i $$</p>\n\n<p>We can use the <strong>dot</strong> function in sylvester for this:</p></div>",
+      "position": 131072,
+      "error": null,
+      "state": null,
+      "id": "3c56f7ce-fd6d-e93d-3a7c-e3a610545103"
+    },
+    {
+      "input": "importScripts('/ext/sylvester.js');\nvar V1 = $V([3,4,5]);\nvar V2 = $V([9,-3,0]);\n\nvar d = V1.dot(V2);\nprint('dot product is ' + d)\n",
+      "type": "code",
+      "inputFold": false,
+      "output": "<div class=\"print\">dot product is 15</div><div class=\"print\">-</div>",
+      "position": 196608,
+      "error": null,
+      "state": null,
+      "id": "b332e537-0902-3fcf-ade5-ec18fba37f0f"
+    }
+  ]
+}

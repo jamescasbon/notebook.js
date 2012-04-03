@@ -256,15 +256,27 @@ pre.prettyprint
     float: right
     img
         cursor: pointer
-        display: none
+        visibility: hidden
+        opacity: 0
+        -webkit-transition: visibility 0s linear 0.5s
+        -moz-transition: visibility 0s linear 0.5s
 
     top: -25px 
     right: -25px
 
-    img.active 
-        opacity: 1
-        display: block
 
+.active-cell .show-when-active
+    opacity: 1
+    visibility: visible
+   
+    
+.eval-cell .show-when-eval
+    opacity: 1
+    visibility: visible
+
+.dirty-cell .show-when-dirty
+    opacity: 1
+    visibility: visible
 
 
 

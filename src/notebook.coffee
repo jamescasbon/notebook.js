@@ -3,21 +3,76 @@ NotebookJS = root.NotebookJS = root.NotebookJS ? {}
 
 
 class Notebook extends Backbone.Model
-  defaults: => (title: "untitled")
+  defaults: =>
+    title: "untitled", 
+    language: 'Javascript'
+    state: null
+    pendingSaves: false
+    engineUrl: null
 
   initialize: =>
-    return
+    
+    # if the browser is closed, notebooks are left hanging 
+    if @get('state') == 'running' and @get('engineUrl') == 'browser://'
+      @set state: null, engineUrl: null
+
+    @cells = new Cells()
+    @cells.on 'add', @cellAdded
+    @cells.on 'change', @cellChanged
+    @cells.on 'remove', @cellChanged
+    @cells.on 'fetch', @cellsFetched
+    @engines = null
 
   # we need this hook for localStorage because the id is not available at init
   readyCells: =>
-    #console.log('creating store for nb id', @get('id'))
-    @cells = new Cells()
     @cells.localStorage = new Store('cells-' + @get('id'))
 
   serialize: =>
     data = @toJSON()
     data.cells = @cells.toJSON()
-    return JSON.stringify(data)
+    return JSON.stringify(data, null, 2)
+
+  # update cell engine refs when fetched 
+  cellsFetched: (cells) =>
+    cells.each (cell) ->
+      cell.engines = @engines
+
+  # new cells need a reference to the engines and the notebooks needs saving
+  cellAdded: (cell) =>
+    cell.engines = @engines
+    @set pendingSaves: true
+
+  # set the notebook as needing to be saved when a cell changes
+  cellChanged: =>  
+    @set pendingSaves: true
+
+  # start the engines for this notebook
+  start: => 
+    @set state: 'running'
+    @set engineUrl: 'browser://'
+    @engines = 
+      code: new NotebookJS.engines.Javascript(),
+      markdown: new NotebookJS.engines.Markdown()
+    @cells.each (cell) => 
+      cell.engines = @engines
+
+  # stop the engines for this notebook
+  stop: => 
+    @set state: null
+    @engines = null
+
+  saveAll: => 
+    console.log 'saving nb'
+    @save()
+    @cells.each (c) -> c.save()
+    @set pendingSaves: false
+
+  destroyAll: =>
+    @cells.fetch success: (cells) ->
+      cells.each (cell) ->
+        cell.destroy()
+    @destroy()
+    
 
 
 class Notebooks extends Backbone.Collection
@@ -36,67 +91,62 @@ class Cell extends Backbone.Model
   tagName: 'li'
   defaults: =>
     input: "",
-    type: "javascript",
+    type: "code",
     inputFold: false
     output: null,
     position: null,
     error: null,
     state: null
 
+  initialize: => 
+    # backwards compatibility shim for new release, can go v soon
+    if @get('type') == 'javascript' then @set type: 'code'
+
   toggleType: =>
-    if @get('type') == 'javascript'
+    # TODO: check if evaluating here and interrupt?
+    if @get('type') == 'code'
       @set type: 'markdown'
     else
-      @set type: 'javascript'
+      @set type: 'code'
     @set state: 'dirty'
     #@evaluate()
 
   toggleInputFold: =>
     @set inputFold: not @get('inputFold')
-    @save()
 
   evaluate: =>
+    if not @engines?
+      console.log 'WARNING: evaluation called with no engines'
+      return 
     @set(output: null, error: null)
     @set state: 'evaluating'
-    @save()
-    # should we save the model at this point?
-    # how to look up handler?
-    @handler = NotebookJS.engines[@get('type')]
-    @handler.evaluate @get('input'), @
+    @engines[@get('type')].evaluate @get('input'), @
 
   interrupt: =>
-    if @handler?
+    if not @engines?
+      console.log 'WARNING: interrupt called with no engines'
+      return 
+    @addOutput('Interrupted', 'error')
+    @engines[@get('type')].interrupt()
+    @set state: null
 
-      @onPrint('Interrupted', 'error')
-      @handler.interrupt()
-      @set state: null
-      @save()
-
-  evaluateSuccess: (output) =>
-    @set output: output, error: null
-    @save()
-
-  evaluateError: (error) =>
-    @set error: error
-    @save
-
-  handleMessage: (data) =>
-    #console.log 'cell handling message from engine', data
-    switch data.msg
-      when 'evalEnd'
-        @set(state: null)
-        @save()
-      when 'error' then @onPrint(data.data, 'error')
-      when 'print' then @onPrint(data.data, 'print')
-      when 'result' then @onPrint(data.data, 'print')
-      when 'raw' then @onPrint(data.data, 'raw')
-
-  onError: (error) ->
-    @set(error: error)
-
-  onPrint: (data, elName) ->
+  addOutput: (data, elName) =>
     current = @get('output') or ""
+    if @get('type') == 'markdown'
+      elName = 'markdown'
+    
     @set(output: current.concat('<div class="' + elName + '">' + data + '</div>'))
+
+
+  # engine protocol
+  error: (data) -> @addOutput data, 'error'
+  print: (data) -> @addOutput data, 'print'
+  result: (data) -> @addOutput data, 'print'
+  evalBegin: => 
+    return 
+  evalEnd: =>
+    @set(state: null)
+
 
 
 

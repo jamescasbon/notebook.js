@@ -1,4 +1,3 @@
-# use [[]] for underscore templates (i.e. client side templating)
 _.templateSettings = {interpolate : /\[\[=(.+?)\]\]/g, evaluate: /\[\[(.+?)\]\]/g}
 
 root = exports ? this
@@ -18,14 +17,12 @@ isScrolledIntoView = (elem) ->
 
 scrollToAtTop = (elem) ->
   target = elem.offset().top - 3 * NAVBAR_HEIGHT
-  console.log 'stat', target
   $(window).scrollTop(target)
 
 scrollToAtBottom = (elem) ->
   bottom = elem.offset().top + elem.height()
   scrollbottom = bottom + (2 * NAVBAR_HEIGHT)
   scrolltop = scrollbottom -  $(window).height()
-  console.log 'stab', scrolltop
   $('body').scrollTop scrolltop
 
 
@@ -49,7 +46,8 @@ class BaseNotebookView extends Backbone.View
 
   saveToFile: (e) =>
     data = @model.serialize()
-    $(e.target).attr('download', "notebook-#{new Date().toISOString().slice(0,10)}.json")
+    slug = _.string.slugify(@model.get('title'))
+    $(e.target).attr('download', slug + ".notebook")
     $(e.target).attr('href', 'data:application/json;charset=utf-8,' + escape(data))
 
   share: =>
@@ -62,7 +60,6 @@ class BaseNotebookView extends Backbone.View
   typeset: =>
     prettyPrint()
     for el in @$('#notebook')
-      console.log 'tp', el
       MathJax.Hub.Typeset(el)
     @$('#toc').html @generateToc()
 
@@ -112,7 +109,6 @@ class ViewNotebookView extends BaseNotebookView
     $('.container').append(@render())
 
     @cells = @$('.cells')
-    console.log @cells
     @model.cells.fetch(success: @addAll)
     if NotebookJS.mathjaxReady
       @typeset()
@@ -147,6 +143,7 @@ class EditNotebookView extends BaseNotebookView
     "click #toggle-edit" : "toggleEdit"
     "click #save-to-file": "saveToFile"
     "click #share-url": "share"
+    "click #save": "save"
   )
 
   # bind to dom and model events, fetch cells
@@ -155,11 +152,10 @@ class EditNotebookView extends BaseNotebookView
     $('.container').append(@render())
 
     @cells = @$('.cells')
-    @model.cells.bind 'add', @addOne
-    @model.cells.bind 'refresh', @addAll
+    @model.cells.bind 'add', @addOne, @
+    @model.cells.bind 'refresh', @addAll, @
     @model.cells.fetch(success: @addAll)
     if NotebookJS.mathjaxReady
-      console.log 'calling typeset at init'
       @typeset()
 
   # render by setting up title and meta elements
@@ -200,6 +196,10 @@ class EditNotebookView extends BaseNotebookView
   toggleEdit: =>
     NotebookJS.router.navigate(@model.get('id') + '/view/', trigger: true)
 
+  save: => 
+    @model.save()
+    @model.cells.each (c) -> c.save()
+    @model.set pendingSaves: false
 
 # CellView manages the Dom elements associated with a cell
 #
@@ -247,17 +247,19 @@ class CellEditView extends Backbone.View
     "click .interrupt": "interrupt",
     "keyup .cell-output": 'handleKeypress',
     "focus .cell-input" : "focusInput",
-    "blur .cell-input" : "blurInput"
+    "focus .cell-output": "focusOutput",
+    "blur .cell-input" : "blurInput",
+    "blur .cell-output" : "blurOutput",
   )
 
   # get template and bind to events
   initialize: =>
     @template = _.template($('#cell-edit-template').html())
-    @model.bind 'change:state', @changeState
-    @model.bind 'change:type', @changeType
-    @model.bind 'change:output', @changeOutput
-    @model.bind 'change:inputFold', @changeInputFold
-    @model.bind 'destroy', @remove
+    @model.bind 'change:state', @changeState, @
+    @model.bind 'change:type', @changeType, @
+    @model.bind 'change:output', @changeOutput, @
+    @model.bind 'change:inputFold', @changeInputFold, @
+    @model.bind 'destroy', @remove, @
     @model.view = @
     @editor = null
 
@@ -301,14 +303,13 @@ class CellEditView extends Backbone.View
     switch @model.get('state')
       when 'evaluating'
         @output.html('...')
-        @intButton.addClass('active')
-        @evalButton.removeClass('active')
-
+        $(@el).addClass('eval-cell')
+        $(@el).removeClass('dirty-cell')
       when 'dirty'
-        @evalButton.addClass('active')
+        $(@el).addClass('dirty-cell')
 
       when null
-        @intButton.removeClass('active')
+        $(@el).removeClass('eval-cell')
 
   # Ace initialization and configuration happens after DOM insertion
   afterDomInsert: =>
@@ -336,9 +337,7 @@ class CellEditView extends Backbone.View
     # chrome screws up on input sizes < 3
     input = @model.get('input')
     crs_to_add = Math.max( 3 - _.string.count(input, '\n') , 0)
-    console.log 'crs'
-    for i in _.range(crs_to_add)
-      input = input + '\n'
+    input = input + '\n'
 
     @editor.getSession().setValue(input)
 
@@ -461,6 +460,8 @@ class CellEditView extends Backbone.View
 
   # TODO: method is unclear, called both when focused and to focus
   focusInput: (where) =>
+  
+    $(@el).addClass('active-cell')
 
     # focus the input from a somewhere, and recall the focus
     if where == 'top'
@@ -476,15 +477,22 @@ class CellEditView extends Backbone.View
       @editor.setHighlightActiveLine(true)
       @$('.ace_cursor-layer').show()
 
-
   # remove editor decoration
   blurInput: =>
+    $(@el).removeClass('active-cell')
+
     if @editor?
       @editor.setHighlightActiveLine(false)
       @$('.ace_cursor-layer').hide() # cannot use renderer.hideCursor as it leaves a mark
 
     # TODO: only revaluate if not pressing eval button
     #@evaluate()
+
+  focusOutput: => 
+    $(@el).addClass('active-cell')
+
+  blurOutput: => 
+    $(@el).removeClass('active-cell')
 
 
   focusCellAbove: =>
@@ -503,7 +511,7 @@ class CellEditView extends Backbone.View
       $('#spawner').focus()
 
   setEditorHighlightMode: =>
-    if @model.get('type') == 'javascript'
+    if @model.get('type') == 'code'
       mode = require("ace/mode/javascript").Mode
     else if @model.get('type') == 'markdown'
       mode = require("ace/mode/markdown").Mode
@@ -515,6 +523,7 @@ class CellEditView extends Backbone.View
     @model.evaluate()
 
   destroy: =>
+    console.log 'destroy'
     @model.destroy()
 
   interrupt: =>
@@ -578,7 +587,7 @@ class IndexView extends Backbone.View
 
   new: =>
     console.log 'new'
-    NotebookJS.router.navigate ('new/'), trigger: true
+    NotebookJS.router.navigate('new/', trigger: true)
 
   loadFile: (ev) =>
     file = ev.target.files[0]
@@ -600,7 +609,7 @@ class NewView extends Backbone.View
   className: 'app'
 
   events:
-    'click button' : 'create'
+    'click #create' : 'create'
 
   initialize: =>
     @template = _.template($('#new-notebook-form').html())
@@ -611,11 +620,15 @@ class NewView extends Backbone.View
     @el
 
   create: =>
-    #console.log 'creating'
-    nb = NotebookJS.notebooks.create((title: @$('input').val()), (wait: true))
+    title =  @$('input').val()
+    if title == ''
+      # TODO: use nb validation and flash user
+      return
+
+    nb = NotebookJS.notebooks.create((title: title), (wait: true))
     nb.readyCells()
     nb.cells.create(position: nb.cells.posJump)
-    NotebookJS.router.navigate (nb.id + '/edit/'), trigger: true
+    NotebookJS.router.navigate(nb.get('id') + '/edit/', trigger: true)
 
   mathjaxReady: =>
     return
@@ -632,70 +645,84 @@ class NotebookRouter extends Backbone.Router
     "import/*data/": 'import'
     "": "index"
 
+  initialize: ->
+    @bind 'all', @_trackPageview
+
+  _trackPageview: ->
+    if _gaq?
+      url = Backbone.history.getFragment()
+      console.log 'pageview', "/#{url}"
+      _gaq.push(['_trackPageview', "/#{url}"])
+
 
   unmatched: (p) => console.log p
 
+  removeView: =>
+
+    # remove view if present
+    view = NotebookJS.app
+    if view?
+      view.remove()
+
+    # clean up notebook
+    if NotebookJS.nb?
+      n = NotebookJS.nb
+
+      # save the notebook and cells
+      n.saveAll()
+    
+      # remove all event handlers in view contexts
+      if view?
+        n.off(null, null, view)
+        n.cells.off(null, null, view)
+      n.cells.each (c) -> 
+        if c.view?
+          c.view = null
+          c.off(null, null, c.view)
+
+      NotebookJS.nb = null
+
   getNotebook: (nb) =>
     notebook = NotebookJS.notebooks.get(nb)
-    #if notebook? # just create one for the minute!
-    #  notebook = NotebookJS.notebooks.create()
-    # TODO: could wait for a sync signal to have the id
     notebook.readyCells()
     NotebookJS.nb = notebook
-    console.log('notebook loaded; id=' +  notebook.get('id'))
+    #console.log('notebook loaded; id=' +  notebook.get('id'))
     notebook
 
   edit: (nb) =>
-    if NotebookJS.app
-      NotebookJS.app.remove()
-    console.log 'activated edit route', nb
+    @removeView()
     notebook = @getNotebook(nb)
     NotebookJS.app = new EditNotebookView(model: notebook)
     setTitle(notebook.get('title') + ' (Editing)')
 
+    if not notebook.get('running')?
+      notebook.start()
+
   view: (nb) =>
-    if NotebookJS.app
-      NotebookJS.app.remove()
-    console.log 'activated view route'
+    @removeView()
     notebook = @getNotebook(nb)
     setTitle(notebook.get('title') + ' (Viewing)')
-
     NotebookJS.app = new ViewNotebookView(model: notebook)
 
-
   delete: (nb) =>
-    console.log 'deleting nb', nb
     confirmed = confirm('You really want to delete that?')
     if confirmed
       notebook = @getNotebook(nb)
+      notebook.destroyAll()
+      NotebookJS.nb = null
 
-      notebook.cells.fetch success: (cells) ->
-        cells.each (cell) ->
-          console.log 'destroy', cell
-          cell.destroy()
-
-      console.log 'cells', notebook.cells.length
-      notebook.destroy()
-
-      console.log('deleted')
-    NotebookJS.router.navigate('', trigger: true)
+    NotebookJS.router.navigate('', trigger: true, replace: true)
 
   new: (nb) =>
-    console.log 'new view'
-    if NotebookJS.app
-      NotebookJS.app.remove()
+    @removeView()
     NotebookJS.app = new NewView()
 
   index: =>
-    if NotebookJS.app
-      NotebookJS.app.remove()
-      NotebookJS.nb = null
-    console.log 'index view'
+    @removeView()
     setTitle('')
     NotebookJS.app = new IndexView()
 
   loadUrl: (url) =>
-    console.log 'loading url'
     $.getJSON url, (data) =>
       notebook = loadNotebook(data)
       NotebookJS.router.navigate(notebook.get('id') + '/view/', (trigger: true, replace: true))
@@ -705,6 +732,12 @@ class NotebookRouter extends Backbone.Router
     notebook = loadNotebook(data)
     NotebookJS.router.navigate(notebook.get('id') + '/view/', (trigger: true, replace: true))
 
+  onbeforeunload: (e) => 
+    if NotebookJS.nb?
+      NotebookJS.nb.saveAll() 
+    
+    if _.any(NotebookJS.notebooks.map((x) -> x.get('state') == 'running') )
+      return 'You have running notebooks, are you sure?'
 
 
 
@@ -720,10 +753,8 @@ loadNotebook = (nbdata) =>
   try
 
     if NotebookJS.notebooks.get(nbdata.id)
-      raise 'duplicate'
-    console.log 'no such nb', nbdata.id
+      throw 'duplicate notebook'
 
-    console.log 'import notebook'
     notebook = NotebookJS.notebooks.create(nbdata)
     notebook.readyCells()
     for c in celldata
@@ -731,7 +762,7 @@ loadNotebook = (nbdata) =>
 
     return notebook
   catch error
-    alert 'Could not import notebook probably because it already exists.  try deleting'
+    alert 'Could not import notebook because it already exists.  try deleting'
     console.log error
 
 
@@ -741,7 +772,6 @@ mathjaxReady = () ->
 
 
 $(document).ready ->
-  console.log 'creating app'
   NotebookJS.notebooks = new NotebookJS.Notebooks()
   NotebookJS.notebooks.fetch()
   NotebookJS.mathjaxReady = false
@@ -751,3 +781,4 @@ $(document).ready ->
   MathJax.Hub.Register.StartupHook('End', mathjaxReady)
 
 
+  window.onbeforeunload = NotebookJS.router.onbeforeunload
